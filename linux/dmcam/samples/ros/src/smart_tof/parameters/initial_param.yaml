@@ -1,0 +1,23 @@
+#initialize tof with these parameters
+  dev_mode: 0
+  mod_freq: 12000000
+  format: 1
+  power_percent: 60
+  fps: 40
+  intg_us: 700
+  srow: 0
+  erow: 240
+  scol: 0
+  ecol: 320
+  cur_fsize: 153600
+  max_fsize: 153600
+
+#camera parameter
+  cx: 162.00374
+  cy: 110.05493
+  fx: 319.33169
+  fy: 319.25846
+  scale: 1.0
+
+#switch test mode(under test mode, you can see more information in terminal and images)
+  testmode: FALSE
