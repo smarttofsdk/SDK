@@ -87,13 +87,12 @@ dmcam_dev_list(dmcam_dev_t *dev_list,int dev_list_num);
 
 #### 3.2.3打开设备
 ~~~C
-dev = dmcam_dev_open(dmcam_dev_t *dev); //打开第一个设备
+dmcam_dev_open(dmcam_dev_t *dev); 
 ~~~
 | 参数   | 描述     |
 | :--- | :----- |
 | dev  | 指定打开设备 |
 
-***
 #### 3.2.4设置参数
 ~~~C
 dmcam_param_batch_set(dmcam_dev_t *dev, const dmcam_param_item_t *param_items, int item_cnt);
@@ -103,13 +102,6 @@ dmcam_param_batch_set(dmcam_dev_t *dev, const dmcam_param_item_t *param_items, i
 | dev         | 指定设备    |
 | param_items | 设置的参数值  |
 | item_cnt    | 设置的参数个数 |
-
-下面是设置1个参数如功率的主要参考
-~~~C
-wparam.param_id = PARAM_ILLUM_POWER;//设置参数为功率wparam.param_val_len = 1;
-wparam.param_val.raw[0] = 30;		//功率大小为30
-assert(dmcam_param_batch_set(dev, &wparam, 1));//调用dmcam_param_batch_set()函数来设置
-~~~
 
 #### 3.2.5设置采集帧缓存
 ~~~C
