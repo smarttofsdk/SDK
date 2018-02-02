@@ -29,8 +29,8 @@ SmartToF SDK支持windows和linux等多种操作系统，同时提供多种参�
 
 具体样例如下表
 
-| 系统      | ROS  | Opencv  | OpenNI  | PCL     | VTK     | matlab | apk  |
-| :--- | :--- | :--- |:--- |:--- |:--- |:--- | :--- |
+| 系统      | ROS  | Opencv  | OpenNI  | PCL     | VTK     | matlab | apk     |
+| :------ | :--- | :------ | :------ | :------ | :------ | :----- | :------ |
 | windows |      | &radic; | &radic; | &radic; | &radic; |        |         |
 | linux   |      | &radic; | &radic; | &radic; | &radic; |        |         |
 | android |      |         |         |         |         |        | &radic; |
@@ -181,7 +181,9 @@ SmartToF SDK提供的主要样例如下：
   - test_gui_pygame.py:采集数据显示
   - test_param.py:展示参数设置和读取
   - test_raw:展示采集数据
-- java样例：参见（[java样例链接]（https://github.com/smarttofsdk/SDK/tree/master/android/samples/java））
+- java样例：参见([java样例链接](https://github.com/smarttofsdk/SDK/tree/master/android/samples/java))
   - testBasic.java:java采集样例
   - testBasicUi.java:java采集显示样例
-- ROS样例：参见（[ros样例链接]（https://github.com/smarttofsdk/SDK/tree/master/linux/dmcam/samples/ros/src/tof_sample）） 展示获取图像和点云
+- ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/linux/dmcam/samples/ros/src/tof_sample))
+  - tof_sample:展示如何获取图像和点云。
+
