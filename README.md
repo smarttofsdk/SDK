@@ -169,6 +169,20 @@ uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 | src_len | 原始数据大小   |
 | finfo   | 原始帧信息    |
 
+#### 3.2.10获取点云数据
+~~~C
+dmcam_frame_get_pcl(dmcam_dev_t * dev, float *pcl, int pcl_len,
+const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
+~~~
+| 参数          | 描述                   |
+| :---------- | :------------------- |
+| dev         | 指定设备                 |
+| pcl         | 输出的点云数据，每三个元素构成一点的坐标 |
+| dist        | 输入图像的深度数据            |
+| dist_len    | 输入图像深度数据的长度          |
+| img_w       | 深度图像的宽度              |
+| img_h       | 深度图像的高度              |
+| p_cam_param | 相机内参                 |
 ***
 ### 3.3相关样例说明
 SmartToF SDK提供的主要样例如下：
