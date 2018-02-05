@@ -61,6 +61,8 @@ fr_cnt = dmcam_cap_get_frames(dev,20,fbuf,FRAME_SIZE*20,&fbuf_info);//采集20�
 dmcam_frame_get_distance(dev,dist,dist_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//解析出一帧深度数据
 /*获得灰度数据*/
 dmcam_frame_get_gray(dev,gray,gray_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//解析出一帧灰度数据
+/*获取点云数据*/
+dmcam_frame_get_pcl(dev,pcl,pcl_len,dist,dist_len,img_w,img_h,&p_cam_param);
 /*停止采集*/
 dmcam_cap_stop(dev);
 ...
