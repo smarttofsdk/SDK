@@ -27,7 +27,7 @@ SmartToF SDK支持windows和linux等多种操作系统，同时提供多种参�
 - ROS样例
 - android样例
 
-SmartToF SDK的概述如下表：
+SmartToF SDK的各个平台支持情况：
 
 |                  | Windows | Linux   | Android |
 | :--------------- | :------ | :------ | :------ |
