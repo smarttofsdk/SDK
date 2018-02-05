@@ -49,7 +49,7 @@ SmartToF SDK中所有相关结构体定义和函数声明都位于lib\include文
 dmcam_init(NULL);
 ...
 /*打开设备*/
-dev = dmcam_dev_open(&dev_list[0]);//打开第一个设备
+dev = dmcam_dev_open(NULL);//打开第一个设备
 /*设置采集缓存*/
 dmcam_cap_set_frame_buffer(dev,NULL,FRAME_SIZE*FRAME_BUF_FCNT);
 ...
