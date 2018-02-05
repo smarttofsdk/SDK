@@ -27,13 +27,20 @@ SmartToF SDK支持windows和linux等多种操作系统，同时提供多种参�
 - ROS样例
 - android样例
 
-具体样例如下表
+SmartToF SDK的概述如下表：
 
-| 系统      | ROS  | Opencv  | OpenNI  | PCL     | VTK     | matlab | apk     |
-| :------ | :--- | :------ | :------ | :------ | :------ | :----- | :------ |
-| windows |      | &radic; | &radic; | &radic; | &radic; |        |         |
-| linux   |      | &radic; | &radic; | &radic; | &radic; |        |         |
-| android |      |         |         |         |         |        | &radic; |
+|                  | Windows | Linux   | Android |
+| :--------------- | :------ | :------ | :------ |
+| 核心API C库         | &radic; | &radic; | &radic; |
+| Python           | &radic; | &radic; |         |
+| Java             | &radic; |         | &radic; |
+| Ros              |         | &radic; |         |
+| C#               |         |         |         |
+| Matlab           |         |         |         |
+| usbdriver        | &radic; | &radic; | &radic; |
+| SmartTofAnalyzer | &radic; | &radic; |         |
+| SmartTofCli      | &radic; | &radic; |         |
+| SmartToFViewer   | &radic; | &radic; | &radic; |
 ***
 ## 2、SmartToF SDK的使用
 SmartToF SDK的使用需要进行所在系统的环境配置，包括
