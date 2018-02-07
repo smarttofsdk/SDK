@@ -1,7 +1,7 @@
 X64?=0
 
 DMCAM_TOP_DIR:=$(shell pwd)/../../
-DMCAM_BIN_DIR:=$(DMCAM_TOP_DIR)/java
+DMCAM_BIN_DIR:=$(DMCAM_TOP_DIR)/bin
 ifeq ($(X64),1)
 	ARCH:=x64
 	CROSS_COMPILE:=x86_64-w64-mingw32-
@@ -84,9 +84,7 @@ ifeq (,$(wildcard $(DMCAM_ANDROID_DIR)/*))
 endif
 
 test:
-	cp -a $(DMCAM_BIN_DIR)/$(ARCH)/*.dll .
-	cp -a $(DMCAM_BIN_DIR)/*.jar .
-	cp -a $(DMCAM_BIN_DIR)/../lib/$(ARCH)/*.dll .
+	#cp -a $(DMCAM_BIN_DIR)/$(ARCH)/*.dll .
 	$(JAVA) -cp dmcam.jar com.smarttof.dmcam.test.testBasicUi
 #---
 show:

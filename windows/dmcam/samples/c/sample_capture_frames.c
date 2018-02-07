@@ -30,10 +30,10 @@
 
 #include "pthread.h"
 #include "dmcam.h"
-#include "zip.h"
+
 #ifdef _WIN32
     #include <windows.h>
-#define sleep(s) Sleep(s*1000)
+    #define sleep(s) Sleep(s*1000)
 #else
 #endif
 
@@ -136,115 +136,6 @@ void test_model_deprecated(void)
     }
 }
 
-static int on_extract_to_folder_entry(const char *filename, void *arg)
-{
-    static int i = 0;
-    int n = *(int *)arg;
-    printf("Extracted: %s (%d of %d)\n", filename, ++i, n);
-
-    return 0;
-}
-bool test_calib_pk_parse(dmcam_dev_t *dev, char *sname)
-{
-    int arg = 1;
-    /*1.Extract head*/
-    dmcam_param_item_t rparam;
-    char *wname = "tmp.zip"; //temp name for zip data
-                             //memcpy(wname + offset + 1, tname, strlen(tname) + 1);
-    printf("new path:%s\n", wname);
-    uint8_t buf[1];
-    uint32_t dsize;
-    uint8_t hsize = sizeof(rparam.param_val.cinfo);
-    FILE *fhead = fopen(sname, "rb");
-    if (fhead) {
-        fread(&rparam.param_val.cinfo, 1, hsize, fhead);
-        if (!rparam.param_val.cinfo.valid) {
-            printf("Data not valid\n");
-            return false;
-        }
-        if (rparam.param_val.cinfo.flag == 1) {
-            printf("ZIP used\n");
-            FILE *fdata = fopen(wname, "wb+");
-            if (fdata == NULL) {
-                printf("Open %s failed\n", wname);
-                return false;
-            }
-            dsize = rparam.param_val.cinfo.datasize;
-            while (dsize--) {
-                fread(buf, 1, 1, fhead);
-                fwrite(buf, 1, 1, fdata); //extract zip data
-            }
-            fclose(fdata);
-            fclose(fhead);
-        }
-    }
-    /*2.Extract calib data from zip file*/
-    if (zip_extract(wname, dev->expath, on_extract_to_folder_entry, &arg) < 0) {
-        printf("%s zip failed\n", wname);
-        return false;
-    }
-    printf("unzip end:%s\n", dev->expath);
-    return true;
-    //remove("tmp.zip");//delete temp zip file
-}
-void test_get_calib_data(void)
-{
-    dmcam_frame_t fbuf_info;
-
-    //int n;
-    int total_fr = 0;
-    int fr_cnt;
-
-    printf("---- test paradigm: start/get_frames/stop  ---\n");
-    dmcam_cap_set_callback_on_frame_ready(dev, NULL); // optional: disable frame ready callback
-                                                      //set dev mode to DATA_UP
-    {
-        dmcam_param_item_t wparam;
-
-        memset(&wparam, 0, sizeof(wparam));
-        wparam.param_id = PARAM_DEV_MODE;
-        wparam.param_val_len = 1;
-        wparam.param_val.dev_mode = DEV_MODE_DATA_UP;
-        assert(dmcam_param_batch_set(dev, &wparam, 1));
-    }
-
-    dmcam_param_item_t rparam;
-    { //read data param info
-        memset(&rparam, 0, sizeof(rparam));
-        rparam.param_id = PARAM_INFO_CALIB;
-        assert(dmcam_param_batch_get(dev, &rparam, 1));
-        printf("%s \n fsize:%d valid data size:%d\nck_sum:%d\nversion:%d\n", rparam.param_val.cinfo.valid == 1 ? "Calib data valid" : "Calib data not valid",
-               rparam.param_val.cinfo.fsize,
-               rparam.param_val.cinfo.datasize,
-               rparam.param_val.cinfo.cksum,
-               rparam.param_val.cinfo.info);
-    }
-    if (rparam.param_val.cinfo.valid) { //if valid calibation data, we try to get it
-        uint32_t frame_size =  rparam.param_val.cinfo.fsize;
-        uint8_t *fbuf = malloc(frame_size);
-        assert(fbuf);
-        dmcam_cap_start(dev);
-
-        /* get 1 frames */
-        fr_cnt = dmcam_cap_get_frames(dev, 1, fbuf, frame_size, &fbuf_info);
-        total_fr += fr_cnt;
-        printf("get %d frames: [%u, %ux%u, %u]\n",
-               fr_cnt, fbuf_info.frame_info.frame_idx,
-               fbuf_info.frame_info.width, fbuf_info.frame_info.height, fbuf_info.frame_info.frame_format);
-        if (fr_cnt != 1) { // less frames means sampling is stopped.
-            printf("capturing is stopped due to some error!\n");
-        }
-        FILE *fid = fopen("calibration.bin", "wb+");
-        if (fid) {
-            fwrite(fbuf, 1, frame_size, fid);
-            fclose(fid);
-        }
-        free(fbuf);
-        //extract calibration data
-        test_calib_pk_parse(dev, "calibration.bin");
-    }
-    dmcam_cap_stop(dev);
-}
 /**
  * this is the recommended programming model. with full 
  * parameter usage. 
@@ -272,7 +163,7 @@ void test_model_new(void)
         fr_cnt = dmcam_cap_get_frames(dev, 20, fbuf, FRAME_SIZE * 20, &fbuf_info);
         total_fr += fr_cnt;
         printf("get %d frames: [%u, %ux%u, %u]\n",
-               fr_cnt, fbuf_info.frame_info.frame_idx,
+               fr_cnt, fbuf_info.frame_info.frame_idx, 
                fbuf_info.frame_info.width, fbuf_info.frame_info.height, fbuf_info.frame_info.frame_format);
         if (fr_cnt < 20) { // less frames means sampling is stopped.
             printf("capturing is stopped due to some error!\n");
@@ -355,7 +246,7 @@ int main(int argc, char **argv)
 
     dmcam_log_cfg(LOG_LEVEL_INFO, LOG_LEVEL_TRACE, LOG_LEVEL_NONE - debug_level);
 
-#if 0
+#if 1
     {
         int dev_cnt;
         dmcam_dev_t dev_list[4];
@@ -364,7 +255,7 @@ int main(int argc, char **argv)
 
         printf(" %d dmcam device found\n", dev_cnt);
         if (dev_cnt == 0)
-        goto FINAL;
+            goto FINAL;
         /* open device  */
         dev = dmcam_dev_open(&dev_list[0]);
         if (!dev) {
@@ -384,8 +275,6 @@ int main(int argc, char **argv)
         printf(" open device failed\n");
         goto FINAL;
     }
-
-#if 0
     /* set illumination power*/
     //{
     //    dmcam_param_item_t wparam;
@@ -399,17 +288,17 @@ int main(int argc, char **argv)
     /* capture frames using interval alloced buffer */
     dmcam_cap_set_frame_buffer(dev, NULL, FRAME_SIZE * FRAME_BUF_FCNT);
     /* set error callback for capturing */
-    dmcam_cap_set_callback_on_error(dev, on_cap_err);
-    dmcam_path_cfg(dev, "F:\\test\\calib");
+    dmcam_cap_set_callback_on_error(dev, NULL);
+
     /* reset the usbif will help to fix stall problem */
     //dmcam_dev_reset(dev, DEV_RST_USB);
-    test_get_calib_data();
-    //  test_model_deprecated();
-    //  test_model_new(frm_num);
+
+    test_model_deprecated();
+    test_model_new();
     //test_model_new_snapshot();
     //
     //test_async_stop();
-#endif
+
     dmcam_dev_close(dev);
 FINAL:
     dmcam_uninit();

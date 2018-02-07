@@ -53,6 +53,7 @@ typedef struct {
     uint16_t min_amp;
     uint16_t max_amp;
     char *name;  // name string of the use case
+    char *pname;  // param name string of the use case
 }dmcam_use_case_t;
 
 /**
