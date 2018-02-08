@@ -29,23 +29,23 @@ SmartToF SDK supports multiple OS including windows and linux. And it provides v
 
 The supported platforms of SmartToF SDK are shown below：
 
-|                  | Windows | Linux   | Android |
-| :--------------- | :------ | :------ | :------ |
-| Core API C library         | &radic; | &radic; | &radic; |
-| Python           | &radic; | &radic; |         |
-| Java             | &radic; |         | &radic; |
-| Ros              |         | &radic; |         |
-| C#               |         |         |         |
-| Matlab           |         |         |         |
-| usbdriver        | &radic; | &radic; | &radic; |
-| SmartTofAnalyzer | &radic; | &radic; |         |
-| SmartTofCli      | &radic; | &radic; |         |
-| SmartToFViewer   | &radic; | &radic; | &radic; |
+|                    | Windows | Linux   | Android |
+| :----------------- | :------ | :------ | :------ |
+| Core API C library | &radic; | &radic; | &radic; |
+| Python             | &radic; | &radic; |         |
+| Java               | &radic; |         | &radic; |
+| Ros                |         | &radic; |         |
+| C#                 |         |         |         |
+| Matlab             |         |         |         |
+| usbdriver          | &radic; | &radic; | &radic; |
+| SmartTofAnalyzer   | &radic; | &radic; |         |
+| SmartTofCli        | &radic; | &radic; |         |
+| SmartToFViewer     | &radic; | &radic; | &radic; |
 ***
 ## 2、The Use of SmartToF SDK
 The use of SmartToF SDK requires system configuration for the working OS，including
-- Windows configurations. Please see ([reference link](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDKwindow%E4%B8%8B%E7%9A%84%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE))
-- Linux configurations. Please see（[reference link](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-Linux%E4%B8%8B%E7%9A%84%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE)）
+- Windows configurations. Please see ([reference link](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-configuration-in-Windows_EN))
+- Linux configurations. Please see（[reference link](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-configuration-in-Linux_EN)）
 
 ***
 ## 3、Introduction on Main APIs and Samples
@@ -81,109 +81,109 @@ dmcam_uninit();
 ~~~C
 dmcam_init(const char *log_fname);	//Initialization
 ~~~
-| Parameter        | Description                                 |
-| :-------- | :---------------------------------- |
+| Parameter | Description                              |
+| :-------- | :--------------------------------------- |
 | log_fname | File name of log. If it is NULL, the default file name is dmcam_YYYYMMDD.log |
 
 #### 3.2.2 List all modules
 ~~~C 
 dmcam_dev_list(dmcam_dev_t *dev_list,int dev_list_num); 
 ~~~
-| Parameter           | Description    |
-| :----------- | :---- |
-| dev_list     | List for connected devices |
+| Parameter    | Description                            |
+| :----------- | :------------------------------------- |
+| dev_list     | List for connected devices             |
 | dev_list_num | Size of the list for connected devices |
 
 #### 3.2.3 Open device
 ~~~C
 dmcam_dev_open(dmcam_dev_t *dev); 
 ~~~
-| Parameter   | Description     |
-| :--- | :----- |
-| dev  | Designated device to open |
+| Parameter | Description               |
+| :-------- | :------------------------ |
+| dev       | Designated device to open |
 
 #### 3.2.4 Set parameters
 ~~~C
 dmcam_param_batch_set(dmcam_dev_t *dev, const dmcam_param_item_t *param_items, int item_cnt);
 ~~~
-| Parameter   | Description      |
-| :---------- | :------ |
-| dev         | Designated device    |
-| param_items | Parameter of device  |
+| Parameter   | Description                |
+| :---------- | :------------------------- |
+| dev         | Designated device          |
+| param_items | Parameter of device        |
 | item_cnt    | Count of device parameters |
 
 #### 3.2.5 Set buffer
 ~~~C
 dmcam_cap_set_frame_buffer(dmcam_dev_t *dev, uint8_t *frame_buf, uint32_t frame_buf_size);
 ~~~
-| Parameter   | Description     |
-| :------------- | :----- |
-| dev            | Designated device   |
-| frame_buf      | Array of buffer   |
+| Parameter      | Description          |
+| :------------- | :------------------- |
+| dev            | Designated device    |
+| frame_buf      | Array of buffer      |
 | frame_buf_size | Size of buffer array |
 
 #### 3.2.6 Set callback function on error
 ~~~C
 dmcam_cap_set_callback_on_error(dmcam_dev_t *dev, dmcam_cap_err_f cb);
 ~~~
-| Parameter   | Description     |
-| :--- | :----- |
-| dev  | Designated device   |
-| cb   | Callback function on error |
+| Parameter | Description                |
+| :-------- | :------------------------- |
+| dev       | Designated device          |
+| cb        | Callback function on error |
 
 #### 3.2.7 Acquire frames
 ~~~C
 dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *frame_data, uint32_t frame_dlen, dmcam_frame_t *first_frame_info);
 ~~~
-| Parameter   | Description      |
-| :--------------- | :------ |
-| dev              | Designated device    |
-| frame_num        | Number of frames to acquire  |
-| frame_data       | Acquired frame data  |
-| frame_dlen       | Size of frame data |
-| first_frame_info | Information of the first frame   |
+| Parameter        | Description                    |
+| :--------------- | :----------------------------- |
+| dev              | Designated device              |
+| frame_num        | Number of frames to acquire    |
+| frame_data       | Acquired frame data            |
+| frame_dlen       | Size of frame data             |
+| first_frame_info | Information of the first frame |
 
 #### 3.2.8 Transform to depth data
 ~~~C
 dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 ~~~
-| Parameter   | Description       |
-| :------ | :------- |
-| dev     | Designated device     |
-| dst     | Destination for the transformed depth data |
-| dst_len | Buffer size of depth data |
-| src     | Original data obtained  |
-| src_len | Size of original data   |
-| finfo   | Information of original frame    |
+| Parameter | Description                              |
+| :-------- | :--------------------------------------- |
+| dev       | Designated device                        |
+| dst       | Destination for the transformed depth data |
+| dst_len   | Buffer size of depth data                |
+| src       | Original data obtained                   |
+| src_len   | Size of original data                    |
+| finfo     | Information of original frame            |
 
 #### 3.2.9 Transform to gray data
 ~~~C
 dmcam_frame_get_gray(dmcam_dev_t *dev, float *dst, int dst_len,
 uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 ~~~
-| Parameter   | Description       |
-| :------ | :------- |
-| dev     | Designated device     |
-| dst     | Destination for the transformed gray data |
-| dst_len | Buffer size of gray data |
-| src     | Original data obtained  |
-| src_len | Size of original data   |
-| finfo   | Information of original frame    |
+| Parameter | Description                              |
+| :-------- | :--------------------------------------- |
+| dev       | Designated device                        |
+| dst       | Destination for the transformed gray data |
+| dst_len   | Buffer size of gray data                 |
+| src       | Original data obtained                   |
+| src_len   | Size of original data                    |
+| finfo     | Information of original frame            |
 
 #### 3.2.10 Acquire pointcloud data
 ~~~C
 dmcam_frame_get_pcl(dmcam_dev_t * dev, float *pcl, int pcl_len,
 const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
 ~~~
-| Parameter          | Description                   |
-| :---------- | :------------------- |
-| dev         | Designated device                 |
+| Parameter   | Description                              |
+| :---------- | :--------------------------------------- |
+| dev         | Designated device                        |
 | pcl         | Pointcloud data output. Each point's coordinate consists of three elements |
-| dist        | Depth data of input image            |
-| dist_len    | Size of depth data of input image          |
-| img_w       | Width of depth image              |
-| img_h       | Height of depth image              |
-| p_cam_param | Internal parameter of camera                 |
+| dist        | Depth data of input image                |
+| dist_len    | Size of depth data of input image        |
+| img_w       | Width of depth image                     |
+| img_h       | Height of depth image                    |
+| p_cam_param | Internal parameter of camera             |
 ***
 ### 3.3 Introduction on relevant samples
 The main samples provided by SmartToF SDK are following：
