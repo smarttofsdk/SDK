@@ -24,7 +24,7 @@
 extern "C"
 {
 #endif
-#ifdef LIBDMCAM_DLL_EXPORTS
+#ifdef LIBDMCAM_EXPORTS
 #define __API __declspec(dllexport)
 #else
 #define __API //__declspec(dllimport)
@@ -45,6 +45,17 @@ extern "C"
 #define DMCAM_ERR_CAP_UNKNOWN  (-10)
 
 #define DMCAM_FILTER_EN 1
+
+typedef struct {
+    uint32_t mod_clk; // modulation clock
+    uint16_t fps;     // frame per seconds
+    uint16_t priv_mode; // other mode
+    uint16_t min_amp;
+    uint16_t max_amp;
+    char *name;  // name string of the use case
+    char *pname;  // param name string of the use case
+}dmcam_use_case_t;
+
 /**
  * dmcam device structure. It describes device usb port info, 
  * device info 
@@ -60,8 +71,10 @@ typedef struct {
     char product[32];
     char vendor[32];
     char serial[32];
-
+    char *expath; //extract path to store calibration data,can be set by dmcam_path_cfg
     void *lock; // device lock
+    
+    dmcam_use_case_t use_case[2];
 
     void *user_data0; // used internally for python extension
     void *user_data1; // used internally for python extension
@@ -108,6 +121,7 @@ typedef enum
     DEV_MODE_NORMAL = 0, //3D mode
     DEV_MODE_DFU,
     DEV_MODE_TEST = 8,
+    DEV_MODE_DATA_UP,
 } dmcam_dev_mode_e;
 
 typedef enum  {
@@ -119,11 +133,6 @@ typedef enum  {
     DEV_REG_MCU = 8
 }dmcam_dev_reg_e;
 
-//typedef enum {
-//    FRAME_FMT_DCS1,
-//    FRAME_FMT_DCS4,
-//}dmcam_frame_format_e;
-
 typedef enum {
     PARAM_DEV_MODE = 0,
     PARAM_MOD_FREQ,
@@ -133,7 +142,9 @@ typedef enum {
     PARAM_INFO_CAPABILITY,
     PARAM_INFO_SERIAL,
     PARAM_INFO_VERSION,  //HW&SW info
+    PARAM_INFO_SENSOR, //part version, chip id, wafer id
 
+    PARAM_INFO_CALIB, //get calibration info
     PARAM_ROI, //ROI set/get
     PARAM_FRAME_FORMAT, //frame information,eg.dcs1for gray,4 dcs for distance
     PARAM_ILLUM_POWER, //illumination power set/get
@@ -221,6 +232,20 @@ typedef union {
         int16_t bl_cal;
         int16_t br_cal;
     }temp;
+    struct {
+        uint8_t valid;      //data is valid;1==valid
+        uint8_t place;   //place type(RAM,FLASH and so on)
+        uint8_t flag;    //0:no compression used;1:zip compression used
+        uint32_t info;   //data info, version
+        uint32_t fsize;   //head+data+paddingsize
+        uint32_t datasize; //data size
+        uint16_t cksum;
+    }cinfo; //calibration info
+    struct {
+        uint16_t part_ver; //chip part version
+        uint16_t chip_id; //chip id
+        uint16_t wafer_id; //wafer id
+    }chip_info;
 }dmcam_param_val_u;
 #pragma pack(pop)
 
@@ -261,14 +286,7 @@ typedef struct {
     void *frame_data;  /** frame data pointer */
 }dmcam_frame_t;
 
-typedef struct {
-    uint32_t mod_clk; // modulation clock
-    uint16_t fps;     // frame per seconds
-    uint16_t priv_mode; // other mode
-    uint16_t min_amp;
-    uint16_t max_amp;
-    char *name;  // name string of the use case
-}dmcam_use_case_t;
+
 
 /** camera frame ready function prototype   */
 typedef void (*dmcam_cap_frdy_f)(dmcam_dev_t *dev, dmcam_frame_t *frame);
@@ -307,6 +325,16 @@ __API void dmcam_uninit(void);
  */
 
 __API void dmcam_log_cfg(dmcam_log_level_e console_level, dmcam_log_level_e file_level, dmcam_log_level_e usb_level);
+
+
+/** 
+ * Setting where to save calibration data
+ * 
+ * @param path
+ * 
+ * @return __API void
+ */
+__API void dmcam_path_cfg(dmcam_dev_t *dev, char *path);
 
 /**
  * list the dmcam device and fill into dmcam_dev_t array.
@@ -617,18 +645,59 @@ __API int dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,
 __API int dmcam_frame_get_gray(dmcam_dev_t *dev, float *dst, int dst_len,
                                uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 
+
 /**
-*	depth data to point cloud data
-*
-*	@param pcl [out] point cloud data after change from depth
-*	@param pcl_size	[in] length of pointcloud
-*	@param srcdata [in] depth data which should be changed to pointcloud
-*   @param img_h [in] rows of the depth
-*   @param img_w [in] cols of the depth
-*	@param sdatatype [in] the type of srcdata 1:uint8_t 2:uint16_t 3:float
-*	@param camera [in] camera intrinsic parameters
-*/
-__API int dmcam_depth_to_pcl(float *pcl, int pcl_size, uint8_t *srcdata, int img_h, int img_w, uint8_t sdatatype, const dmcam_camera_para_t *camera);
+ * get point cloud data from distance data. The distance data is
+ * usually calcuated using dmcam_frame_get_distance.
+ * 
+ * @param dev [in] specified dmcam device
+ * @param pcl [out] point clound buffer. each 3 element consists
+ *            a (x,y,z) point
+ * @param pcl_len [in] point cloud float element count
+ * @param dist [in] distance image data buffer. The unit of 
+ *             distance is meter (float)
+ * @param dist_len [in] distance image data count (in 
+ *                 sizeof(float))
+ * @param img_w [in] distance image width in pixel
+ * @param img_h [in] distance image height in pixel
+ * @param p_cam_param [in] user specified camera lens parameter. 
+ *                    if null, the internal camera parameter is
+ *                    used.
+ * 
+ * @return int [out] return number of points in point cloud 
+ *         buffer. Note: n points means 3*n floats
+ */
+
+__API int dmcam_frame_get_pcl(dmcam_dev_t * dev, float *pcl, int pcl_len,
+                              const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
+
+/**
+ * get point cloud data from distance data. The distance data is
+ * usually calcuated using dmcam_frame_get_distance.
+ * 
+ * @param dev [in] specified dmcam device
+ * @param pcl [out] point clound buffer. each 4 element consists
+ *            a (x,y,z,d) point. (x,y,z) is coordinate, d is
+ *            distance or pseudo-color
+ * @param pcl_len [in] point cloud float element count
+ * @param dist [in] distance image data buffer. The unit of
+ *             distance is meter (float)
+ * @param dist_len [in] distance image data count (in
+ *                 sizeof(float))
+ * @param img_w [in] distance image width in pixel
+ * @param img_h [in] distance image height in pixel
+ * @param pseudo_color [in] if true, d is pseudo uint32 rgb 
+ *                     color value; if false, d is the distance
+ *                     in meter
+ * @param p_cam_param [in] user specified camera lens parameter.
+ *                    if null, the internal camera parameter is
+ *                    used.
+ * @return int [out] return number of points in point cloud
+ *         buffer. Note: n points means 3*n floats
+ */
+
+int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
+                             const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
 #if DMCAM_FILTER_EN
 typedef enum {
     DMCAM_FILTER_ID_LEN_CALIB,  /**>lens calibration*/
@@ -640,7 +709,6 @@ typedef enum {
 }dmcam_filter_id_e;
 
 typedef union {
-    uint8_t raw[20];
     uint8_t case_idx; /**>User Scenario index */
     uint32_t lens_id; /**>length index*/
     uint32_t min_amp; /**>Min amplitude threshold*/
