@@ -765,6 +765,98 @@ typedef enum {
 
 __API int dmcam_cmap_float(uint8_t *dst, int dst_len, const float *src, int src_len, dmcam_cmap_outfmt_e outfmt, float min_val, float max_val);
 
+
+
+typedef enum {
+    DMCAM_FRAME_SAVE_FLOAT32 = 0,
+    DMCAM_FRAME_SAVE_UINT32,
+    DMCAM_FRAME_SAVE_UINT16,
+    DMCAM_FRAME_SAVE_UINT8,
+
+    DMCAM_FRAME_SAVE_PCL,
+}dmcam_frame_save_fmt_t;
+
+/**
+ * save specified distance data (in float32, unit: meter) with 
+ * specified pixcel width and height to file with specified 
+ * saving format. 
+ * 
+ * @param fd [in] specified file handler
+ * @param save_fmt [in] file saving format defined in 
+ *                 dmcam_frame_save_fmt_t. only followin format
+ *                 is supported:
+ *              DMCAM_FRAME_SAVE_FLOAT32
+ *              DMCAM_FRAME_SAVE_UINT32
+ *              DMCAM_FRAME_SAVE_UINT16
+ * @param dist [in] distance data (in float32, unit: meter)
+ * @param dist_len [in] number of distance data (in count of 
+ *                 float)
+ * @param img_w [in] dist data pixel width
+ * @param img_h [in] dist data pixel height
+ * 
+ * @return bool [out] true = save distance frame ok, false = 
+ *         fail
+ */
+__API bool dmcam_frame_save_distance(int fd, dmcam_frame_save_fmt_t save_fmt, const float *dist, int dist_len, int img_w, int img_h);
+
+
+/**
+ * save specified distance data (in float32, unit: meter) with
+ * specified pixcel width and height to file with specified
+ * saving format.
+ * 
+ * @param fd [in] specified file handler
+ * @param save_fmt [in] file saving format defined in
+ *                 dmcam_frame_save_fmt_t. only followin format
+ *                 is supported:
+ *              DMCAM_FRAME_SAVE_UINT16
+ *              DMCAM_FRAME_SAVE_UINT8
+ * @param src [in] gray data (in float32)
+ * @param src_len [in] number of distance data (in count of
+ *                 float)
+ * @param img_w [in] dist data pixel width
+ * @param img_h [in] dist data pixel height
+ * 
+ * @return bool [out] true = save distance frame ok, false =
+ *         fail
+ */
+__API bool dmcam_frame_save_gray(int fd, dmcam_frame_save_fmt_t save_fmt, const float *src, int src_len, int img_w, int img_h);
+
+/**
+ * load one distance frame from specified file fd.
+ * 
+ * @param fd [in] specified data file fd. The fd related file is 
+ *           always saved by dmcam_frame_save_xxx api
+ * @param dst [out] distance in float (unit: meter)
+ * @param dst_len [in] dst buffer length (in count of 
+ *                sizeof(float))
+ * @param dst_w [out] distance frame pixel width
+ * @param dst_h [out] distance frame pixel height
+ * 
+ * @return int [out] length of loaded distance data (in count of
+ *         sizeof(float))
+ */
+
+__API int dmcam_frame_load_distance(int fd, float *dst, int dst_len, int *dst_w, int *dst_h);
+
+
+/**
+ * load one gray frame from specified file fd.
+ * 
+ * @param fd [in] specified data file fd. The fd related file is 
+ *           always saved by dmcam_frame_save_gray api
+ * @param dst [out] gray in float (unit: meter)
+ * @param dst_len [in] dst buffer length (in count of 
+ *                sizeof(float))
+ * @param dst_w [out] gray frame pixel width
+ * @param dst_h [out] gray frame pixel height
+ * 
+ * @return int [out] length of loaded gray data (in count of
+ *         sizeof(float))
+ */
+
+__API int dmcam_frame_load_gray(int fd, float *dst, int dst_len, int *dst_w, int *dst_h);
+
 #ifdef __cplusplus
 }
 #endif
