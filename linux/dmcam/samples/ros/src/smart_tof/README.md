@@ -1,8 +1,6 @@
 # smart_tof
 ros package for smart tof camera(ver 0.1.1, this is a release version)
 
-by **Xue Wuyang** and **Liu Guiyu**.
-
 ## Requirement:
 1. ubuntu(16.04 recommended)
 2. ros(kinetic recommended)
