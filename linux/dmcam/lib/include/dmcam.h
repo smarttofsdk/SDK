@@ -73,7 +73,7 @@ typedef struct {
     char serial[32];
     char *expath; //extract path to store calibration data,can be set by dmcam_path_cfg
     void *lock; // device lock
-    
+
     dmcam_use_case_t use_case[2];
 
     void *user_data0; // used internally for python extension
@@ -153,6 +153,7 @@ typedef enum {
     PARAM_PHASE_CORR, //phase offset correction
                       //PARAM_SWITCH_MODE, /*>swith mode use[gray,3d]*/
     PARAM_TEMP,        //<Get camera temperature--------------
+    PARAM_HDR_INTG_TIME, //<Setting HDR integration time param
     PARAM_ENUM_COUNT,
 }dmcam_dev_param_e;
 
@@ -668,7 +669,7 @@ __API int dmcam_frame_get_gray(dmcam_dev_t *dev, float *dst, int dst_len,
  *         buffer. Note: n points means 3*n floats
  */
 
-__API int dmcam_frame_get_pcl(dmcam_dev_t * dev, float *pcl, int pcl_len,
+__API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
                               const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
 
 /**
@@ -705,6 +706,7 @@ typedef enum {
     DMCAM_FILETER_ID_KALMAN,    /**>Kalman filter for distance data*/
     DMCAM_FILETER_ID_GAUSS,     /**>Gauss filter for distance data*/
     DMCAM_FILTER_ID_AMP, /**>Amplitude filter control*/
+    DMCAM_FILTER_ID_SAT_RATIO, /**>Saturation ratio threshold for auto integration time controll use*/
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
 
@@ -712,6 +714,7 @@ typedef union {
     uint8_t case_idx; /**>User Scenario index */
     uint32_t lens_id; /**>length index*/
     uint32_t min_amp; /**>Min amplitude threshold*/
+    uint16_t sat_ratio; /**>saturation ratio threshold*/
 }dmcam_filter_args_u;
 
 
