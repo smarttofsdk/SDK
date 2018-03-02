@@ -306,6 +306,6 @@ void py_dmcam_cap_set_callback_on_error(dmcam_dev_t* dev, PyObject *PyFunc);
 }
 #endif
 /*  Parse the header file to generate wrappers */
-%include "../../src/dmcam.h"
+%include "../../lib/include/dmcam.h"
 /*%include "../src/dmcam_dfu.h"*/
 

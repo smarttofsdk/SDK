@@ -1,7 +1,7 @@
 X64?=0
 
 DMCAM_TOP_DIR:=$(shell pwd)/../../
-DMCAM_BIN_DIR:=$(DMCAM_TOP_DIR)/bin
+DMCAM_BIN_DIR:=$(DMCAM_TOP_DIR)/lib
 ifeq ($(X64),1)
 	ARCH:=x64
 	CROSS_COMPILE:=x86_64-w64-mingw32-
@@ -12,7 +12,7 @@ else
 	JAVA_HOME:=c:/Program\ Files\ \(x86\)/Java/jdk1.8.0_151
 endif
 
-DMCAM_ANDROID_DIR:=$(DMCAM_TOP_DIR)/build/android/dmcam_jar
+#DMCAM_ANDROID_DIR:=$(DMCAM_TOP_DIR)/build/android/dmcam_jar
 
 JAVA:=$(JAVA_HOME)/bin/java.exe
 JAVAC:=$(JAVA_HOME)/bin/javac.exe
@@ -20,7 +20,8 @@ JAR:=$(JAVA_HOME)/bin/jar.exe
 
 MOD_NAME:=dmcam
 MOD_DYNAMIC_TARGET:=$(MOD_NAME)_java.dll
-MOD_TARGET_JAR:=$(MOD_NAME).jar
+MOD_TARGET_JAR:=$(MOD_NAME)_notest.jar
+MOD_TARGET_TEST_JAR:=$(MOD_NAME)_test.jar
 MOD_PACK:=com.smarttof.dmcam
 
 MOD_SRC_OUT:=$(subst .,/,$(MOD_PACK))
@@ -34,14 +35,15 @@ LDFLAGS:= -L$(DMCAM_BIN_DIR)/$(ARCH) -ldmcam -mthreads -Wl,--add-stdcall-alias
 #-------------------------------------------------
 JAVA_SRCS := $(wildcard $(MOD_SRC_OUT)/*.java)
 JAVA_SRCS_TEST:= $(wildcard $(MOD_SRC_OUT)/test/*.java)
-JAVA_OBJS := $(JAVA_SRCS:.java=.class) $(JAVA_SRCS_TEST:.java=.class)
+JAVA_OBJS := $(JAVA_SRCS:.java=.class) 
+JAVA_TEST_OBJS := $(JAVA_SRCS_TEST:.java=.class)
 JAVA_OBJS_JAR_RAW := $(JAVA_OBJS) $(wildcard $(MOD_SRC_OUT)/test/*.class)
 JAVA_OBJS_JAR := $(subst $$,\$$,$(JAVA_OBJS_RAW))
 
-.PHONY: all jar
+.PHONY: all jar jar-test
 
 all: $(MOD_SRC_OUT) $(MOD_DYNAMIC_TARGET) 
-	@$(MAKE) -f $(MAKEFILE_NAME) jar
+	@$(MAKE) -f $(MAKEFILE_NAME) jar jar-test
 
 $(MOD_SRC_OUT):
 	@mkdir -p $@
@@ -65,27 +67,28 @@ MAKEFILE_NAME := $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))
 
 jar: $(MOD_TARGET_JAR)
 
+jar-test: $(MOD_TARGET_TEST_JAR)
+
 $(MOD_TARGET_JAR): $(JAVA_OBJS)
-	$(JAR) cvf $(MOD_NAME).jar $^ $(MOD_SRC_OUT)/test/*.class
+	$(JAR) cvf $@ $^
+
+$(MOD_TARGET_TEST_JAR): $(JAVA_OBJS) $(JAVA_TEST_OBJS)
+	$(JAR) cvf $@ $^ $(MOD_SRC_OUT)/test/*.class
 
 #--- install --
-
 install:
 	@echo "Install binary to bin/java ..."
 	@mkdir -p $(DMCAM_BIN_DIR)/java/$(ARCH)
-	@cp -a $(MOD_NAME).jar  $(DMCAM_BIN_DIR)/java/
+	@cp -a $(MOD_TARGET_TEST_JAR) $(DMCAM_BIN_DIR)/java/$(MOD_NAME).jar 
 	@cp -a $(MOD_DYNAMIC_TARGET) $(DMCAM_BIN_DIR)/java/$(ARCH)/
-	@echo "Install generated source to android build..."
-	@mkdir -p $(DMCAM_ANDROID_DIR)/src/$(MOD_SRC_OUT)
-	@cp -a $(JAVA_SRCS) $(DMCAM_ANDROID_DIR)/src/$(MOD_SRC_OUT)
 
 ifeq (,$(wildcard $(DMCAM_ANDROID_DIR)/*))
 	$(error dmcam android dir not found!)
 endif
 
-test:
+test: 
 	#cp -a $(DMCAM_BIN_DIR)/$(ARCH)/*.dll .
-	$(JAVA) -cp dmcam.jar com.smarttof.dmcam.test.testBasicUi
+	$(JAVA) -cp $(MOD_TARGET_TEST_JAR) com.smarttof.dmcam.test.testBasicUi
 #---
 show:
 	@echo "SOURCES: $(JAVA_SRCS)"
