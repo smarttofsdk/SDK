@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-
-  <node pkg="smart_tof" name="smart_tof" type="smart_tof_main" output="screen">
-  </node>
-
-  <rosparam command="load" file="$(find smart_tof)/parameters/initial_param.yaml"/>
-
-</launch>
