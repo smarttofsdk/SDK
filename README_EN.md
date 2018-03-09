@@ -69,7 +69,7 @@ dmcam_frame_get_distance(dev,dist,dist_len,fbuf,fbuf_info.frame_info.frame_size,
 /*Acquire gray data*/
 dmcam_frame_get_gray(dev,gray,gray_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//Transform one frame to gray data
 /*Acquire pointcloud data*/
-dmcam_frame_get_pcl(dev,pcl,pcl_len,dist,dist_len,img_w,img_h,&p_cam_param);//Transform the depth data to pointcloud data
+dmcam_frame_get_pcl(dev,pcl,pcl_len,dist,dist_len,img_w,img_h,NULL);//Transform the depth data to pointcloud data
 /*Stop acquisition*/
 dmcam_cap_stop(dev);
 ...

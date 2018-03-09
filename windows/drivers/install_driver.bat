@@ -1,0 +1,1 @@
+libusb_drv_cli --vid 0x111b --pid 0x1238 -n DMiracle -d SmartTOF --driver-backend 0

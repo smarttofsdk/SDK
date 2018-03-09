@@ -1,0 +1,5 @@
+numpy
+matplotlib
+pygame
+PyQt5
+pyqtgraph
