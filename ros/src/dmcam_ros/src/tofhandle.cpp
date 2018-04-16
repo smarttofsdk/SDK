@@ -298,12 +298,12 @@ void TofHandle::sudodev(dmcam_dev_t *_dev)
     char path[21];
     char *_pa = "/dev/bus/usb/000/000";
     strcpy(path, _pa);
-    int tmp = _dev->usb_dev_addr;
+    int tmp = _dev->if_info.info.usb.usb_dev_addr;
     for (int i = 0; tmp != 0; ++i) {
         path[19 - i] = tmp % 10 - 0 + '0';
         tmp = tmp / 10;
     }
-    path[15] = _dev->usb_bus_num - 0 + '0';
+    path[15] = _dev->if_info.info.usb.usb_bus_num - 0 + '0';
     char *orhead = "sudo -S chmod 666 ";
     char order[39];
     strcpy(order, orhead);

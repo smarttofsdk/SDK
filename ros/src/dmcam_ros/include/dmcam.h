@@ -38,11 +38,12 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 15
-#define DM_VERSION_STR "v1.15"
+#define DM_VERSION_MINOR 20
+#define DM_VERSION_STR "v1.20"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
+#define DMCAM_ERR_CAP_CANCEL (-3)
 #define DMCAM_ERR_CAP_TIMEOUT (-5)
 #define DMCAM_ERR_CAP_STALL   (-7)
 #define DMCAM_ERR_CAP_ERROR   (-8)
@@ -60,6 +61,26 @@ typedef struct {
     char *pname;  // param name string of the use case
 }dmcam_use_case_t;
 
+typedef enum {
+    DEV_IF_USB = 0,
+    DEV_IF_ETH,
+}dmcam_dev_if_e;
+
+typedef struct {
+    dmcam_dev_if_e type; // interface type
+    union {
+        struct dmcam_dev_if_info_usb {
+            uint8_t usb_bus_num;
+            uint8_t usb_port_num;
+            uint8_t usb_dev_addr;
+            uint8_t usb_speed;
+        } usb;
+        struct dmcam_dev_if_info_eth{
+            uint8_t ipv4[16];
+        } eth;
+    } info;
+}dmcam_dev_if_info_t;
+
 /**
  * dmcam device structure. It describes device usb port info, 
  * device info 
@@ -67,15 +88,23 @@ typedef struct {
 typedef struct {
     void *handler;
 
-    uint8_t usb_bus_num;
-    uint8_t usb_port_num;
-    uint8_t usb_dev_addr;
-    uint8_t usb_speed;
+    dmcam_dev_if_info_t if_info;
 
+    //uint8_t usb_bus_num;
+    //uint8_t usb_port_num;
+    //uint8_t usb_dev_addr;
+    //uint8_t usb_speed;
+
+    /* - ether if  */
+
+
+    /*  device info  */
     char product[32];
     char vendor[32];
     char serial[32];
     uint16_t version[4];
+
+    /*  internal used vars  */
     char *expath; //extract path to store calibration data,can be set by dmcam_path_cfg
     void *lock; // device lock
 
@@ -242,6 +271,7 @@ typedef union {
         int16_t tr_cal;
         int16_t bl_cal;
         int16_t br_cal;
+        int16_t ib_cal;
     }temp;
     struct {
         uint8_t valid;      //data is valid;1==valid
@@ -345,8 +375,16 @@ __API void dmcam_log_cfg(dmcam_log_level_e console_level, dmcam_log_level_e file
  * 
  * @return __API void
  */
-__API void dmcam_path_cfg(dmcam_dev_t *dev, char *path);
+__API void dmcam_path_cfg(const char *path);
 
+
+/** 
+ * Getting calibration data path
+ * 
+ * 
+ * @return _API char*
+ */
+__API char* dmcam_path_get(void);
 /**
  * list the dmcam device and fill into dmcam_dev_t array.
  * 
@@ -718,6 +756,7 @@ typedef enum {
     DMCAM_FILTER_ID_AMP, /**>Amplitude filter control*/
     DMCAM_FILTER_ID_AUTO_INTG, /**>auto integration filter enable : use sat_ratio to adjust */
     DMCAM_FILTER_ID_SYNC_DELAY,//**>Delay module capture start in random ms, capture sync use
+    DMCAM_FILTER_ID_TEMP_MONITOR,//**>Monitor Module temperature 
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
 
@@ -728,6 +767,7 @@ typedef union {
     uint16_t sat_ratio; /**>saturation ratio threshold*/
     uint16_t sync_delay;/**>capture sync delay*/
     uint8_t random_delay_en;/**>0:enable/>=1:disable random delay value*/
+    int16_t temp_threshold;/**>Temperature threshold for temperature monitor*/
 }dmcam_filter_args_u;
 
 
