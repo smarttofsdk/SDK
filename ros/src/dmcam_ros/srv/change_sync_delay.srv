@@ -1,0 +1,3 @@
+int32 sync_delay_value
+---
+int32 sync_delay_new_value

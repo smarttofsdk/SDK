@@ -1,0 +1,3 @@
+int32 frame_rate_value
+---
+int32 frame_rate_new_value

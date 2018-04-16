@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="dmcam_ros" name="dmcam_ros" type="dmcam_ros_main" output="screen">
+  </node>
+
+  <rosparam command="load" file="$(find dmcam_ros)/parameters/initial_param.yaml"/>
+
+</launch>

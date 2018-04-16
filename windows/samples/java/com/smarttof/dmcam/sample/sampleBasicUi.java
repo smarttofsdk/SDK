@@ -148,15 +148,15 @@ public class sampleBasicUi {
 		int cnt = dmcam.dev_list(devs.cast(), 16);
 
 		System.out.printf("found %d device\n", cnt);
-		for (int i = 0; i < cnt; i++) {
-			System.out
-					.printf("DMCAM#%d [%03d:%03d:%03d]: VENDOR=%s, PROD=%s, SERIAL=%s\n",
-							i, devs.getitem(i).getUsb_port_num(),
-							devs.getitem(i).getUsb_bus_num(), devs.getitem(i)
-									.getUsb_dev_addr(), devs.getitem(i)
-									.getVendor(), devs.getitem(i).getProduct(),
-							devs.getitem(i).getSerial());
-		}
+		//for (int i = 0; i < cnt; i++) {
+			//System.out
+					//.printf("DMCAM#%d [%03d:%03d:%03d]: VENDOR=%s, PROD=%s, SERIAL=%s\n",
+							//i, devs.getitem(i).getUsb_port_num(),
+							//devs.getitem(i).getUsb_bus_num(), devs.getitem(i)
+									//.getUsb_dev_addr(), devs.getitem(i)
+									//.getVendor(), devs.getitem(i).getProduct(),
+							//devs.getitem(i).getSerial());
+		//}
 		if (cnt == 0) {
 			return;
 		}

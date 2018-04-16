@@ -1,4 +1,45 @@
+
+
+# 版本号：1.20
+
+## 发布时间：2018/04/13
+
+## 主要修改：
+
+- dmcam lib
+  - 优化温度校准补偿
+  - 增加温度保护机制
+  - 增加多模组干扰软件滤波支持
+- ROS
+  - 增加ROS平台支持
+    - 提供深度、灰度、点云、相机参数4个topic
+    - 提供修改参数service
+    - 提供ROS扩展的样例
+- Android
+  - 增加Android平台支持
+    - 提供Android平台smarttofviewer工具及源码
+    - 提供Android平台所需要的库
+- samples
+  - 完善样例readme
+- tools
+  - SmartToFCli
+    - 增加保存灰度、深度、点云数据命令支持
+    - 增加固件更新脚本
+  - SmartToFViewer 
+    - 界面增加多模组滤波干扰复选框
+- doc
+  - 样例readme
+    - README_C_sample.md
+    - README_Python_sample.md
+    - README_sample.md
+  - 应用指南
+    - 《SMARTTof_SDK_ROS用户手册.pdf》
+    - 《TCM-Ex模组固件升级说明.pdf》
+    - 《SmartTof怎样获得不定距离的最佳图像.pdf》
+    - 《SmartTof怎样获得最佳图像.pdf》
+
 # 版本号：1.15
+
 ## 发布时间：2018/03/09
 ## 主要修改：
 - dmcam lib
