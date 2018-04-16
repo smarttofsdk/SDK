@@ -1,8 +1,8 @@
-#SmartToF Python 样例
+# SmartToF Python 样例
 ***
 针对Windows、Linux平台的python开发，提供适用于python的包文件，并提供样例展示如何在python下使用模组。
 
-##python样例运行所需的库
+## python样例运行所需的库
 - 安装支持smarttof模组的python扩展库
   SDK中分别为windows和linux平台提供了支持smarttof模组的python扩展库，并且对应不同的python版本，方便用户选择适合的开发环境。下图是python扩展库的版本支持列表。
   -  windows
@@ -33,7 +33,7 @@
 
 说明：在python2.7或者python3.4环境下安装PyQt5可能回导致失败，可以换成安装PyQt4。
 
-##python样例的使用
+## python样例的使用
 - 注意和C库中的名称区别
 在使用python开发时，先安装对导入dmcam包后，python中使用的API函数跟dmcam.h中的函数名有所区别。C库中的API形式如dmcam_xxx_xxx,例如dmcam_dev_open,而在python中调用dmcam库时，形式为dmcam.xxx_xxx,打开设备为dmcam.dev_open。
 - python下基本参数设置和采集
