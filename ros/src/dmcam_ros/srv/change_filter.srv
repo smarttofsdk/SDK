@@ -1,3 +1,5 @@
 string filter_id
+int32 filter_value
 ---
 string change_filter_id
+int32 change_filter_value

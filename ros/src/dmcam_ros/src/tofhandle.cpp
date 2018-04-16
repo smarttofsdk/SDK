@@ -567,7 +567,10 @@ bool TofHandle::change_sync_delay(dmcam_ros::change_sync_delay::Request& req, dm
 
 bool TofHandle::change_filter(dmcam_ros::change_filter::Request& req, dmcam_ros::change_filter::Response& res)
 {
-	printf("change_filter_amplitude is %s\n",req.filter_id.c_str());
+	int filter_value =  0;
+	filter_value = req.filter_value;
+	printf("change_filter_id is %s\n",req.filter_id.c_str());
+	printf("change_filter_value is %d\n",req.filter_value);
 	dmcam_filter_args_u filter_args;
 	dmcam_filter_id_e filter_type;
 	std::map<std::string, dmcam_filter_id_e>::iterator itor;
@@ -577,6 +580,7 @@ bool TofHandle::change_filter(dmcam_ros::change_filter::Request& req, dmcam_ros:
 		}
 	}	
 	res.change_filter_id = req.filter_id.c_str();
+	res.change_filter_value = req.filter_value;
 	switch (filter_type)
 		{
 		
@@ -593,7 +597,11 @@ bool TofHandle::change_filter(dmcam_ros::change_filter::Request& req, dmcam_ros:
 			dmcam_filter_enable(dev, DMCAM_FILTER_ID_GAUSS, &filter_args, sizeof(filter_args));
 			break;
 		case DMCAM_FILTER_ID_AMP:
-			filter_args.min_amp = 30;
+			if(filter_value == 0)
+			{
+				filter_value = 30;
+			}
+			filter_args.min_amp = filter_value;
 			dmcam_filter_enable(dev, DMCAM_FILTER_ID_AMP, &filter_args, sizeof(filter_args));
 			break;
 		case DMCAM_FILTER_ID_AUTO_INTG:
