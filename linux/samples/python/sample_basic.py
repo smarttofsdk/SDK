@@ -35,11 +35,11 @@ if devs is None:
     sys.exit(1)
 
 print("found %d device" % len(devs))
-
+			 
 for i in range(len(devs)):
     print("DMCAM#%d [%03d:%03d:%03d]: VENDOR=%s, PROD=%s, SERIAL=%s"
-          % (i, devs[i].usb_port_num, devs[i].usb_bus_num,
-             devs[i].usb_dev_addr, devs[i].vendor,
+          % (i, devs[i].if_info.info.usb.usb_port_num, devs[i].if_info.info.usb.usb_bus_num,
+             devs[i].if_info.info.usb.usb_dev_addr, devs[i].vendor,
              devs[i].product, devs[i].serial))
 
 print(" Open dmcam device ..")
