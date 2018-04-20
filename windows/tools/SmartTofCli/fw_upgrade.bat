@@ -1,1 +1,1 @@
-call dmcam-cli.exe -f smart_tof_e2_fw_20180410.bin
+call dmcam-cli.exe -f smart_tof_e2_fw_20180420.bin
