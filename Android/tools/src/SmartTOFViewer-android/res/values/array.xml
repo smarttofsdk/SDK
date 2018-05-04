@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="sceneitems">
+        <item>FPS = 10</item>
+        <item>FPS = 15</item>
+        <item>FPS = 20</item>
+        <item>FPS = 30</item>
+    </array>
+    <array name="viewitems">
+        <item>深度图(彩色编码)</item>
+        <item>深度图(灰度编码)</item>
+        <item>灰度图</item>
+        <item>点云图</item>
+    </array>
+</resources>

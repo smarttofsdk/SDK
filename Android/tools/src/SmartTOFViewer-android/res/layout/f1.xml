@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="visible"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_scenation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:text="@string/tvScenario"
+            />
+        <Spinner
+            android:id="@+id/spin1"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:entries="@array/sceneitems"
+            android:gravity="center|right"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_viewtype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.31"
+            android:gravity="center|left"
+            android:text="@string/tvViewType"
+            />
+        <Spinner
+            android:id="@+id/spin2"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:entries="@array/viewitems"
+            android:gravity="center|right"
+            />
+    </LinearLayout>
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tvExposure"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.31"
+            android:gravity="center|left"
+            android:text="@string/tvExposure" />
+
+        <SeekBar
+            android:id="@+id/sbarExposure"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:max="100"
+            android:progress="50" />
+
+        <TextView
+            android:id="@+id/tvExposureValue"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:paddingRight="10dp"
+            android:text="@string/tvExposureValue"
+            android:textColor="@android:color/holo_blue_light" />
+    </LinearLayout>
+    
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvMinAmp"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.31"
+            android:gravity="center|left"
+            android:text="@string/tvMinAmp" />
+
+        <SeekBar
+            android:id="@+id/sbarMinAmp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:max="100"
+            android:progress="0" />
+
+        <TextView
+            android:id="@+id/tvMinAmpValue"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:paddingRight="10dp"
+            android:text="@string/tvMinAmpValue"
+            android:textColor="@android:color/holo_blue_light" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvRangeMin"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:gravity="center|left"
+            android:layout_weight="0.31"
+            android:text="@string/tvRangeMin" />
+
+        <SeekBar
+            android:id="@+id/sbarMinDistance"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:max="100"
+            android:progress="0" />
+
+        <TextView
+            android:id="@+id/tvMinDistance"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:text="@string/tvMinDistance"
+            android:textColor="@android:color/holo_blue_light" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvRangeMax"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:gravity="center|left"
+            android:layout_weight="0.31"
+            android:text="@string/tvRangeMax" />
+        <SeekBar
+            android:id="@+id/sbarMaxDistance"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:max="100"
+            android:progress="100" />
+        <TextView
+            android:id="@+id/tvMaxDistance"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:text="@string/tvMaxDistance"
+            android:textColor="@android:color/holo_blue_light" />
+    </LinearLayout>
+    <LinearLayout  
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content">
+	        <TextView
+	            android:id="@+id/auto_expo"
+	            android:layout_width="10dp"
+            	android:layout_height="match_parent"
+            	android:gravity="center|left"
+            	android:layout_weight="0.31"
+	            android:text="@string/autoexpo" />
+	        <CheckBox
+	            android:id="@+id/ckb2"
+	            android:layout_width="50dp"
+            	android:layout_height="match_parent"
+            	android:layout_weight="1"
+            	android:checked="false" />
+	</LinearLayout>
+</LinearLayout>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        >
+        <TextView
+            android:id="@+id/tv_base2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:clickable="true"
+            android:text="基础参数"
+            android:textSize="20dp" />
+        <TextView
+            android:id="@+id/tv_advanced2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_marginLeft="5dp"
+            android:text="高级参数"
+            android:textSize="20dp"
+            android:visibility="invisible"
+            />
+
+        <LinearLayout  
+        	android:layout_width="fill_parent"  
+        	android:layout_height="wrap_content"  
+        	android:gravity="right" >
+	        <TextView
+	            android:id="@+id/tv_log"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="输出日志"
+	            android:layout_marginRight="5dp"
+	            android:textColor="#000000"
+	            android:textSize="20dp" />
+	        <CheckBox
+	            android:id="@+id/ckb"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:checked="true" />
+		</LinearLayout>		
+    </LinearLayout>
+    
+    <FrameLayout
+        android:id="@+id/layoutDmcamPreview"
+        android:layout_width="match_parent"
+        android:layout_height="242dp"
+        android:layout_gravity="start" />
+
+    <ScrollView
+        android:id="@+id/svLog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingBottom="10dp"
+         android:background="@drawable/textview_boader"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:paddingLeft="5dp"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            android:text="log"
+            android:textColor="@android:color/background_light" />
+
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        >
+        <Button
+            android:id="@+id/btnCapture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:onClick="onClick_Capture"
+            android:text="开始采集" />
+        <LinearLayout  
+        	android:layout_width="fill_parent"  
+        	android:layout_height="wrap_content"  
+        	android:gravity="right" >
+			<Button
+	            android:id="@+id/btnExit"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="right|center_vertical"
+	            android:layout_marginLeft="30dp"
+	            android:onClick="onClick_Exit"
+	            android:text="退出程序"/>
+		</LinearLayout>	
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,21 @@
+E:\WORK\SDK1214\SmartTOFViewer-android\gen\com\example\testdmcam\R.java \
+ : E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable\cover.jpg \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable\textview_boader.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable-hdpi\ic_launcher.png \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable-ldpi\ic_launcher.png \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable-mdpi\ic_launcher.png \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable-xhdpi\ic_launcher.png \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable-xxhdpi\ic_launcher.png \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\drawable-xxxhdpi\ic_launcher.png \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\layout\activity_testdmcam.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\layout\f1.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\layout\f2.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\menu\testcusenative.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values\array.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values\dimens.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values\strings.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values\styles.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values-v11\styles.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values-v14\styles.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\res\values-w820dp\dimens.xml \
+E:\WORK\SDK1214\SmartTOFViewer-android\bin\AndroidManifest.xml \

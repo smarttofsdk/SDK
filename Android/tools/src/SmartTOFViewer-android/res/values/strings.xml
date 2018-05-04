@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SmartTOFViewer</string>
+    <string name="action_settings">Settings</string>
+	<string name="tvExposure">积分时间:</string>
+    <string name="tvExposureValue">750us</string>
+    <string name="tvMinAmp">最小幅值:</string>
+    <string name="tvMinAmpValue">0</string>
+    <string name="tvRangeMin">最近距离:</string>
+    <string name="tvMinDistance">0mm</string>
+    <string name="tvRangeMax">最远距离:</string>
+    <string name="tvMaxDistance">10000mm</string>
+    <string name="autoexpo">自动曝光:</string>
+    <string name="tvScenario">场景:</string>
+    <string name="tvViewType">视图类型:</string>
+    <string name="tvbase">基础参数</string>
+    <string name="tvadvance">高级参数</string>
+    <string name="tvFreq">调制频率(Mhz)</string>
+    <string name="tvFrameRate">帧率模式</string>
+    <string name="tvRevise">修正系数</string>
+    <string name="tvReviseValue">0</string>
+    
+</resources>
