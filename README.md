@@ -199,5 +199,6 @@ SmartToF SDK提供的主要样例如下：
 - java样例：参见([java样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
   - sampleBasic.java:java采集样例
   - sampleBasicUi.java:java采集显示样例
-- ROS样例：待重新发布
+- ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/ros))
+
 
