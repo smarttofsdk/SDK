@@ -1,4 +1,3 @@
-
 # SmartToF SDK使用说明
 ***
 ## 1、SmartToF SDK简介
@@ -200,5 +199,3 @@ SmartToF SDK提供的主要样例如下：
   - sampleBasic.java:java采集样例
   - sampleBasicUi.java:java采集显示样例
 - ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/ros))
-
-

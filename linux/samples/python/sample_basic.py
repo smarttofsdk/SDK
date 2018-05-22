@@ -35,7 +35,7 @@ if devs is None:
     sys.exit(1)
 
 print("found %d device" % len(devs))
-			 
+
 for i in range(len(devs)):
     print("DMCAM#%d [%03d:%03d:%03d]: VENDOR=%s, PROD=%s, SERIAL=%s"
           % (i, devs[i].if_info.info.usb.usb_port_num, devs[i].if_info.info.usb.usb_bus_num,

@@ -1,0 +1,38 @@
+﻿生成启动时间为 2018/3/22 星期四 下午 4:03:51。
+     1>项目“F:\every\Openni\SimpleViewer_smarttof_dbgDLL\SimpleViewer.vcxproj”在节点 2 上(Rebuild 个目标)。
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I.\OpenNI2\Include /I.\GL\Include /ZI /nologo /W4 /WX /MP /Od /Oy- /D _WINDLL /D _MBCS /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp Viewer.cpp
+         main.cpp
+         Viewer.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\every\Openni\SimpleViewer_smarttof_dbgDLL\Debug\SimpleViewer.exe" /INCREMENTAL /NOLOGO /LIBPATH:.\OpenNI2\Lib\ /LIBPATH:.\GL\Lib\ /WX glut32.lib OpenNI2.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\every\Openni\SimpleViewer_smarttof_dbgDLL\Debug\SimpleViewer.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\every\Openni\SimpleViewer_smarttof_dbgDLL\Debug\SimpleViewer.lib" /MACHINE:X86 Debug\main.obj
+         Debug\Viewer.obj
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniInitialize，该符号在函数 "public: static enum openni::Status __cdecl openni::OpenNI::initialize(void)" (?initialize@OpenNI@openni@@SA?AW4Status@2@XZ) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniShutdown，该符号在函数 "public: static void __cdecl openni::OpenNI::shutdown(void)" (?shutdown@OpenNI@openni@@SAXXZ) 中被引用
+     1>Viewer.obj : error LNK2001: 无法解析的外部符号 __imp__oniShutdown
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniGetExtendedError，该符号在函数 "public: static char const * __cdecl openni::OpenNI::getExtendedError(void)" (?getExtendedError@OpenNI@openni@@SAPBDXZ) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceOpen，该符号在函数 "public: enum openni::Status __thiscall openni::Device::open(char const *)" (?open@Device@openni@@QAE?AW4Status@2@PBD@Z) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceClose，该符号在函数 "public: void __thiscall openni::Device::close(void)" (?close@Device@openni@@QAEXXZ) 中被引用
+     1>Viewer.obj : error LNK2001: 无法解析的外部符号 __imp__oniDeviceClose
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceGetInfo，该符号在函数 "private: enum openni::Status __thiscall openni::Device::_setHandle(struct _OniDevice *)" (?_setHandle@Device@openni@@AAE?AW4Status@2@PAU_OniDevice@@@Z) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceCreateStream，该符号在函数 "public: enum openni::Status __thiscall openni::VideoStream::create(class openni::Device const &,enum openni::SensorType)" (?create@VideoStream@openni@@QAE?AW4Status@2@ABVDevice@2@W4SensorType@2@@Z) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceIsPropertySupported，该符号在函数 "public: bool __thiscall openni::Device::isPropertySupported(int)const " (?isPropertySupported@Device@openni@@QBE_NH@Z) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceIsCommandSupported，该符号在函数 "public: bool __thiscall openni::Device::isCommandSupported(int)const " (?isCommandSupported@Device@openni@@QBE_NH@Z) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamDestroy，该符号在函数 "public: void __thiscall openni::VideoStream::destroy(void)" (?destroy@VideoStream@openni@@QAEXXZ) 中被引用
+     1>Viewer.obj : error LNK2001: 无法解析的外部符号 __imp__oniStreamDestroy
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamGetSensorInfo，该符号在函数 "private: void __thiscall openni::VideoStream::_setHandle(struct _OniStream *)" (?_setHandle@VideoStream@openni@@AAEXPAU_OniStream@@@Z) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamStart，该符号在函数 "public: enum openni::Status __thiscall openni::VideoStream::start(void)" (?start@VideoStream@openni@@QAE?AW4Status@2@XZ) 中被引用
+     1>main.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamIsPropertySupported，该符号在函数 "public: bool __thiscall openni::VideoStream::isPropertySupported(int)const " (?isPropertySupported@VideoStream@openni@@QBE_NH@Z) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniWaitForAnyStream，该符号在函数 "public: static enum openni::Status __cdecl openni::OpenNI::waitForAnyStream(class openni::VideoStream * *,int,int *,int)" (?waitForAnyStream@OpenNI@openni@@SA?AW4Status@2@PAPAVVideoStream@2@HPAHH@Z) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniDeviceSetProperty，该符号在函数 "public: enum openni::Status __thiscall openni::Device::setProperty(int,void const *,int)" (?setProperty@Device@openni@@QAE?AW4Status@2@HPBXH@Z) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamStop，该符号在函数 "public: void __thiscall openni::VideoStream::stop(void)" (?stop@VideoStream@openni@@QAEXXZ) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamReadFrame，该符号在函数 "public: enum openni::Status __thiscall openni::VideoStream::readFrame(class openni::VideoFrameRef *)" (?readFrame@VideoStream@openni@@QAE?AW4Status@2@PAVVideoFrameRef@2@@Z) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamSetProperty，该符号在函数 "public: enum openni::Status __thiscall openni::VideoStream::setProperty(int,void const *,int)" (?setProperty@VideoStream@openni@@QAE?AW4Status@2@HPBXH@Z) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniStreamGetProperty，该符号在函数 "public: enum openni::Status __thiscall openni::VideoStream::getProperty(int,void *,int *)const " (?getProperty@VideoStream@openni@@QBE?AW4Status@2@HPAXPAH@Z) 中被引用
+     1>Viewer.obj : error LNK2019: 无法解析的外部符号 __imp__oniFrameRelease，该符号在函数 "public: void __thiscall openni::VideoFrameRef::release(void)" (?release@VideoFrameRef@openni@@QAEXXZ) 中被引用
+     1>F:\every\Openni\SimpleViewer_smarttof_dbgDLL\Debug\SimpleViewer.exe : fatal error LNK1120: 20 个无法解析的外部命令
+     1>已完成生成项目“F:\every\Openni\SimpleViewer_smarttof_dbgDLL\SimpleViewer.vcxproj”(Rebuild 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:02.56

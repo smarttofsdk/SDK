@@ -1,6 +1,6 @@
-# SmartToF C 样例
+#SmartToF C 样例
 ***
-## 在windows下运行
+##在windows下运行
 - 在windows下生成vs工程
 
 1. 在windows/samples/c下新建文件夹vsbuild
@@ -32,7 +32,7 @@ make -j
 ~~~
 3.编译生成可执行文件后可双击运行
 
-## 在linux下运行
+##在linux下运行
 1. 将对应版本的libdmcam.so拷贝到/usr/lib目录下
 2. 打开终端，安装cmake
 ~~~BASH
@@ -46,7 +46,7 @@ make -j
 ~~~
 运行生成的可执行文件。
 
-## C样例说明
+##C样例说明
 1 sample_capture_frames展示模组的基本使用，从连接到采集数据及最后原始采集数据的处理。样例基本概括展示了使用模组采集数据所用到的相关API，具体的API说明参考([SmartToF_SDK重要接口说明](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-%E9%87%8D%E8%A6%81API%E8%AF%B4%E6%98%8E))。
 
 2 sample_filter展示对原始数据的一些滤波处理所用到的两个主要API-- dmcam_filter_enable(dmcam_dev_t *dev,  dmcam_filter_id_e fid, dmcam_filter_args_u *args, uint32_t arg_len) 和dmcam_filter_disable(dmcam_dev_t *dev,  dmcam_filter_id_e fid)。dmcam_filter_id_e 和dmcam_filter_args_u的定义分别如下
@@ -58,6 +58,9 @@ typedef enum {
     DMCAM_FILETER_ID_GAUSS,     /**>Gauss filter for distance data*/
     DMCAM_FILTER_ID_AMP, /**>Amplitude filter control*/
     DMCAM_FILTER_ID_AUTO_INTG, /**>auto integration filter enable : use sat_ratio to adjust */
+    DMCAM_FILTER_ID_SYNC_DELAY,//Delay module capture start in random ms,capture sync use
+    DMCAM_FILTER_ID_TEMP_MONITOR,//Monitor Module temperature
+    DMCAM_FILTER_ID_HDR,
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
 

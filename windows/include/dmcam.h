@@ -38,8 +38,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 20
-#define DM_VERSION_STR "v1.20"
+#define DM_VERSION_MINOR 30
+#define DM_VERSION_STR "v1.30"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -51,15 +51,15 @@ extern "C"
 
 #define DMCAM_FILTER_EN 1
 
-typedef struct {
-    uint32_t mod_clk; // modulation clock
-    uint16_t fps;     // frame per seconds
-    uint16_t priv_mode; // other mode
-    uint16_t min_amp;
-    uint16_t max_amp;
-    char *name;  // name string of the use case
-    char *pname;  // param name string of the use case
-}dmcam_use_case_t;
+//typedef struct {
+//    uint32_t mod_clk; // modulation clock
+//    uint16_t fps;     // frame per seconds
+//    uint16_t priv_mode; // other mode
+//    uint16_t min_amp;
+//    uint16_t max_amp;
+//    char *name;  // name string of the use case
+//    char *pname;  // param name string of the use case
+//}dmcam_use_case_t;
 
 typedef enum {
     DEV_IF_USB = 0,
@@ -76,11 +76,22 @@ typedef struct {
             uint8_t usb_speed;
         } usb;
         struct dmcam_dev_if_info_eth{
-            uint8_t ipv4[16];
+            uint8_t addr[16]; 
+            uint8_t reserved[16];
+            uint32_t token;
+            uint32_t cid;
         } eth;
     } info;
 }dmcam_dev_if_info_t;
-
+typedef union {
+    uint16_t version[4];
+    struct {
+        uint16_t hw_ver;
+        uint16_t sw_ver;
+        uint16_t sw2_ver;
+        uint16_t hw2_ver;
+    }ver; 
+}dmcam_dev_ver_u;
 /**
  * dmcam device structure. It describes device usb port info, 
  * device info 
@@ -90,25 +101,17 @@ typedef struct {
 
     dmcam_dev_if_info_t if_info;
 
-    //uint8_t usb_bus_num;
-    //uint8_t usb_port_num;
-    //uint8_t usb_dev_addr;
-    //uint8_t usb_speed;
-
-    /* - ether if  */
-
-
     /*  device info  */
     char product[32];
     char vendor[32];
     char serial[32];
-    uint16_t version[4];
-
+    //uint16_t version[4];
+    dmcam_dev_ver_u version;
     /*  internal used vars  */
     char *expath; //extract path to store calibration data,can be set by dmcam_path_cfg
     void *lock; // device lock
 
-    dmcam_use_case_t use_case[2];
+    //dmcam_use_case_t use_case[2];
 
     void *user_data0; // used internally for python extension
     void *user_data1; // used internally for python extension
@@ -252,7 +255,7 @@ typedef union {
         uint32_t fps;
     } frame_rate;
      struct {
-         bool random_delay_en;
+        uint8_t random_delay_en;
         uint16_t delay;
     }sync_delay; 
     dmcam_param_roi_t roi;
@@ -262,6 +265,9 @@ typedef union {
     struct {
         uint16_t intg_us;
     } intg;
+    struct{
+        uint16_t intg_3dhdr;
+    }intg_hdr;
     struct {
         uint16_t corr1; //range:[0,4095]
         uint16_t corr2; //range:[0,4095]
@@ -742,7 +748,7 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
  *                    if null, the internal camera parameter is
  *                    used.
  * @return int [out] return number of points in point cloud
- *         buffer. Note: n points means 3*n floats
+ *         buffer. Note: n points means 4*n floats
  */
 
 int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
@@ -757,6 +763,7 @@ typedef enum {
     DMCAM_FILTER_ID_AUTO_INTG, /**>auto integration filter enable : use sat_ratio to adjust */
     DMCAM_FILTER_ID_SYNC_DELAY,//**>Delay module capture start in random ms, capture sync use
     DMCAM_FILTER_ID_TEMP_MONITOR,//**>Monitor Module temperature 
+    DMCAM_FILTER_ID_HDR,//**>Monitor Module temperature 
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
 
@@ -768,6 +775,10 @@ typedef union {
     uint16_t sync_delay;/**>capture sync delay*/
     uint8_t random_delay_en;/**>0:enable/>=1:disable random delay value*/
     int16_t temp_threshold;/**>Temperature threshold for temperature monitor*/
+    struct{
+          uint16_t intg_3d;/**>intg_3d:3d intg time*/
+          uint16_t intg_3dhdr;/**> intg_3dhdr:3dhdr intg time*/
+          }intg;
 }dmcam_filter_args_u;
 
 

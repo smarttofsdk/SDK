@@ -1,3 +1,48 @@
+# 版本号：1.30
+
+## 发布时间：2018/05/22
+
+## 主要修改：
+
+### 固件部分
+  - 增加HDR支持
+  - 修复USB异常断开，灯板未关闭问题
+  - 增加温度保护机制
+  - 增加帧数据校验
+  - 修复数据帧增加padding后，低帧率采集问题
+  - 修复电源指示灯采集中熄灭问题
+
+### SDK软件部分
+- dmcam lib
+  - 增加HDR支持
+  - 调整数据帧头，优化传输速度
+  - 增加帧数据校验支持
+  - 修复android 打开设备问题
+  - 修复参数长度溢出问题
+- Android
+  - 发布Android平台支持
+    - 提供Android平台所需要的库
+    - 提供Android平台smarttofviewer工具和源码
+- Samples
+  - 发布windows下Openni2的驱动库
+  - 增加使用Openni2样例
+- tools 
+  - SmartTofViewer
+    - 界面增加HDR选项和HDR曝光时间调整条
+  - SmartTofCli
+    - 修复采集时获取数据错误等bug
+- doc
+  - 样例
+  - README_OpenNI2.md
+  - 应用指南
+  - 《SmartTof FAQ 手册》
+  - 《SmartTof SDK 简介》
+  - 《SmartTof_Cli 说明文档》
+  - 《SmartTof怎样消除多模组同时使用时的串扰》
+- 其他
+  - 在linux下增加使用模组设备的权限设置的脚本
+
+
 
 
 # 版本号：1.20

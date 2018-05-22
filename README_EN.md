@@ -201,4 +201,3 @@ The main samples provided by SmartToF SDK are following：
   - testBasicUi.java: java acquisition and demonstration sample
 - ROS sample: See([ros sample link](https://github.com/smarttofsdk/SDK/tree/master/linux/dmcam/samples/ros/src/tof_sample))
   - tof_sample: Demonstrate how to acquire image and pointcloud
-

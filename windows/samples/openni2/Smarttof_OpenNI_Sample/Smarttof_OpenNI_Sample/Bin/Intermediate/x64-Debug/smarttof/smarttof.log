@@ -1,0 +1,35 @@
+﻿生成启动时间为 2018/5/21 星期一 17:58:06。
+     1>项目“F:\NIRelease\Openni\OpenNISource_debugDLL\OpenNI2\Source\Drivers\smarttof\smarttof.vcxproj”在节点 3 上(Rebuild 个目标)。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(364,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I..\..\..\Include /I.\headerfile /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.1\References\CommonConfiguration\Neutral" /Zi /clr /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D SMARTTOF_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\\" /Fd"F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\vc120.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /errorReport:prompt /clr:nostdlib BaseSmartTofStream.cpp smarttofDevice.cpp smarttofDriver.cpp smarttofDepthStream.cpp SmartTofStreamImpl.cpp
+         BaseSmartTofStream.cpp
+         smarttofDevice.cpp
+         smarttofDriver.cpp
+         smarttofDepthStream.cpp
+         SmartTofStreamImpl.cpp
+         正在生成代码...
+     1>f:\nirelease\openni\opennisource_debugdll\openni2\source\drivers\smarttof\smarttofdriver.cpp(69): warning C4715: “smarttof::smarttofDriver::initialize”: 不是所有的控件路径都返回值
+     1>f:\nirelease\openni\opennisource_debugdll\openni2\include\driver\onidriverapi.h(142): warning C4793: “oni::driver::DriverServices::errorLoggerAppend”: 编译为本机的函数:
+         	/clr 下不支持 varargs
+     1>f:\nirelease\openni\opennisource_debugdll\openni2\include\driver\onidriverapi.h(144): warning C4793: “oni::driver::DriverServices::errorLoggerAppend”: 编译为本机的函数:
+         	托管代码中发现一个不受支持的内部函数
+     1>f:\nirelease\openni\opennisource_debugdll\openni2\include\driver\onidriverapi.h(146): warning C4793: “oni::driver::DriverServices::errorLoggerAppend”: 编译为本机的函数:
+         	托管代码中发现一个不受支持的内部函数
+     1>f:\nirelease\openni\opennisource_debugdll\openni2\source\drivers\smarttof\basesmarttofstream.cpp(31): warning C4715: “smarttof::BaseSmartTofStream::start”: 不是所有的控件路径都返回值
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I..\..\..\Include /I.\headerfile /Zi /clr /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D SMARTTOF_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\\" /Fd"F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\vc120.pdb" /TP /errorReport:prompt "C:\Users\Administrator\AppData\Local\Temp\.NETFramework,Version=v4.0.AssemblyAttributes.cpp"
+         .NETFramework,Version=v4.0.AssemblyAttributes.cpp
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"..\..\..\..\..\SimpleViewer_smarttof_dbgDLL\x64\Debug\OpenNI2\Drivers\smarttof.dll" /INCREMENTAL /NOLOGO /LIBPATH:"F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\x64-Debug\\" /LIBPATH:.\libfile libdmcam.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"..\..\..\..\..\SimpleViewer_smarttof_dbgDLL\x64\Debug\OpenNI2\Drivers\smarttof.pdb" /ASSEMBLYDEBUG /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X64 /DLL "F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\BaseSmartTofStream.obj"
+         "F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\smarttofDevice.obj"
+         "F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\smarttofDriver.obj"
+         "F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\smarttofDepthStream.obj"
+         "F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\SmartTofStreamImpl.obj"
+         "F:\NIRelease\Openni\SimpleViewer_smarttof_dbgDLL\Bin\Intermediate\x64-Debug\smarttof\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
+            正在创建库 ..\..\..\..\..\SimpleViewer_smarttof_dbgDLL\x64\Debug\OpenNI2\Drivers\smarttof.lib 和对象 ..\..\..\..\..\SimpleViewer_smarttof_dbgDLL\x64\Debug\OpenNI2\Drivers\smarttof.exp
+         smarttof.vcxproj -> F:\NIRelease\Openni\OpenNISource_debugDLL\OpenNI2\Source\Drivers\smarttof\..\..\..\..\..\SimpleViewer_smarttof_dbgDLL\x64\Debug\OpenNI2\Drivers\smarttof.dll
+     1>已完成生成项目“F:\NIRelease\Openni\OpenNISource_debugDLL\OpenNI2\Source\Drivers\smarttof\smarttof.vcxproj”(Rebuild 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:06.74
