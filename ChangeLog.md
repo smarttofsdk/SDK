@@ -1,6 +1,6 @@
 # 版本号：1.30
 
-## 发布时间：2018/05/23
+## 发布时间：2018/05/21
 
 ## 主要修改：
 
@@ -29,6 +29,8 @@
 - tools 
   - SmartTofViewer
     - 界面增加HDR选项和HDR曝光时间调整条
+  - SmartToF_PCLViewer
+    - 解决点云显示边缘曲面弯曲的问题
   - SmartTofCli
     - 修复采集时获取数据错误等bug
 - doc
