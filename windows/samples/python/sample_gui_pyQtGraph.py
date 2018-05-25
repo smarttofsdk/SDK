@@ -1,4 +1,5 @@
 # import cv2
+import time
 import dmcam
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -127,6 +128,8 @@ class DmcamThread(QtCore.QThread):
         self.run = True
         while self.run:
             global f_dist, f_gray, frame_data, f_mutex
+            if dev is None:
+                time.sleep(0.5)
             # get one frame
             finfo = dmcam.frame_t()
             ret = dmcam.cap_get_frames(dev, 1, frame_data, finfo)  # will blocking wait
@@ -162,6 +165,7 @@ def handle_capture_done():
 
     print(" Close dmcam device ..")
     dmcam.dev_close(dev)
+    dev = None
     dmcam.uninit()
 
 
