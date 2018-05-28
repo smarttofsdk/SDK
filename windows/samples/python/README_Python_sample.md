@@ -1,11 +1,12 @@
-#SmartToF Python 样例
+# SmartToF Python 样例
 ***
 针对Windows、Linux平台的python开发，提供适用于python的包文件，并提供样例展示如何在python下使用模组。
 
-##python样例运行所需的库
+## python样例运行所需的库
 - 安装支持smarttof模组的python扩展库
   SDK中分别为windows和linux平台提供了支持smarttof模组的python扩展库，并且对应不同的python版本，方便用户选择适合的开发环境。下图是python扩展库的版本支持列表。
   -  windows
+  
   |支持版本|扩展库名|
   |:---|:---|
   |python2.7 32位|dmcam-xxx-cp27-cp27m-win32.whl|
@@ -17,6 +18,7 @@
   |python3.5 64位|dmcam-xxx-cp35-cp35m-win_amd64.whl|
   |python3.6 64位|dmcam-xxx-cp36-cp36m-win_amd64.whl|
   - Linux
+  
   |支持版本|扩展库名|
   |:---|:---|
   |python2.7 64位|dmcam-xxx-cp27-cp27mu-linux_x86_64.whl|
@@ -33,7 +35,7 @@
 
 说明：在python2.7或者python3.4环境下安装PyQt5可能回导致失败，可以换成安装PyQt4。
 
-##python样例的使用
+## python样例的使用
 - 注意和C库中的名称区别
 在使用python开发时，先安装对导入dmcam包后，python中使用的API函数跟dmcam.h中的函数名有所区别。C库中的API形式如dmcam_xxx_xxx,例如dmcam_dev_open,而在python中调用dmcam库时，形式为dmcam.xxx_xxx,打开设备为dmcam.dev_open。
 - python下基本参数设置和采集
@@ -84,12 +86,12 @@
   amp_min_val.min_amp = 30	#设置幅值滤波阈值
   dmcam.filter_enable(dev,dmcam.DMCAM_FILTER_ID_AMP,amp_min_val,sys.getsizeof(amp_min_val))	#开启幅值滤波
   
-  #开启自动积分时间
+  # 开启自动积分时间
   intg_auto_arg = dmcam.filter_args_u()
   intg_auto_arg.sta_ratio = 5	#设置曝光点参数，一般为5
   dmcam.filter_enable(dev,dmcam.DMCAM_FILTER_ID_AUTO_INTG,intg_auto_arg,sys.getsizeof(intg_auto_arg))	#开启自动曝光
   
-  #开启消除串扰
+  # 开启消除串扰
   delay = dmcam.filter_args_u()
   delay.sync_delay = 0; #random delay
   if INTERFERENC_CHECK_EN:	#需检测是否使能
