@@ -1,4 +1,4 @@
-#SmartToF C 样例
+# SmartToF C 样例
 ***
 ##在windows下运行
 - 在windows下生成vs工程
