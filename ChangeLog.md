@@ -1,120 +1,119 @@
-# �汾�ţ�1.31
+# 版本号：1.31
 
-## ����ʱ�䣺2018/05/25
-## ע��
-SDK v1.31�汾��linux�²�������ǰ��ģ��̼���������linux��ʹ��SDK v1.31����Ҫ����ģ��̼�������HDR���¶ȱ����������� windows��linux�¶���Ҫ����ģ��̼����̼�λ����SmarttofCli��
+## 发布时间：2018/05/25
+## 注意
+SDK v1.31版本在linux下不兼容以前的模组固件，所以在linux下使用SDK v1.31必须要更新模组固件，对于HDR、温度保护等新特性 windows和linux下都需要更新模组固件，固件位置在SmarttofCli中
 
-## ��Ҫ�޸ģ�
+## 主要修改：
 
-### �̼�����
-  - ����HDR֧��
-  - �޸�USB�쳣�Ͽ����ư�δ�ر�����
-  - �����¶ȱ�������
-  - ����֡����У��
-  - �޸�����֡����padding�󣬵�֡�ʲɼ�����
-  - �޸���Դָʾ�Ʋɼ���Ϩ������
+### 固件部分
+  - 增加HDR支持
+  - 修复USB异常断开，灯板未关闭问题
+  - 增加温度保护机制
+  - 增加帧数据校验
+  - 修复数据帧增加padding后，低帧率采集问题
+  - 修复电源指示灯采集中熄灭问题
 
-### SDK��������
+### SDK软件部分
 - dmcam lib
-  - ����HDR֧��
-  - ��������֡ͷ���Ż������ٶ�
-  - ����֡����У��֧��
-  - �޸�android ���豸����
-  - �޸����������������
+  - 增加HDR支持
+  - 调整数据帧头，优化传输速度
+  - 增加帧数据校验支持
+  - 修复android 打开设备问题
+  - 修复参数长度溢出问题
+  - 修复点云显示边缘曲面弯曲的问题
 - Android
-  - ����Androidƽ̨֧��
-    - �ṩAndroidƽ̨����Ҫ�Ŀ�
-    - �ṩAndroidƽ̨smarttofviewer���ߺ�Դ��
+  - 发布Android平台支持
+    - 提供Android平台所需要的库
+    - 提供Android平台smarttofviewer工具和源码
 - Samples
-  - ����windows��Openni2��������
-  - ����ʹ��Openni2����
+  - 发布windows下Openni2的驱动库
+  - 增加使用Openni2样例
 - tools 
   - SmartTofViewer
-    - ��������HDRѡ���HDR�ع�ʱ�������
-  - SmartToF_PCLViewer
-    - ���������ʾ��Ե��������������
+    - 界面增加HDR选项和HDR曝光时间调整条
   - SmartTofCli
-    - �޸��ɼ�ʱ��ȡ���ݴ����bug
+    - 修复采集时获取数据错误等bug
 - doc
-  - ����
+  - 样例
   - README_OpenNI2.md
-  - Ӧ��ָ��
-  - ��SmartTof FAQ �ֲᡷ
-  - ��SmartTof SDK ��顷
-  - ��SmartTof_Cli ˵���ĵ���
-  - ��SmartTof����������ģ��ͬʱʹ��ʱ�Ĵ��š�
-- ����
-  - ��linux������ʹ��ģ���豸��Ȩ�����õĽű�
+  - 应用指南
+  - 《SmartTof FAQ 手册》
+  - 《SmartTof SDK 简介》
+  - 《SmartTof_Cli 说明文档》
+  - 《SmartTof怎样消除多模组同时使用时的串扰》
+- 其他
+  - 在linux下增加使用模组设备的权限设置的脚本
 
 
 
 
-# �汾�ţ�1.20
+# 版本号：1.20
 
-## ����ʱ�䣺2018/04/13
+## 发布时间：2018/04/13
 
-## ��Ҫ�޸ģ�
+## 主要修改：
 
 - dmcam lib
-  - �Ż��¶�У׼����
-  - �����¶ȱ�������
-  - ���Ӷ�ģ����������˲�֧��
+  - 优化温度校准补偿
+  - 增加温度保护机制
+  - 增加多模组干扰软件滤波支持
 - ROS
-  - ����ROSƽ̨֧��
-    - �ṩ��ȡ��Ҷȡ����ơ��������4��topic
-    - �ṩ�޸Ĳ���service
-    - �ṩROS��չ������
+  - 增加ROS平台支持
+    - 提供深度、灰度、点云、相机参数4个topic
+    - 提供修改参数service
+    - 提供ROS扩展的样例
 - Android
-  - ����Androidƽ̨֧��
-    - �ṩAndroidƽ̨smarttofviewer���߼�Դ��
-    - �ṩAndroidƽ̨����Ҫ�Ŀ�
+  - 增加Android平台支持
+    - 提供Android平台smarttofviewer工具及源码
+    - 提供Android平台所需要的库
 - samples
-  - ��������readme
+  - 完善样例readme
 - tools
   - SmartToFCli
-    - ���ӱ���Ҷȡ���ȡ�������������֧��
-    - ���ӹ̼����½ű�
+    - 增加保存灰度、深度、点云数据命令支持
+    - 增加固件更新脚本
   - SmartToFViewer 
-    - �������Ӷ�ģ���˲����Ÿ�ѡ��
+    - 界面增加多模组滤波干扰复选框
 - doc
-  - ����readme
+  - 样例readme
     - README_C_sample.md
     - README_Python_sample.md
     - README_sample.md
-  - Ӧ��ָ��
-    - ��SMARTTof_SDK_ROS�û��ֲ�.pdf��
-    - ��TCM-Exģ��̼�����˵��.pdf��
-    - ��SmartTof������ò�����������ͼ��.pdf��
-    - ��SmartTof����������ͼ��.pdf��
+  - 应用指南
+    - 《SMARTTof_SDK_ROS用户手册.pdf》
+    - 《TCM-Ex模组固件升级说明.pdf》
+    - 《SmartTof怎样获得不定距离的最佳图像.pdf》
+    - 《SmartTof怎样获得最佳图像.pdf》
 
-# �汾�ţ�1.15
+# 版本号：1.15
 
-## ����ʱ�䣺2018/03/09
-## ��Ҫ�޸ģ�
+## 发布时间：2018/03/09
+## 主要修改：
 - dmcam lib
-  - ���Ӿ�̬�����(.a)��visual studio��(.lib)
-  - ֧���Զ��ع�ʱ��ģʽ
+  - 增加静态编译库(.a)和visual studio库(.lib)
+  - 支持自动曝光时间模式
 - python
-  - ����python��չ�ȶ���
-  - ����windows 64bit python֧��
-    - win��Ŀǰ֧�� python 2.7/3.4/3.5/3.6 ��32bit��64bit�汾
-    - Linux��Ŀǰ֧�� python 2.7/3.4/3.5 ��64bit�汾
+  - 提升python扩展稳定性
+  - 增加windows 64bit python支持
+    - win下目前支持 python 2.7/3.4/3.5/3.6 的32bit、64bit版本
+    - Linux下目前支持 python 2.7/3.4/3.5 的64bit版本
 - java
-  - ����linux java��չ
-    - win��֧��java 32bit, 64bit
-    - Linux��֧��java 64bit
+  - 增加linux java扩展
+    - win下支持java 32bit, 64bit
+    - Linux下支持java 64bit
 - samples
-  - Ϊc/c++ sample����CMakelist.txt����ֱ���ڷ���Ŀ¼�±���
+  - 为c/c++ sample增加CMakelist.txt，可直接在发布目录下编译
 - tools
   - SmartToFCli
-    - Ĭ�Ͻ���interactiveģʽ��-h��ʾ����
+    - 默认进入interactive模式，-h显示帮助
   - SmartToFViewer 
-    - �Ż��Ҷ�ͼ��ʾ
-    - ֧���Զ��ع�ʱ��ģʽ
+    - 优化灰度图显示
+    - 支持自动曝光时间模式
 
-# �汾�ţ�1.12
-## ����ʱ�䣺2018/02/28
-## ��Ҫ�޸ģ�
- * �����¶Ȳ���
- * ֧��֡������
- * �Ż��Ҷ�ͼ��ʾ
+# 版本号：1.12
+## 发布时间：2018/02/28
+## 主要修改：
+ * 增加温度补偿
+ * 支持帧率设置
+ * 优化灰度图显示
