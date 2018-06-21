@@ -38,8 +38,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 31
-#define DM_VERSION_STR "v1.31"
+#define DM_VERSION_MINOR 32
+#define DM_VERSION_STR "v1.32"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)

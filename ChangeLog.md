@@ -1,119 +1,177 @@
-# ç‰ˆæœ¬å·ï¼š1.31
+# °æ±¾ºÅ£º1.32
 
-## å‘å¸ƒæ—¶é—´ï¼š2018/05/25
-## æ³¨æ„
-SDK v1.31ç‰ˆæœ¬åœ¨linuxä¸‹ä¸å…¼å®¹ä»¥å‰çš„æ¨¡ç»„å›ºä»¶ï¼Œæ‰€ä»¥åœ¨linuxä¸‹ä½¿ç”¨SDK v1.31å¿…é¡»è¦æ›´æ–°æ¨¡ç»„å›ºä»¶ï¼Œå¯¹äºŽHDRã€æ¸©åº¦ä¿æŠ¤ç­‰æ–°ç‰¹æ€§ windowså’Œlinuxä¸‹éƒ½éœ€è¦æ›´æ–°æ¨¡ç»„å›ºä»¶ï¼Œå›ºä»¶ä½ç½®åœ¨SmarttofCliä¸­
+## ·¢²¼Ê±¼ä£º2018/06/21
 
-## ä¸»è¦ä¿®æ”¹ï¼š
+## ×¢Òâ
 
-### å›ºä»¶éƒ¨åˆ†
-  - å¢žåŠ HDRæ”¯æŒ
-  - ä¿®å¤USBå¼‚å¸¸æ–­å¼€ï¼Œç¯æ¿æœªå…³é—­é—®é¢˜
-  - å¢žåŠ æ¸©åº¦ä¿æŠ¤æœºåˆ¶
-  - å¢žåŠ å¸§æ•°æ®æ ¡éªŒ
-  - ä¿®å¤æ•°æ®å¸§å¢žåŠ paddingåŽï¼Œä½Žå¸§çŽ‡é‡‡é›†é—®é¢˜
-  - ä¿®å¤ç”µæºæŒ‡ç¤ºç¯é‡‡é›†ä¸­ç†„ç­é—®é¢˜
+SDK v1.31¼°ÆäÒÔÉÏ°æ±¾ÔÚlinuxÏÂ²»¼æÈÝÒÔÇ°µÄÄ£×é¹Ì¼þ£¬ËùÒÔÔÚlinuxÏÂÊ¹ÓÃSDK v1.31±ØÐëÒª¸üÐÂÄ£×é¹Ì¼þ£»¹Ì¼þÎ»ÖÃÔÚSmarttofCliÖÐ£¬SDK1.32ÖÐSmarttofCli¹¤¾ß²»Ö§³ÖÉý¼¶µÍÓÚ132°æ±¾¹Ì¼þ°ü¡£
 
-### SDKè½¯ä»¶éƒ¨åˆ†
+## Ö÷ÒªÐÞ¸Ä£º
+
+### ¹Ì¼þ²¿·Ö
+
+- ÐÞ¸ÄCB°åÎÂ¶È¸üÐÂ»úÖÆ
+- °æ±¾ºÅ132
+
+### SDKÈí¼þ²¿·Ö
+
 - dmcam lib
-  - å¢žåŠ HDRæ”¯æŒ
-  - è°ƒæ•´æ•°æ®å¸§å¤´ï¼Œä¼˜åŒ–ä¼ è¾“é€Ÿåº¦
-  - å¢žåŠ å¸§æ•°æ®æ ¡éªŒæ”¯æŒ
-  - ä¿®å¤android æ‰“å¼€è®¾å¤‡é—®é¢˜
-  - ä¿®å¤å‚æ•°é•¿åº¦æº¢å‡ºé—®é¢˜
-  - ä¿®å¤ç‚¹äº‘æ˜¾ç¤ºè¾¹ç¼˜æ›²é¢å¼¯æ›²çš„é—®é¢˜
+  - ÐÞ¸´HDR»Ò¶ÈÍ¼ÎÊÌâ
+  - Ôö¼Ó½ûÓÃDRNUÏñËØÐ£×¼Ö§³Ö
+  - Èí¼þÔöÇ¿USB´«Êä¿¹¸ÉÈÅ´¦Àí
+  - ÓÅ»¯ÎÂ¶È²¹³¥ÏµÊý
 - Android
-  - å‘å¸ƒAndroidå¹³å°æ”¯æŒ
-    - æä¾›Androidå¹³å°æ‰€éœ€è¦çš„åº“
-    - æä¾›Androidå¹³å°smarttofviewerå·¥å…·å’Œæºç 
+  - Í¬²½¸üÐÂSmartTofViewer apk
 - Samples
-  - å‘å¸ƒwindowsä¸‹Openni2çš„é©±åŠ¨åº“
-  - å¢žåŠ ä½¿ç”¨Openni2æ ·ä¾‹
+  - Ôö¼ÓC++ÑùÀý
 - tools 
   - SmartTofViewer
-    - ç•Œé¢å¢žåŠ HDRé€‰é¡¹å’ŒHDRæ›å…‰æ—¶é—´è°ƒæ•´æ¡
+    - ½çÃæÔö¼Ó¡°ÏñËØÐ£×¼¡±¸´Ñ¡¿ò
+    - ÐÞ¸´µ×²ãstallµ¼ÖÂviewerÒì³£´íÎóÎÊÌâ
   - SmartTofCli
-    - ä¿®å¤é‡‡é›†æ—¶èŽ·å–æ•°æ®é”™è¯¯ç­‰bug
-- doc
-  - æ ·ä¾‹
-  - README_OpenNI2.md
-  - åº”ç”¨æŒ‡å—
-  - ã€ŠSmartTof FAQ æ‰‹å†Œã€‹
-  - ã€ŠSmartTof SDK ç®€ä»‹ã€‹
-  - ã€ŠSmartTof_Cli è¯´æ˜Žæ–‡æ¡£ã€‹
-  - ã€ŠSmartTofæ€Žæ ·æ¶ˆé™¤å¤šæ¨¡ç»„åŒæ—¶ä½¿ç”¨æ—¶çš„ä¸²æ‰°ã€‹
-- å…¶ä»–
-  - åœ¨linuxä¸‹å¢žåŠ ä½¿ç”¨æ¨¡ç»„è®¾å¤‡çš„æƒé™è®¾ç½®çš„è„šæœ¬
+    - Ôö¼Ó¹Ì¼þÓëÄ£×éÓ²¼þÊÇ·ñÆ¥Åä¼ì²â
 
+# °æ±¾ºÅ£º1.31
 
+## ·¢²¼Ê±¼ä£º2018/05/25
 
+## ×¢Òâ
 
-# ç‰ˆæœ¬å·ï¼š1.20
+SDK v1.31°æ±¾ÔÚlinuxÏÂ²»¼æÈÝÒÔÇ°µÄÄ£×é¹Ì¼þ£¬ËùÒÔÔÚlinuxÏÂÊ¹ÓÃSDK v1.31±ØÐëÒª¸üÐÂÄ£×é¹Ì¼þ£¬¶ÔÓÚHDR¡¢ÎÂ¶È±£»¤µÈÐÂÌØÐÔ windowsºÍlinuxÏÂ¶¼ÐèÒª¸üÐÂÄ£×é¹Ì¼þ£¬¹Ì¼þÎ»ÖÃÔÚSmarttofCliÖÐ
 
-## å‘å¸ƒæ—¶é—´ï¼š2018/04/13
+## Ö÷ÒªÐÞ¸Ä£º
 
-## ä¸»è¦ä¿®æ”¹ï¼š
+### ¹Ì¼þ²¿·Ö
+
+- ÎÂ¶È±£»¤×îµÍ½µÖÁ1Ö¡£¬ÎÂ¶È½µÏÂÀ´ºóÖ§³Ö×Ô¶¯ÉýÖ¡ÂÊ
+- ÔöÇ¿ÇÐ»»Ö¡ÂÊÎÈ¶¨ÐÔ
+
+### SDKÈí¼þ²¿·Ö
 
 - dmcam lib
-  - ä¼˜åŒ–æ¸©åº¦æ ¡å‡†è¡¥å¿
-  - å¢žåŠ æ¸©åº¦ä¿æŠ¤æœºåˆ¶
-  - å¢žåŠ å¤šæ¨¡ç»„å¹²æ‰°è½¯ä»¶æ»¤æ³¢æ”¯æŒ
-- ROS
-  - å¢žåŠ ROSå¹³å°æ”¯æŒ
-    - æä¾›æ·±åº¦ã€ç°åº¦ã€ç‚¹äº‘ã€ç›¸æœºå‚æ•°4ä¸ªtopic
-    - æä¾›ä¿®æ”¹å‚æ•°service
-    - æä¾›ROSæ‰©å±•çš„æ ·ä¾‹
+  - ÐÞ¸´µÍÖ¡ÂÊtimeoutÎÊÌâ
+  - ÐÞ¸´HDRºÍ¾µÍ·Ð£×¼Í¬Ê±Ê¹ÓÃÎÊÌâ
+  - ´ó·ùÓÅ»¯Êý¾Ý×ª»»½Ó¿Ú£¨raw2dist,raw2gray£©ÐÔÄÜ
+  - ÐÞ¸´frame_get_xyzd½Ó¿ÚÊä³öÑÕÉ«¿ÉÄÜ²»Õý³£ÎÊÌâ
+  - Ä¬ÈÏ¾µÍ·²ÎÊýÊ¹ÓÃ¾µÍ·TRC-2150D2(122¶È)µÄ²ÎÊý
+  - ÐÞ¸´Æ½ÃæÎïÌåµãÔÆÍ¼ÏñÍäÇúÎÊÌâ£¬ÓÅ»¯µãÔÆÏÔÊ¾Ð§¹û
+- tools 
+  - PCLViewer
+    - ÓÅ»¯ÏÔÊ¾¼°µ÷ÕûÐ§¹û
+
+# °æ±¾ºÅ£º1.30
+
+## ·¢²¼Ê±¼ä£º2018/05/21
+
+## Ö÷ÒªÐÞ¸Ä£º
+
+### ¹Ì¼þ²¿·Ö
+  - Ôö¼ÓHDRÖ§³Ö
+  - ÐÞ¸´USBÒì³£¶Ï¿ª£¬µÆ°åÎ´¹Ø±ÕÎÊÌâ
+  - Ôö¼ÓÎÂ¶È±£»¤»úÖÆ
+  - Ôö¼ÓÖ¡Êý¾ÝÐ£Ñé
+  - ÐÞ¸´Êý¾ÝÖ¡Ôö¼Ópaddingºó£¬µÍÖ¡ÂÊ²É¼¯ÎÊÌâ
+  - ÐÞ¸´µçÔ´Ö¸Ê¾µÆ²É¼¯ÖÐÏ¨ÃðÎÊÌâ
+
+### SDKÈí¼þ²¿·Ö
+- dmcam lib
+  - Ôö¼ÓHDRÖ§³Ö
+  - µ÷ÕûÊý¾ÝÖ¡Í·£¬ÓÅ»¯´«ÊäËÙ¶È
+  - Ôö¼ÓÖ¡Êý¾ÝÐ£ÑéÖ§³Ö
+  - ÐÞ¸´android ´ò¿ªÉè±¸ÎÊÌâ
+  - ÐÞ¸´²ÎÊý³¤¶ÈÒç³öÎÊÌâ
 - Android
-  - å¢žåŠ Androidå¹³å°æ”¯æŒ
-    - æä¾›Androidå¹³å°smarttofviewerå·¥å…·åŠæºç 
-    - æä¾›Androidå¹³å°æ‰€éœ€è¦çš„åº“
+  - ·¢²¼AndroidÆ½Ì¨Ö§³Ö
+    - Ìá¹©AndroidÆ½Ì¨ËùÐèÒªµÄ¿â
+    - Ìá¹©AndroidÆ½Ì¨smarttofviewer¹¤¾ßºÍÔ´Âë
+- Samples
+  - ·¢²¼windowsÏÂOpenni2µÄÇý¶¯¿â
+  - Ôö¼ÓÊ¹ÓÃOpenni2ÑùÀý
+- tools 
+  - SmartTofViewer
+    - ½çÃæÔö¼ÓHDRÑ¡ÏîºÍHDRÆØ¹âÊ±¼äµ÷ÕûÌõ
+  - SmartTofCli
+    - ÐÞ¸´²É¼¯Ê±»ñÈ¡Êý¾Ý´íÎóµÈbug
+- doc
+  - ÑùÀý
+  - README_OpenNI2.md
+  - Ó¦ÓÃÖ¸ÄÏ
+  - ¡¶SmartTof FAQ ÊÖ²á¡·
+  - ¡¶SmartTof SDK ¼ò½é¡·
+  - ¡¶SmartTof_Cli ËµÃ÷ÎÄµµ¡·
+  - ¡¶SmartTofÔõÑùÏû³ý¶àÄ£×éÍ¬Ê±Ê¹ÓÃÊ±µÄ´®ÈÅ¡·
+- ÆäËû
+  - ÔÚlinuxÏÂÔö¼ÓÊ¹ÓÃÄ£×éÉè±¸µÄÈ¨ÏÞÉèÖÃµÄ½Å±¾
+
+
+
+
+# °æ±¾ºÅ£º1.20
+
+## ·¢²¼Ê±¼ä£º2018/04/13
+
+## Ö÷ÒªÐÞ¸Ä£º
+
+- dmcam lib
+  - ÓÅ»¯ÎÂ¶ÈÐ£×¼²¹³¥
+  - Ôö¼ÓÎÂ¶È±£»¤»úÖÆ
+  - Ôö¼Ó¶àÄ£×é¸ÉÈÅÈí¼þÂË²¨Ö§³Ö
+- ROS
+  - Ôö¼ÓROSÆ½Ì¨Ö§³Ö
+    - Ìá¹©Éî¶È¡¢»Ò¶È¡¢µãÔÆ¡¢Ïà»ú²ÎÊý4¸ötopic
+    - Ìá¹©ÐÞ¸Ä²ÎÊýservice
+    - Ìá¹©ROSÀ©Õ¹µÄÑùÀý
+- Android
+  - Ôö¼ÓAndroidÆ½Ì¨Ö§³Ö
+    - Ìá¹©AndroidÆ½Ì¨smarttofviewer¹¤¾ß¼°Ô´Âë
+    - Ìá¹©AndroidÆ½Ì¨ËùÐèÒªµÄ¿â
 - samples
-  - å®Œå–„æ ·ä¾‹readme
+  - ÍêÉÆÑùÀýreadme
 - tools
   - SmartToFCli
-    - å¢žåŠ ä¿å­˜ç°åº¦ã€æ·±åº¦ã€ç‚¹äº‘æ•°æ®å‘½ä»¤æ”¯æŒ
-    - å¢žåŠ å›ºä»¶æ›´æ–°è„šæœ¬
+    - Ôö¼Ó±£´æ»Ò¶È¡¢Éî¶È¡¢µãÔÆÊý¾ÝÃüÁîÖ§³Ö
+    - Ôö¼Ó¹Ì¼þ¸üÐÂ½Å±¾
   - SmartToFViewer 
-    - ç•Œé¢å¢žåŠ å¤šæ¨¡ç»„æ»¤æ³¢å¹²æ‰°å¤é€‰æ¡†
+    - ½çÃæÔö¼Ó¶àÄ£×éÂË²¨¸ÉÈÅ¸´Ñ¡¿ò
 - doc
-  - æ ·ä¾‹readme
+  - ÑùÀýreadme
     - README_C_sample.md
     - README_Python_sample.md
     - README_sample.md
-  - åº”ç”¨æŒ‡å—
-    - ã€ŠSMARTTof_SDK_ROSç”¨æˆ·æ‰‹å†Œ.pdfã€‹
-    - ã€ŠTCM-Exæ¨¡ç»„å›ºä»¶å‡çº§è¯´æ˜Ž.pdfã€‹
-    - ã€ŠSmartTofæ€Žæ ·èŽ·å¾—ä¸å®šè·ç¦»çš„æœ€ä½³å›¾åƒ.pdfã€‹
-    - ã€ŠSmartTofæ€Žæ ·èŽ·å¾—æœ€ä½³å›¾åƒ.pdfã€‹
+  - Ó¦ÓÃÖ¸ÄÏ
+    - ¡¶SMARTTof_SDK_ROSÓÃ»§ÊÖ²á.pdf¡·
+    - ¡¶TCM-ExÄ£×é¹Ì¼þÉý¼¶ËµÃ÷.pdf¡·
+    - ¡¶SmartTofÔõÑù»ñµÃ²»¶¨¾àÀëµÄ×î¼ÑÍ¼Ïñ.pdf¡·
+    - ¡¶SmartTofÔõÑù»ñµÃ×î¼ÑÍ¼Ïñ.pdf¡·
 
-# ç‰ˆæœ¬å·ï¼š1.15
+# °æ±¾ºÅ£º1.15
 
-## å‘å¸ƒæ—¶é—´ï¼š2018/03/09
-## ä¸»è¦ä¿®æ”¹ï¼š
+## ·¢²¼Ê±¼ä£º2018/03/09
+## Ö÷ÒªÐÞ¸Ä£º
 - dmcam lib
-  - å¢žåŠ é™æ€ç¼–è¯‘åº“(.a)å’Œvisual studioåº“(.lib)
-  - æ”¯æŒè‡ªåŠ¨æ›å…‰æ—¶é—´æ¨¡å¼
+  - Ôö¼Ó¾²Ì¬±àÒë¿â(.a)ºÍvisual studio¿â(.lib)
+  - Ö§³Ö×Ô¶¯ÆØ¹âÊ±¼äÄ£Ê½
 - python
-  - æå‡pythonæ‰©å±•ç¨³å®šæ€§
-  - å¢žåŠ windows 64bit pythonæ”¯æŒ
-    - winä¸‹ç›®å‰æ”¯æŒ python 2.7/3.4/3.5/3.6 çš„32bitã€64bitç‰ˆæœ¬
-    - Linuxä¸‹ç›®å‰æ”¯æŒ python 2.7/3.4/3.5 çš„64bitç‰ˆæœ¬
+  - ÌáÉýpythonÀ©Õ¹ÎÈ¶¨ÐÔ
+  - Ôö¼Ówindows 64bit pythonÖ§³Ö
+    - winÏÂÄ¿Ç°Ö§³Ö python 2.7/3.4/3.5/3.6 µÄ32bit¡¢64bit°æ±¾
+    - LinuxÏÂÄ¿Ç°Ö§³Ö python 2.7/3.4/3.5 µÄ64bit°æ±¾
 - java
-  - å¢žåŠ linux javaæ‰©å±•
-    - winä¸‹æ”¯æŒjava 32bit, 64bit
-    - Linuxä¸‹æ”¯æŒjava 64bit
+  - Ôö¼Ólinux javaÀ©Õ¹
+    - winÏÂÖ§³Öjava 32bit, 64bit
+    - LinuxÏÂÖ§³Öjava 64bit
 - samples
-  - ä¸ºc/c++ sampleå¢žåŠ CMakelist.txtï¼Œå¯ç›´æŽ¥åœ¨å‘å¸ƒç›®å½•ä¸‹ç¼–è¯‘
+  - Îªc/c++ sampleÔö¼ÓCMakelist.txt£¬¿ÉÖ±½ÓÔÚ·¢²¼Ä¿Â¼ÏÂ±àÒë
 - tools
   - SmartToFCli
-    - é»˜è®¤è¿›å…¥interactiveæ¨¡å¼ï¼Œ-hæ˜¾ç¤ºå¸®åŠ©
+    - Ä¬ÈÏ½øÈëinteractiveÄ£Ê½£¬-hÏÔÊ¾°ïÖú
   - SmartToFViewer 
-    - ä¼˜åŒ–ç°åº¦å›¾æ˜¾ç¤º
-    - æ”¯æŒè‡ªåŠ¨æ›å…‰æ—¶é—´æ¨¡å¼
+    - ÓÅ»¯»Ò¶ÈÍ¼ÏÔÊ¾
+    - Ö§³Ö×Ô¶¯ÆØ¹âÊ±¼äÄ£Ê½
 
-# ç‰ˆæœ¬å·ï¼š1.12
-## å‘å¸ƒæ—¶é—´ï¼š2018/02/28
-## ä¸»è¦ä¿®æ”¹ï¼š
- * å¢žåŠ æ¸©åº¦è¡¥å¿
- * æ”¯æŒå¸§çŽ‡è®¾ç½®
- * ä¼˜åŒ–ç°åº¦å›¾æ˜¾ç¤º
+# °æ±¾ºÅ£º1.12
+## ·¢²¼Ê±¼ä£º2018/02/28
+## Ö÷ÒªÐÞ¸Ä£º
+ * Ôö¼ÓÎÂ¶È²¹³¥
+ * Ö§³ÖÖ¡ÂÊÉèÖÃ
+ * ÓÅ»¯»Ò¶ÈÍ¼ÏÔÊ¾

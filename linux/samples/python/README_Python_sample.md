@@ -5,7 +5,6 @@
 ## python样例运行所需的库
 - 安装支持smarttof模组的python扩展库
   SDK中分别为windows和linux平台提供了支持smarttof模组的python扩展库，并且对应不同的python版本，方便用户选择适合的开发环境。下图是python扩展库的版本支持列表。
-  
   -  windows
   
   |支持版本|扩展库名|
@@ -87,12 +86,12 @@
   amp_min_val.min_amp = 30	#设置幅值滤波阈值
   dmcam.filter_enable(dev,dmcam.DMCAM_FILTER_ID_AMP,amp_min_val,sys.getsizeof(amp_min_val))	#开启幅值滤波
   
-  #开启自动积分时间
+  # 开启自动积分时间
   intg_auto_arg = dmcam.filter_args_u()
   intg_auto_arg.sta_ratio = 5	#设置曝光点参数，一般为5
   dmcam.filter_enable(dev,dmcam.DMCAM_FILTER_ID_AUTO_INTG,intg_auto_arg,sys.getsizeof(intg_auto_arg))	#开启自动曝光
   
-  #开启消除串扰
+  # 开启消除串扰
   delay = dmcam.filter_args_u()
   delay.sync_delay = 0; #random delay
   if INTERFERENC_CHECK_EN:	#需检测是否使能

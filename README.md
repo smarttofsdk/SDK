@@ -1,3 +1,4 @@
+
 # SmartToF SDK使用说明
 ***
 ## 1、SmartToF SDK简介
@@ -186,16 +187,18 @@ const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t
 ***
 ### 3.3相关样例说明
 SmartToF SDK提供的主要样例如下：
-- C样例：参见（[C样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c)）
+- C样例：参见（[C样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/dmcam/samples/c)）
   - sample_capture_frames.c:展示采集数据
   - sample_set_param.c:展示进行参数的设置
   - sample_filter.c:展示校准数据
-- python样例：参见（[python样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/python)）
-  - sample_gui_pyQtGraph.py:采集数据显示
-  - sample_gui_pygame.py:采集数据显示
-  - sample_param.py:展示参数设置和读取
-  - sample_basic:展示采集数据
-- java样例：参见([java样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
-  - sampleBasic.java:java采集样例
-  - sampleBasicUi.java:java采集显示样例
-- ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/ros))
+- python样例：参见（[python样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/dmcam/samples/python)）
+  - test_gui_pyQtGraph.py:采集数据显示
+  - test_gui_pygame.py:采集数据显示
+  - test_param.py:展示参数设置和读取
+  - test_raw:展示采集数据
+- java样例：参见([java样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/dmcam/samples/java))
+  - testBasic.java:java采集样例
+  - testBasicUi.java:java采集显示样例
+- ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/linux/dmcam/samples/ros/src/tof_sample))
+  - tof_sample:展示如何获取图像和点云。
+

@@ -1,2 +1,2 @@
-call dmcam-cli.exe -f smart_tof_e2_fw_20180525.bin
+call dmcam-cli.exe -f TM-E2_HW20_SW132_20180605.bin
 pause
