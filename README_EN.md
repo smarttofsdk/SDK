@@ -191,6 +191,10 @@ The main samples provided by SmartToF SDK are following：
   - sample_capture_frames.c: Demonstrate data acquired
   - sample_set_param.c: Demonstrate setting parameters
   - sample_filter.c: Demonstrate data calibration
+- C++ samples:See([C++ samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c%2B%2B))
+  - sample_capture_frames.cpp: Demonstrate data acquired
+  - sample_set_param.cpp: Demonstrate setting parameters
+  - sample_filter.cpp: Demonstrate data calibration 
 - python samples：See（[python samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/python)）
   - sample_gui_pyQtGraph.py: Demonstrate data acquired
   - sample_gui_pygame.py: Demonstrate data acquired
@@ -199,6 +203,7 @@ The main samples provided by SmartToF SDK are following：
 - java samples: See([java samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
   - sampleBasic.java: java acquisition sample
   - sampleBasicUi.java: java acquisition and demonstration sample
+- OpenNI sample:see([OpenNI sample link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/openni2))
 - ROS sample: See([ros sample link](https://github.com/smarttofsdk/SDK/tree/master/ros))
   - tof_sample: Demonstrate how to acquire image and pointcloud
 

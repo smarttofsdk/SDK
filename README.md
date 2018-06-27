@@ -231,6 +231,10 @@ SmartToF SDK提供的主要样例如下：
   - sample_capture_frames.c:展示采集数据
   - sample_set_param.c:展示进行参数的设置
   - sample_filter.c:展示校准数据
+- C++样例：参见([C++样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c%2B%2B))
+  - sample_capture_frames.cpp:展示采集数据
+  - sample_set_param.cpp:展示进行参数的设置
+  - sample_filter.cpp:展示校准数据
 - python样例：参见（[python样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/python)）
   - sample_gui_pyQtGraph.py:采集数据显示
   - sample_gui_pygame.py:采集数据显示
@@ -239,5 +243,6 @@ SmartToF SDK提供的主要样例如下：
 - java样例：参见([java样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
   - sampleBasic.java:java采集样例
   - sampleBasicUi.java:java采集显示样例
+- OpenNI样例：参见([OpenNI样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/openni2))
 - ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/ros))
 
