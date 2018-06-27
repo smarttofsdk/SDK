@@ -187,18 +187,18 @@ const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t
 ***
 ### 3.3 Introduction on relevant samples
 The main samples provided by SmartToF SDK are following：
-- C samples：See（[C samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/dmcam/samples/c)）
+- C samples：See（[C samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c)）
   - sample_capture_frames.c: Demonstrate data acquired
   - sample_set_param.c: Demonstrate setting parameters
   - sample_filter.c: Demonstrate data calibration
-- python samples：See（[python samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/dmcam/samples/python)）
-  - test_gui_pyQtGraph.py: Demonstrate data acquired
-  - test_gui_pygame.py: Demonstrate data acquired
-  - test_param.py: Demonstrate parameters setting and reading
-  - test_raw: Demonstrate data acquired
-- java samples: See([java samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/dmcam/samples/java))
-  - testBasic.java: java acquisition sample
-  - testBasicUi.java: java acquisition and demonstration sample
-- ROS sample: See([ros sample link](https://github.com/smarttofsdk/SDK/tree/master/linux/dmcam/samples/ros/src/tof_sample))
+- python samples：See（[python samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/python)）
+  - sample_gui_pyQtGraph.py: Demonstrate data acquired
+  - sample_gui_pygame.py: Demonstrate data acquired
+  - sample_param.py: Demonstrate parameters setting and reading
+  - sample_basic: Demonstrate data acquired
+- java samples: See([java samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
+  - sampleBasic.java: java acquisition sample
+  - sampleBasicUi.java: java acquisition and demonstration sample
+- ROS sample: See([ros sample link](https://github.com/smarttofsdk/SDK/tree/master/ros))
   - tof_sample: Demonstrate how to acquire image and pointcloud
 
