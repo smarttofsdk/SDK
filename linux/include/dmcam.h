@@ -26,10 +26,16 @@ extern "C"
 #endif
 #ifdef _MSC_VER
 #define __API __declspec(dllexport)
+
+#if _MSC_VER >= 1800
+#include <stdbool.h>
+#else
 #define false   0
 #define true    1
 
 #define bool int
+#endif
+
 #else
 #define __API //__declspec(dllimport)
 #include <stdbool.h>
@@ -38,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 32
-#define DM_VERSION_STR "v1.32"
+#define DM_VERSION_MINOR 40
+#define DM_VERSION_STR "v1.40"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -686,8 +692,8 @@ __API int dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,
  * get gray data from raw frame data.
  * 
  * @param dev [in] specified dmcam device
- * @param dst [out] distance buffer. The unit of distance is in 
- *            meters (float32)
+ * @param dst [out] gray buffer. The gray value denotes the amplitude. 
+ *            (float32 in [0, 2048.0) )
  * @param dst_len [in] distance buffer length in number of float
  * @param src [in] raw frame  data buffer
  * @param src_len [in] raw frame data length in byte
@@ -757,7 +763,7 @@ int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
 typedef enum {
     DMCAM_FILTER_ID_LEN_CALIB,  /**>lens calibration*/
     DMCAM_FILTER_ID_PIXEL_CALIB, /**>pixel calibration*/
-    DMCAM_FILTER_ID_KALMAN,    /**>Kalman filter for distance data*/
+    DMCAM_FILTER_ID_MEDIAN,    /**>Median filter for distance data*/
     DMCAM_FILTER_ID_GAUSS,     /**>Gauss filter for distance data*/
     DMCAM_FILTER_ID_AMP, /**>Amplitude filter control*/
     DMCAM_FILTER_ID_AUTO_INTG, /**>auto integration filter enable : use sat_ratio to adjust */
@@ -772,13 +778,14 @@ typedef union {
     uint32_t lens_id; /**>length index*/
     uint32_t min_amp; /**>Min amplitude threshold*/
     uint16_t sat_ratio; /**>saturation ratio threshold*/
-    uint16_t sync_delay;/**>capture sync delay*/
-    uint8_t random_delay_en;/**>0:enable/>=1:disable random delay value*/
-    int16_t temp_threshold;/**>Temperature threshold for temperature monitor*/
-    struct{
-          uint16_t intg_3d;/**>intg_3d:3d intg time*/
-          uint16_t intg_3dhdr;/**> intg_3dhdr:3dhdr intg time*/
-          }intg;
+    uint16_t sync_delay; /**>capture sync delay*/
+    uint8_t random_delay_en; /**>0:enable/>=1:disable random delay value*/
+    int16_t temp_threshold; /**>Temperature threshold for temperature monitor*/
+    struct {
+        uint16_t intg_3d; /**>intg_3d:3d intg time*/
+        uint16_t intg_3dhdr; /**> intg_3dhdr:3dhdr intg time*/
+    }intg;
+    uint8_t median_ksize; /**> median filter kernel size. Normally use 3 or 5*/
 }dmcam_filter_args_u;
 
 
