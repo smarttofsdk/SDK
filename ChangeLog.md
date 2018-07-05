@@ -10,8 +10,9 @@
 
 ### SDK软件部分
 - dmcam lib
-  - 增加点云优化处理
+  - 增加点云优化处理，默认使能fliter_id为DMCAM_FILTER_ID_MEDIAN,用户可以自行关闭
   - 修复HDR显示问题
+  - 修复灰度图时内存泄漏问题
 - tools
   - SmarttofViewer
     - 增加深度图滤波复选框
