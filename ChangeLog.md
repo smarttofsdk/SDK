@@ -17,6 +17,8 @@
   - SmarttofViewer
     - 增加深度图滤波复选框
     - 大幅优化点云显示效果
+- firmware
+  - 增加firmware文件夹，存放固件升级相关文件
 
 
 
