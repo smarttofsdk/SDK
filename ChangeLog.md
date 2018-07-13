@@ -10,12 +10,12 @@
 
 ### SDK软件部分
 - dmcam lib
-  - 增加优化的filter：gauss、flynoise、fillhome
+  - 增加优化的filter：gauss、flynoise、fillhole
   - 进一步优化点云效果
-- bug fix
   - 修复连续cap_start导致的问题
   - 改进实测距离偏小问题
   - 改进快速算法，优化内存占用
+  - 修复内存泄漏
 
 # 版本号：1.40
 
