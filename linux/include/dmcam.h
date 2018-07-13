@@ -44,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 40
-#define DM_VERSION_STR "v1.40"
+#define DM_VERSION_MINOR 42
+#define DM_VERSION_STR "v1.42"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -54,8 +54,6 @@ extern "C"
 #define DMCAM_ERR_CAP_STALL   (-7)
 #define DMCAM_ERR_CAP_ERROR   (-8)
 #define DMCAM_ERR_CAP_UNKNOWN  (-10)
-
-#define DMCAM_FILTER_EN 1
 
 //typedef struct {
 //    uint32_t mod_clk; // modulation clock
@@ -625,16 +623,15 @@ __API int dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *fr
 
 /**
 * get one frame into specified buffer. this function is
-* non-blocking, if no frame is ready, it returns false
+* non-blocking, if no frame is ready, it returns 0
 *
 * @param dev [in] dmcam device handler
 * @param frame_data [out] frame data  to be filled, it can be
 *                   NULL
 * @param frame_info [out] frame attributes. It can be NULL
 *
-* @return bool
+* @return int return 0 if not frame is ready, else return 1
 */
-
 __API int dmcam_cap_get_frame(dmcam_dev_t *dev, uint8_t *frame_data, uint32_t frame_dlen, dmcam_frame_t *frame_info);
 /**
 * (Deprecated) wait capture process with specified timeout
@@ -759,7 +756,6 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
 
 int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
                              const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
-#if DMCAM_FILTER_EN
 typedef enum {
     DMCAM_FILTER_ID_LEN_CALIB,  /**>lens calibration*/
     DMCAM_FILTER_ID_PIXEL_CALIB, /**>pixel calibration*/
@@ -776,10 +772,9 @@ typedef enum {
 typedef union {
     uint8_t case_idx; /**>User Scenario index */
     uint32_t lens_id; /**>length index*/
-    uint32_t min_amp; /**>Min amplitude threshold*/
+    uint16_t min_amp; /**>Min amplitude threshold*/
     uint16_t sat_ratio; /**>saturation ratio threshold*/
-    uint16_t sync_delay; /**>capture sync delay*/
-    uint8_t random_delay_en; /**>0:enable/>=1:disable random delay value*/
+    uint16_t sync_delay; /**> sync delay: 0 = random delay, 1 = specified delay in ms */
     int16_t temp_threshold; /**>Temperature threshold for temperature monitor*/
     struct {
         uint16_t intg_3d; /**>intg_3d:3d intg time*/
@@ -812,7 +807,6 @@ __API int dmcam_filter_enable(dmcam_dev_t *dev,  dmcam_filter_id_e fid, dmcam_fi
  * @return __API int
  */
 __API int dmcam_filter_disable(dmcam_dev_t *dev,  dmcam_filter_id_e fid);
-#endif
 
 
 
