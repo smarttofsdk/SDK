@@ -60,8 +60,9 @@ SmartToF SDK的使用需要进行所在系统的环境配置，包括
 ------
 
 ## 3、主要API介绍和样例说明
+**注意 目前API接口不是线程安全的，建议在同一个线程中使用API接口**
 
-SmartToF SDK中所有相关结构体定义和函数声明都位于lib\include文件夹下的dmcam.h中，例如windows下在SDK/windows/dmcam/lib/include下，里面对函数的主要功能和参数都有详细说明。
+SmartToF SDK中所有相关结构体定义和函数声明都位于lib\include文件夹下的dmcam.h中，例如windows下在SDK/windows/dmcam/lib/include下，里面对函数的主要功能和参数都有详细说明,在wiki下也有[《SmartToF SDK 重要API接口说明》](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-%E9%87%8D%E8%A6%81API%E8%AF%B4%E6%98%8E)
 
 ### 3.1 最简化的采集数据例程
 
