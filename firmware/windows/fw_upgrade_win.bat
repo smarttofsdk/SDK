@@ -1,6 +1,6 @@
 @echo off
 
-set upgradebin= TM-E2_HW20_SW132_20180605.bin
+set upgradebin= TM-E2_HW20_SW143_20180724.bin
 REM set upgradebinHW= TM-E2_HW100_SW132_20180605.bin
 
 call dmcam-cli-140.exe -v debug -e "print info" >moduleinfo.txt
