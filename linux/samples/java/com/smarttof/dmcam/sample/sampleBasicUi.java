@@ -142,7 +142,7 @@ public class sampleBasicUi {
 		// showImage(img);
 		// return;
 		dmcam.init(null);
-		dmcam.log_cfg(log_level_e.LOG_LEVEL_NONE, log_level_e.LOG_LEVEL_WARN,
+		dmcam.log_cfg(log_level_e.LOG_LEVEL_NONE, log_level_e.LOG_LEVEL_DEBUG,
 				log_level_e.LOG_LEVEL_NONE);
 		dmcamDevArray devs = new dmcamDevArray(16);
 		int cnt = dmcam.dev_list(devs.cast(), 16);
@@ -199,6 +199,9 @@ public class sampleBasicUi {
         filter_args_u amp_min_val = new filter_args_u();
         amp_min_val.setMin_amp(15);
         dmcam.filter_enable(dev, filter_id_e.DMCAM_FILTER_ID_AMP, amp_min_val, 4);
+
+        /* disable pix calib */
+        dmcam.filter_disable(dev, filter_id_e.DMCAM_FILTER_ID_PIXEL_CALIB);
 
         while (run) {
 			// get one frame
