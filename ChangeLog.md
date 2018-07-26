@@ -19,6 +19,8 @@
 - tools 
   - Smarttof cli
     - 修复采集数据丢失问题
+  - Smarttofviewer
+    - 修复smarttofviewer不能正常退出的问题
 
 
 # 版本号：1.42
