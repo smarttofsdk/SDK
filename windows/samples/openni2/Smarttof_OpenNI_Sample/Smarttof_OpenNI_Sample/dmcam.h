@@ -26,10 +26,16 @@ extern "C"
 #endif
 #ifdef _MSC_VER
 #define __API __declspec(dllexport)
+
+#if _MSC_VER >= 1800
+#include <stdbool.h>
+#else
 #define false   0
 #define true    1
 
 #define bool int
+#endif
+
 #else
 #define __API //__declspec(dllimport)
 #include <stdbool.h>
@@ -38,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 30
-#define DM_VERSION_STR "v1.30"
+#define DM_VERSION_MINOR 43
+#define DM_VERSION_STR "v1.43"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -48,8 +54,6 @@ extern "C"
 #define DMCAM_ERR_CAP_STALL   (-7)
 #define DMCAM_ERR_CAP_ERROR   (-8)
 #define DMCAM_ERR_CAP_UNKNOWN  (-10)
-
-#define DMCAM_FILTER_EN 1
 
 //typedef struct {
 //    uint32_t mod_clk; // modulation clock
@@ -619,16 +623,15 @@ __API int dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *fr
 
 /**
 * get one frame into specified buffer. this function is
-* non-blocking, if no frame is ready, it returns false
+* non-blocking, if no frame is ready, it returns 0
 *
 * @param dev [in] dmcam device handler
 * @param frame_data [out] frame data  to be filled, it can be
 *                   NULL
 * @param frame_info [out] frame attributes. It can be NULL
 *
-* @return bool
+* @return int return 0 if not frame is ready, else return 1
 */
-
 __API int dmcam_cap_get_frame(dmcam_dev_t *dev, uint8_t *frame_data, uint32_t frame_dlen, dmcam_frame_t *frame_info);
 /**
 * (Deprecated) wait capture process with specified timeout
@@ -686,14 +689,14 @@ __API int dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,
  * get gray data from raw frame data.
  * 
  * @param dev [in] specified dmcam device
- * @param dst [out] distance buffer. The unit of distance is in 
- *            meters (float32)
+ * @param dst [out] gray buffer. The gray value denotes the amplitude. 
+ *            (float32 in [0, 2048.0) )
  * @param dst_len [in] distance buffer length in number of float
  * @param src [in] raw frame  data buffer
  * @param src_len [in] raw frame data length in byte
  * @param finfo [in] raw frame information 
  * 
- * @return int [out] return the number for distance points in 
+ * @return int [out] return the number for gray points in 
  *         dst
  */
 
@@ -753,11 +756,10 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
 
 int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
                              const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
-#if DMCAM_FILTER_EN
 typedef enum {
     DMCAM_FILTER_ID_LEN_CALIB,  /**>lens calibration*/
     DMCAM_FILTER_ID_PIXEL_CALIB, /**>pixel calibration*/
-    DMCAM_FILTER_ID_KALMAN,    /**>Kalman filter for distance data*/
+    DMCAM_FILTER_ID_MEDIAN,    /**>Median filter for distance data*/
     DMCAM_FILTER_ID_GAUSS,     /**>Gauss filter for distance data*/
     DMCAM_FILTER_ID_AMP, /**>Amplitude filter control*/
     DMCAM_FILTER_ID_AUTO_INTG, /**>auto integration filter enable : use sat_ratio to adjust */
@@ -770,15 +772,15 @@ typedef enum {
 typedef union {
     uint8_t case_idx; /**>User Scenario index */
     uint32_t lens_id; /**>length index*/
-    uint32_t min_amp; /**>Min amplitude threshold*/
+    uint16_t min_amp; /**>Min amplitude threshold*/
     uint16_t sat_ratio; /**>saturation ratio threshold*/
-    uint16_t sync_delay;/**>capture sync delay*/
-    uint8_t random_delay_en;/**>0:enable/>=1:disable random delay value*/
-    int16_t temp_threshold;/**>Temperature threshold for temperature monitor*/
-    struct{
-          uint16_t intg_3d;/**>intg_3d:3d intg time*/
-          uint16_t intg_3dhdr;/**> intg_3dhdr:3dhdr intg time*/
-          }intg;
+    uint16_t sync_delay; /**> sync delay: 0 = random delay, 1 = specified delay in ms */
+    int16_t temp_threshold; /**>Temperature threshold for temperature monitor*/
+    struct {
+        uint16_t intg_3d; /**>intg_3d:3d intg time*/
+        uint16_t intg_3dhdr; /**> intg_3dhdr:3dhdr intg time*/
+    }intg;
+    uint8_t median_ksize; /**> median filter kernel size. Normally use 3 or 5*/
 }dmcam_filter_args_u;
 
 
@@ -805,7 +807,6 @@ __API int dmcam_filter_enable(dmcam_dev_t *dev,  dmcam_filter_id_e fid, dmcam_fi
  * @return __API int
  */
 __API int dmcam_filter_disable(dmcam_dev_t *dev,  dmcam_filter_id_e fid);
-#endif
 
 
 

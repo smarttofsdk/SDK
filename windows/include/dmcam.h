@@ -44,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 42
-#define DM_VERSION_STR "v1.42"
+#define DM_VERSION_MINOR 43
+#define DM_VERSION_STR "v1.43"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -696,7 +696,7 @@ __API int dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,
  * @param src_len [in] raw frame data length in byte
  * @param finfo [in] raw frame information 
  * 
- * @return int [out] return the number for distance points in 
+ * @return int [out] return the number for gray points in 
  *         dst
  */
 
