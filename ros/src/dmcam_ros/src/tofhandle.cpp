@@ -436,7 +436,7 @@ void TofHandle::pub_image(void)
 //publish point cloud
 void TofHandle::pub_pointCloud(float* pcl_buff)
 {
-	dmcam_frame_get_pcl(dev,pcl_exchange,roi.cur_fsize/2,pcl_buff,fbuf_info.frame_info.frame_size,fbuf_info.frame_info.width,fbuf_info.frame_info.height,&cam_int_param);
+	dmcam_frame_get_pcl(dev,pcl_exchange,3*roi.cur_fsize/2,pcl_buff,fbuf_info.frame_info.frame_size,fbuf_info.frame_info.width,fbuf_info.frame_info.height,&cam_int_param);
     pclPointCloudXYZ::Ptr pCloud(new pclPointCloudXYZ);
     for (int m = 0; m < roi.cur_fsize / 2; m++) {
         pCloud->points.push_back(pcl::PointXYZ(pcl_exchange[3 * m], pcl_exchange[3 * m + 1], pcl_exchange[3 * m + 2]));
