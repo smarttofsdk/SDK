@@ -1,0 +1,3 @@
+1.根据自身系统进入windows或者linux
+2.windows下运行fw_upgrade_win.bat,linux下运行fw_upgrade_linux.sh
+注意：升级前模组固件版本为143以前的，升级时间较长，需要根据升级提示耐心等待。

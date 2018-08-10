@@ -2,9 +2,11 @@
 SCRIPT_DIR=$(cd `dirname $0`;pwd)
 
 TARGET_DIR=$SCRIPT_DIR
-# FINDID=111b:1238
-# FINDVERSION="MCU Firmware Version : 112"
-upgradebin=./TM-E2_HW20_SW143_20180724.bin
+
+package_DIR=$SCRIPT_DIR/package_upgrade
+nopackHW20_DIR=$SCRIPT_DIR/nopack_HW20
+nopackHW30_DIR=$SCRIPT_DIR/nopack_HW30
+
 
 die(){
     echo "ERROR:$@"	
@@ -17,24 +19,44 @@ cd $TARGET_DIR
 echo "`pwd`"
 
  
- # ./dmcam-cli -f $upgradebin
- # ./dmcam-cli -e "flash mcu "$upgradebin""
  
-ver=`./dmcam-cli-140 --print info |grep "MCU" |awk -F' ' 'NR==1{print $5}'`
- 
-echo "now mcu version is $ver"
+ver=`./dmcam-cli_static143 --print info |grep "MCU" |awk -F' ' 'NR==1{print $5}'`
+hardver=`./dmcam-cli_static143 --print info |grep "Its Hardware" |awk -F' ' 'NR==1{print $5}'`
+tfcver=`./dmcam-cli_static143 --print info |grep "TFC Firmware" |awk -F' ' 'NR==1{print $5}'`
 
+# ver=146
+# hardver=30
 
-if [ $ver -le 131 ]; then
-    echo "use cli131"
-    # ./dmcam-cli-131 -f $upgradebin
-	./dmcam-cli-131 -f "TM-E2_HW20_SW143_20180724.bin"
+echo "now mcu version is $ver,hardver is $hardver,tfcver is $tfcver"
+
+if [ $tfcver -gt 0 -a $tfcver -le 145 ]; then
+	echo "your version is not correct for support,please contact the FAE for help"
 else
-    echo "use cli140"
-    # ./dmcam-cli-140 -f $upgradebin
-	 ./dmcam-cli-140 -f "TM-E2_HW20_SW143_20180724.bin"
+	if [ $ver -le 131 ]; then
+		
+		echo "your version is too old,please first to the uploaddir to upgrade to 143,the do the next upgrade"
+	else
+		if [ $ver -le 143 -a $hardver -eq 20 ]; then
+			echo "use in package_upgrade"
+			cd $package_DIR
+			./upgrade.sh
+		else
+			if [ $hardver -eq 20 -a $ver -gt 143 ]; then
+				echo "use in nopack_HW20"
+				cd $nopackHW20_DIR
+				./upgrade.sh
+			else
+				if [ $hardver -eq 30 ]; then
+					echo "use in nopack_HW30"
+					cd $nopackHW30_DIR
+					./upgrade.sh
+				else
+					echo "not support upgrade,please contact the FAE"
+				fi
+			fi
+		fi
+	fi
 fi
-
 
 
 
