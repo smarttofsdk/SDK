@@ -44,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 43
-#define DM_VERSION_STR "v1.43"
+#define DM_VERSION_MINOR 50
+#define DM_VERSION_STR "v1.50"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -70,21 +70,24 @@ typedef enum {
     DEV_IF_ETH,
 }dmcam_dev_if_e;
 
+struct dmcam_dev_if_info_usb {
+    uint8_t usb_bus_num;
+    uint8_t usb_port_num;
+    uint8_t usb_dev_addr;
+    uint8_t usb_speed;
+};
+struct dmcam_dev_if_info_eth{
+    uint8_t addr[16]; 
+    uint8_t reserved[16];
+    uint32_t token;
+    uint32_t cid;
+};
+
 typedef struct {
     dmcam_dev_if_e type; // interface type
     union {
-        struct dmcam_dev_if_info_usb {
-            uint8_t usb_bus_num;
-            uint8_t usb_port_num;
-            uint8_t usb_dev_addr;
-            uint8_t usb_speed;
-        } usb;
-        struct dmcam_dev_if_info_eth{
-            uint8_t addr[16]; 
-            uint8_t reserved[16];
-            uint32_t token;
-            uint32_t cid;
-        } eth;
+        struct dmcam_dev_if_info_usb usb;
+        struct dmcam_dev_if_info_eth eth;
     } info;
 }dmcam_dev_if_info_t;
 typedef union {
@@ -283,15 +286,23 @@ typedef union {
         int16_t br_cal;
         int16_t ib_cal;
     }temp;
-    struct {
+      struct {
         uint8_t valid;      //data is valid;1==valid
-        uint8_t place;   //place type(RAM,FLASH and so on)
         uint8_t flag;    //0:no compression used;1:zip compression used
-        uint32_t info;   //data info, version
+        uint32_t ID;   //data info, version
+        uint32_t timestamp;
         uint32_t fsize;   //head+data+paddingsize
         uint32_t datasize; //data size
-        uint16_t cksum;
     }cinfo; //calibration info
+    //struct {
+    //    uint8_t valid;      //data is valid;1==valid
+    //    uint8_t place;   //place type(RAM,FLASH and so on)
+    //    uint8_t flag;    //0:no compression used;1:zip compression used
+    //    uint32_t info;   //data info, version
+    //    uint32_t fsize;   //head+data+paddingsize
+    //    uint32_t datasize; //data size
+    //    uint16_t cksum;
+    //}cinfo; //calibration info
     struct {
         uint16_t part_ver; //chip part version
         uint16_t chip_id; //chip id
@@ -766,6 +777,8 @@ typedef enum {
     DMCAM_FILTER_ID_SYNC_DELAY,//**>Delay module capture start in random ms, capture sync use
     DMCAM_FILTER_ID_TEMP_MONITOR,//**>Monitor Module temperature 
     DMCAM_FILTER_ID_HDR,//**>Monitor Module temperature 
+    DMCAM_FILTER_ID_OFFSET, /**> set offset for calc distance */
+    //-------------------
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
 
@@ -781,6 +794,7 @@ typedef union {
         uint16_t intg_3dhdr; /**> intg_3dhdr:3dhdr intg time*/
     }intg;
     uint8_t median_ksize; /**> median filter kernel size. Normally use 3 or 5*/
+    int32_t offset_mm;  /**> offset in mm for DMCMA_FILTER_ID_OFFSET filter */
 }dmcam_filter_args_u;
 
 
