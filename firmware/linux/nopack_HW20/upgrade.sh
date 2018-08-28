@@ -13,8 +13,8 @@ cd $TARGET_DIR
 
 echo "`pwd`"
 
-
-./dmcam-cli -f TM-E2_HW20_SW150_20180809.bin
+export LD_LIBRARY_PATH=./
+./dmcam-cli -f TM-E2_HW20_SW154_20180828.bin
 
 
 

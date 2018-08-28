@@ -19,19 +19,22 @@ echo "be careful there are 3 steps to upgrade,do not shutdown the window during 
 echo "...............step 1 of all 3................"
 ./dmcam-cli_static143 -e version
  
+export LD_LIBRARY_PATH=./
 ./bin_data_upgrade 1
 
 echo "...............step 2 of all 3................"
-./dmcam-cli_static143 -f TM-E2_HW20_SW150_20180809.bin
+./dmcam-cli_static143 -f TM-E2_HW20_SW154_20180828.bin
 echo "do not close"
 #wait 
 sleep 10
 
+export LD_LIBRARY_PATH=./
 ./bin_data_upgrade 6
 echo "do not close"
 sleep 10
 
 echo "...............step 3 of all 3................"
+export LD_LIBRARY_PATH=./
 ./bin_data_upgrade 2
 echo "now upgrade finished"
 
