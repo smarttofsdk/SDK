@@ -44,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 50
-#define DM_VERSION_STR "v1.50"
+#define DM_VERSION_MINOR 54
+#define DM_VERSION_STR "v1.54"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -68,6 +68,9 @@ extern "C"
 typedef enum {
     DEV_IF_USB = 0,
     DEV_IF_ETH,
+    DEV_IF_FILE,
+
+    DEV_IF_NONE = 99,
 }dmcam_dev_if_e;
 
 struct dmcam_dev_if_info_usb {
@@ -83,13 +86,19 @@ struct dmcam_dev_if_info_eth{
     uint32_t cid;
 };
 
+struct dmcam_dev_if_info_fil{
+    void* fd;
+};
+
 typedef struct {
     dmcam_dev_if_e type; // interface type
     union {
         struct dmcam_dev_if_info_usb usb;
         struct dmcam_dev_if_info_eth eth;
+        struct dmcam_dev_if_info_fil fil;
     } info;
 }dmcam_dev_if_info_t;
+
 typedef union {
     uint16_t version[4];
     struct {
@@ -124,7 +133,7 @@ typedef struct {
     void *user_data1; // used internally for python extension
     bool init_flag;  /* struct init flag */
     bool alloc_flag; /* malloc flag used internally */
-    bool api_flag; /* sync between frame wait/get and normal api */
+    uint8_t api_flag; /* sync between frame wait/get and normal api */
 }dmcam_dev_t;
 
 /**
@@ -185,20 +194,20 @@ typedef enum {
     PARAM_INFO_PRODUCT,
     PARAM_INFO_CAPABILITY,
     PARAM_INFO_SERIAL,
-    PARAM_INFO_VERSION,  //HW&SW info
-    PARAM_INFO_SENSOR, //part version, chip id, wafer id
+    PARAM_INFO_VERSION,   //HW&SW info
+    PARAM_INFO_SENSOR,    //part version, chip id, wafer id
 
-    PARAM_INFO_CALIB, //get calibration info
-    PARAM_ROI, //ROI set/get
-    PARAM_FRAME_FORMAT, //frame information,eg.dcs1for gray,4 dcs for distance
-    PARAM_ILLUM_POWER, //illumination power set/get
-    PARAM_FRAME_RATE, //frame rate set/get
-    PARAM_INTG_TIME, //integration time set/get
-    PARAM_PHASE_CORR, //phase offset correction
-                      //PARAM_SWITCH_MODE, /*>swith mode use[gray,3d]*/
-    PARAM_TEMP,        //<Get camera temperature--------------
-    PARAM_HDR_INTG_TIME, //<Setting HDR integration time param
-    PARAM_SYNC_DELAY,//<delay ms for sync use
+    PARAM_INFO_CALIB,     //get calibration info
+    PARAM_ROI,            //ROI set/get
+    PARAM_FRAME_FORMAT,   //frame information,eg.dcs1for gray,4 dcs for distance
+    PARAM_ILLUM_POWER,    //illumination power set/get
+    PARAM_FRAME_RATE,     //frame rate set/get
+    PARAM_INTG_TIME,      //integration time set/get
+    PARAM_PHASE_CORR,     //phase offset correction
+                          //PARAM_SWITCH_MODE, /*>swith mode use[gray,3d]*/
+    PARAM_TEMP,           //<Get camera temperature--------------
+    PARAM_HDR_INTG_TIME,  //<Setting HDR integration time param
+    PARAM_SYNC_DELAY,     //<delay ms for sync use
     PARAM_ENUM_COUNT,
 }dmcam_dev_param_e;
 
@@ -294,15 +303,6 @@ typedef union {
         uint32_t fsize;   //head+data+paddingsize
         uint32_t datasize; //data size
     }cinfo; //calibration info
-    //struct {
-    //    uint8_t valid;      //data is valid;1==valid
-    //    uint8_t place;   //place type(RAM,FLASH and so on)
-    //    uint8_t flag;    //0:no compression used;1:zip compression used
-    //    uint32_t info;   //data info, version
-    //    uint32_t fsize;   //head+data+paddingsize
-    //    uint32_t datasize; //data size
-    //    uint16_t cksum;
-    //}cinfo; //calibration info
     struct {
         uint16_t part_ver; //chip part version
         uint16_t chip_id; //chip id
@@ -337,13 +337,12 @@ typedef struct {
     uint8_t depth;
     uint8_t pixel_format;
     uint16_t priv_code;
+
+    int16_t temp0, temp1;
+    uint32_t reserved[2];
 }dmcam_frame_info_t;
 
 typedef struct {
-    //uint32_t frame_format;  /** raw frame format  */
-    //int frame_fbpos;   /** frame position in frame buffer */
-    //int frame_count;   /** frame count from the start of capturing */
-    //int frame_size;    /** frame size in bytes */
     dmcam_frame_info_t frame_info;
     void *frame_data;  /** frame data pointer */
 }dmcam_frame_t;
@@ -439,6 +438,16 @@ __API dmcam_dev_t* dmcam_dev_open(dmcam_dev_t *dev);
  *         failed.
  */
 __API dmcam_dev_t* dmcam_dev_open_by_fd(int fd);
+
+/**
+ * open specified dmcam replay file with specified file name and product string 
+ * 
+ * @param filename [in] specified filename 
+ * 
+ * @return dmcam_dev_t* NULL = open device failed.
+ */
+dmcam_dev_t* dmcam_dev_open_replay(const char *filename);
+
 /**
 * Close specified dmcam device.
 *
@@ -859,6 +868,29 @@ typedef enum {
 }dmcam_frame_save_fmt_t;
 
 /**
+ * save specified raw data (in uin16_t) with specified pixcel
+ * width and height to file with specified saving format.
+ * 
+ * @param fd [in] specified file handler
+ * @param save_fmt [in] file saving format defined in
+ *                 dmcam_frame_save_fmt_t. only followin format
+ *                 is supported:
+ *              DMCAM_FRAME_SAVE_UINT32
+ *              DMCAM_FRAME_SAVE_UINT16
+ * @param raw [in] raw data
+ * @param raw_len [in] number of raw data (in count of
+ *                 uint16_t)
+ * @param img_w [in] dist data pixel width
+ * @param img_h [in] dist data pixel height
+ * @param raw_tag
+ * 
+ * @return bool [out] true = save raw frame ok, false =
+ *         fail
+ */
+__API bool dmcam_frame_save_raw(int fd, dmcam_frame_save_fmt_t save_fmt, const uint16_t *raw, int raw_len, 
+        int img_w, int img_h, int dcs_cnt, const char* raw_tag);
+
+/**
  * save specified distance data (in float32, unit: meter) with 
  * specified pixcel width and height to file with specified 
  * saving format. 
@@ -883,9 +915,8 @@ __API bool dmcam_frame_save_distance(int fd, dmcam_frame_save_fmt_t save_fmt, co
 
 
 /**
- * save specified distance data (in float32, unit: meter) with
- * specified pixcel width and height to file with specified
- * saving format.
+ * save specified gray data (in float32) with specified pixcel 
+ * width and height to file with specified saving format. 
  * 
  * @param fd [in] specified file handler
  * @param save_fmt [in] file saving format defined in
@@ -903,6 +934,26 @@ __API bool dmcam_frame_save_distance(int fd, dmcam_frame_save_fmt_t save_fmt, co
  *         fail
  */
 __API bool dmcam_frame_save_gray(int fd, dmcam_frame_save_fmt_t save_fmt, const float *src, int src_len, int img_w, int img_h);
+
+/*!
+ * load one raw frame from specified file fd.
+ * 
+ * @param fd [in] specified data file fd. The fd related file is
+ *           always saved by dmcam_frame_save_raw api
+ * @param dst [out] raw
+ * @param dst_len [in] dst buffer length (in count of
+ *                sizeof(uint16_t))
+ * @param dst_w [out] raw frame pixel width
+ * @param dst_h [out] raw frame pixel height
+ * @param dst_dcsn [out] raw dcs cnt per frame
+ * @param dst_tag [out] raw data tag string
+ * @param tag_len [in] raw data tag buffer size
+ * 
+ * @return int [out] length of loaded raw data (in count of
+ *         sizeof(uint16))
+ */
+__API int dmcam_frame_load_raw(int fd, uint16_t *dst, int dst_len, int *dst_w, int *dst_h, 
+                         int* dst_dcsn, char* dst_tag, int dst_tag_len);
 
 /**
  * load one distance frame from specified file fd.
