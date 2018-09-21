@@ -1,2 +1,2 @@
-call dmcam-cli.exe -f TM-E2_HW30_SW154_20180828.bin
+call dmcam-cli.exe -f TM-E2_HW30_SW156_20180921.bin
 pause

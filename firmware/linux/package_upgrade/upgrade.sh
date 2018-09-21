@@ -23,7 +23,7 @@ export LD_LIBRARY_PATH=./
 ./bin_data_upgrade 1
 
 echo "...............step 2 of all 3................"
-./dmcam-cli_static143 -f TM-E2_HW20_SW154_20180828.bin
+./dmcam-cli_static143 -f TM-E2_HW20_SW156_20180921.bin
 echo "do not close"
 #wait 
 sleep 10
