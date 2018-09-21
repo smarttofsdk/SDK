@@ -44,8 +44,8 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 54
-#define DM_VERSION_STR "v1.54"
+#define DM_VERSION_MINOR 56
+#define DM_VERSION_STR "v1.56"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -442,7 +442,8 @@ __API dmcam_dev_t* dmcam_dev_open_by_fd(int fd);
 /**
  * open specified dmcam replay file with specified file name and product string 
  * 
- * @param filename [in] specified filename 
+ * @param filename [in] specified filename. The replay file 
+ *                 should be recorded using dmcam_frame_save_raw
  * 
  * @return dmcam_dev_t* NULL = open device failed.
  */
@@ -777,33 +778,35 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
 int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
                              const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
 typedef enum {
-    DMCAM_FILTER_ID_LEN_CALIB,  /**>lens calibration*/
-    DMCAM_FILTER_ID_PIXEL_CALIB, /**>pixel calibration*/
-    DMCAM_FILTER_ID_MEDIAN,    /**>Median filter for distance data*/
-    DMCAM_FILTER_ID_GAUSS,     /**>Gauss filter for distance data*/
-    DMCAM_FILTER_ID_AMP, /**>Amplitude filter control*/
-    DMCAM_FILTER_ID_AUTO_INTG, /**>auto integration filter enable : use sat_ratio to adjust */
-    DMCAM_FILTER_ID_SYNC_DELAY,//**>Delay module capture start in random ms, capture sync use
-    DMCAM_FILTER_ID_TEMP_MONITOR,//**>Monitor Module temperature 
-    DMCAM_FILTER_ID_HDR,//**>Monitor Module temperature 
-    DMCAM_FILTER_ID_OFFSET, /**> set offset for calc distance */
+    DMCAM_FILTER_ID_LEN_CALIB,    /**>lens calibration*/
+    DMCAM_FILTER_ID_PIXEL_CALIB,  /**>pixel calibration*/
+    DMCAM_FILTER_ID_MEDIAN,       /**>Median filter for distance data*/
+    DMCAM_FILTER_ID_RESERVED,        /**>Gauss filter for distance data*/
+    DMCAM_FILTER_ID_AMP,          /**>Amplitude filter control*/
+    DMCAM_FILTER_ID_AUTO_INTG,    /**>auto integration filter enable : use sat_ratio to adjust */
+    DMCAM_FILTER_ID_SYNC_DELAY,   /**> sync delay */
+    DMCAM_FILTER_ID_TEMP_MONITOR, /**>temperature monitor */
+    DMCAM_FILTER_ID_HDR,          /**>HDR mode */
+    DMCAM_FILTER_ID_OFFSET,       /**> set offset for calc distance */
+    DMCAM_FILTER_ID_SPORT_MODE,   /**> set sport mode */
     //-------------------
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
 
 typedef union {
-    uint8_t case_idx; /**>User Scenario index */
-    uint32_t lens_id; /**>length index*/
-    uint16_t min_amp; /**>Min amplitude threshold*/
-    uint16_t sat_ratio; /**>saturation ratio threshold*/
-    uint16_t sync_delay; /**> sync delay: 0 = random delay, 1 = specified delay in ms */
-    int16_t temp_threshold; /**>Temperature threshold for temperature monitor*/
+    uint8_t case_idx;          /**>User Scenario index */
+    uint32_t lens_id;          /**> DMCAM_FILTER_ID_LEN_CALIB parameter: length index*/
+    uint16_t min_amp;          /**> DMCAM_FILTER_ID_AMP parameter: Min amplitude threshold*/
+    uint16_t sat_ratio;        /**> DMCAM_FILTER_ID_AUTO_INTG parameter: saturation ratio threshold*/
+    uint16_t sync_delay;       /**> DMCAM_FILTER_ID_SYNC_DELAY parameter: sync delay: 0 = random delay, 1 = specified delay in ms */
+    int16_t temp_threshold;    /**> DMCAM_FILTER_ID_TEMP_MONITOR paramter: Temperature threshold for temperature monitor*/
     struct {
-        uint16_t intg_3d; /**>intg_3d:3d intg time*/
-        uint16_t intg_3dhdr; /**> intg_3dhdr:3dhdr intg time*/
-    }intg;
-    uint8_t median_ksize; /**> median filter kernel size. Normally use 3 or 5*/
-    int32_t offset_mm;  /**> offset in mm for DMCMA_FILTER_ID_OFFSET filter */
+        uint16_t intg_3d;      /**> intg_3d: exposure time 0 */
+        uint16_t intg_3dhdr;   /**> intg_3dhdr: exposure time 1 */
+    }intg;                     /**> DMCAM_FILTER_ID_HDR paramter */
+    uint8_t median_ksize;      /**> DMCAM_FILTER_ID_MEDIAN paramter:  kernel size. Normally use 3 or 5*/
+    int32_t offset_mm;         /**> DMCAM_FILTER_ID_OFFSET paramter : offset in mm for DMCMA_FILTER_ID_OFFSET filter */
+    uint8_t sport_mode;        /**> DMCAM_FILTER_ID_SPORT_MODE parameter: 0 = high motion mode, 1 = extrem high motion mode */
 }dmcam_filter_args_u;
 
 
@@ -855,7 +858,6 @@ typedef enum {
  */
 
 __API int dmcam_cmap_float(uint8_t *dst, int dst_len, const float *src, int src_len, dmcam_cmap_outfmt_e outfmt, float min_val, float max_val);
-
 
 
 typedef enum {

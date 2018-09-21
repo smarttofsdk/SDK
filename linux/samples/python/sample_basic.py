@@ -70,7 +70,7 @@ wparams = {
 }
 wparams[dmcam.PARAM_ILLUM_POWER].illum_power.percent = pwr_percent
 wparams[dmcam.PARAM_INTG_TIME].intg.intg_us = 1000
-wparams[dmcam.PARAM_FRAME_FORMAT].frame_format.format = 1
+wparams[dmcam.PARAM_FRAME_FORMAT].frame_format.format = 2
 
 if not dmcam.param_batch_set(dev, wparams):
     print(" set parameter failed")

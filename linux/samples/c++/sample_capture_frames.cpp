@@ -144,7 +144,7 @@ int main(int argc, char **argv)
                     {
                         int pcl_len = fbuf_info.frame_info.width * fbuf_info.frame_info.height;
 						float *pcl = new float[pcl_len * 4];	//
-                        int calc_len = dmcam_frame_get_pcl_xyzd(dev, pcl, pcl_len, dist, dist_len, w, h, true, NULL);
+                        int calc_len = dmcam_frame_get_pcl_xyzd(dev, pcl, pcl_len*4, dist, dist_len, w, h, true, NULL);
 
                         /* process distance data */
                         printf("proc pcl data ....\n"); 
