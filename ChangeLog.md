@@ -1,3 +1,36 @@
+# 版本号：1.56
+
+## 发布时间 ： 2018/09/21
+
+### 固件部分
+
+- [**Bugfix**] 修复温度及帧率切换上层missing frame问题
+- [**Bugfix**]修复设置低帧率自动升帧问题
+- [**New**]增加运动模式支持
+- [**New**]加快温度更新频率
+
+### SDK软件部分
+
+- dmcam lib
+  - [**New**] 支持运动模式0和1，大幅消除降低物体运动时的重影问题。
+  - [**New**] 支持UDP cap
+  - [**Enhance**] 日志打印优化
+  - [**Enhance**] 大幅优化HDR效果
+  - [**Bugfix**] 修复正常模式HDR问题
+  - [**Bugfix**] 修复filter_enable接口无效ID返回true的问题
+  - [**Bugfix**] 修复dmcam_get_frames可能超时的问题
+- C#扩展
+  - [**New**] 提供C#环境所需要的库
+- tools
+  - smarttofviewer
+    - [**New**] 增加运动模式0、1控制支持
+    - [**New**] 灰度模式显示平均幅值
+  - smartofcli
+    - [**New**] CLI工具改为静态编译
+- samples
+  - c#
+    - [**New**] 增加c#使用dmcam库接口样例
+
 # 版本号：1.54
 
 ## 发布时间 ： 2018/08/28
