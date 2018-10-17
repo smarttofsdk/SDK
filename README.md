@@ -41,7 +41,7 @@ SmartToF SDK的各个平台支持情况：
 | Python           | &radic; | &radic; |         |
 | Java             | &radic; |         | &radic; |
 | Ros              |         | &radic; |         |
-| C#               |         |         |         |
+| C#               | &radic; | &radic; |         |
 | Matlab           |         |         |         |
 | usbdriver        | &radic; | &radic; | &radic; |
 | SmartTofAnalyzer | &radic; | &radic; |         |
