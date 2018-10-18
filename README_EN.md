@@ -33,10 +33,10 @@ The supported platforms of SmartToF SDK are shown below：
 | :----------------- | :------ | :------ | :------ |
 | Core API C library | &radic; | &radic; | &radic; |
 | Python             | &radic; | &radic; |         |
-| Java               | &radic; |         | &radic; |
+| Java               | &radic; | &radic; | &radic; |
 | Ros                |         | &radic; |         |
-| C#                 |         |         |         |
-| Matlab             |         |         |         |
+| C#                 | &radic; | &radic; |         |
+| Matlab             | &radic; |         |         |
 | usbdriver          | &radic; | &radic; | &radic; |
 | SmartTofAnalyzer   | &radic; | &radic; |         |
 | SmartTofCli        | &radic; | &radic; |         |
