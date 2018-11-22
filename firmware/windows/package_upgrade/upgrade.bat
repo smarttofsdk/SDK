@@ -11,7 +11,7 @@ call bin_data_upgrade.exe 1
 
 rem upgrade new firmware
 echo step 2
-call dmcam-cli_static143.exe -f TM-E2_HW20_SW156_20180921.bin
+call dmcam-cli_static143.exe -f TM-E2_HW20_SW158_20181120.bin
 
 rem wait mcu reset
 echo do not close 
