@@ -35,8 +35,17 @@ namespace sampleBasic {
             //if (!dmcam.param_batch_set(dev, wparams.cast(), 1)) {
                 //Console.Write(" set illu_power to %d %% failed\n", pwr_percent);
             //}
+            cap_cfg_t cfg = new cap_cfg_t();
+            cfg.cache_frames_cnt = 10;
+            cfg.on_error= null;
+            cfg.on_frame_ready= null;
+            cfg.en_save_replay= 0;
+            cfg.en_save_dist_u16= 0;
+            cfg.en_save_gray_u16= 0;
+            cfg.fname_replay= null;
 
-            dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
+            dmcam.cap_config_set(dev, cfg);
+            //dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
             // dmcam.cap_set_callback_on_error(dev, null);
             Console.WriteLine(" Start capture ...");
             dmcam.cap_start(dev);
@@ -66,12 +75,12 @@ namespace sampleBasic {
                     }
                     Console.Write("]\n");
 
-                    float[] dist = new float[img_w * img_h];
+                    ushort[] dist = new ushort[img_w * img_h];
 
                     //dmcam.raw2dist(dist, dist.length, f, f.capacity());
-                    dmcam.frame_get_distance(dev, dist, dist.Length, f, f.Length, finfo.frame_info);
+                    dmcam.frame_get_dist_u16(dev, dist, dist.Length, f, f.Length, finfo.frame_info);
                     for (int n = 0; n < 16; n++) {
-                        Console.Write("{0:F},", dist[n]);
+                        Console.Write("{0},", dist[n]);
                     }
                     Console.Write("]\n");
                     count += 1;

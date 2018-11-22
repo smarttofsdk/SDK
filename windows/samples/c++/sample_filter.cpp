@@ -39,18 +39,29 @@ dmcam_dev_t *dev;
  */
 void test_filter(dmcam_dev_t *dev)
 {
-    dmcam_filter_args_u witem;
-    witem.lens_id = 1;
-    assert(dmcam_filter_enable(dev,DMCAM_FILTER_ID_LEN_CALIB, &witem,sizeof(dmcam_filter_args_u))); //enable lens calibration.eg.distortion
-
-    witem.case_idx = 2; //factory calibration enable
-    assert(dmcam_filter_enable(dev,DMCAM_FILTER_ID_PIXEL_CALIB, &witem,sizeof(dmcam_filter_args_u)));
-
-    witem.case_idx = 3; //user calibration enable
-    assert(dmcam_filter_enable(dev,DMCAM_FILTER_ID_PIXEL_CALIB, &witem, sizeof(dmcam_filter_args_u)));
-
-    witem.case_idx = 3; //user calibration disable
-    assert(dmcam_filter_disable(dev,DMCAM_FILTER_ID_PIXEL_CALIB));
+	dmcam_filter_args_u witem;
+	dmcam_filter_id_e filter_id = DMCAM_FILTER_ID_PIXEL_CALIB; //像素校准
+	dmcam_filter_enable(dev,filter_id,&witem,sizeof(dmcam_filter_args_u));//开启像素校准
+	
+	filter_id = DMCAM_FILTER_ID_MEDIAN;	//深度滤波
+	witem.median_ksize = 3;	//深度滤波通常设置值
+	dmcam_filter_enable(dev,filter_id,&witem,sizeof(dmcam_filter_args_u));//开启深度滤波
+	
+	filter_id = DMCAM_FILTER_ID_AMP;	//最小幅值滤波
+	witem.min_amp = 30;	//设置的最小幅值滤波的阈值
+	dmcam_filter_enable(dev,filter_id,&witem,sizeof(dmcam_filter_args_u));//开启最小幅值滤波
+	
+	filter_id = DMCAM_FILTER_ID_AUTO_INTG;	//自动曝光
+	witem.sat_ratio = 5;//自动曝光时设置的值
+	dmcam_filter_enable(dev,filter_id,&witem,sizeof(dmcam_filter_args_u));//开启自动曝光
+	
+	dmcam_filter_disable(dev,DMCAM_FILTER_ID_PIXEL_CALIB); //关闭像素校准
+	
+	dmcam_filter_disable(dev,DMCAM_FILTER_ID_MEDIAN);	//关闭深度滤波
+	
+	dmcam_filter_disable(dev,DMCAM_FILTER_ID_AMP);	//关闭最小幅值滤波
+	
+	dmcam_filter_disable(dev,DMCAM_FILTER_ID_AUTO_INTG);	//关闭自动曝光
 
 }
 int main(int argc, char **argv)

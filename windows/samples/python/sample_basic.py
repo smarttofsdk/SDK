@@ -48,9 +48,20 @@ print(" Open dmcam device ..")
 dev = dmcam.dev_open(None)
 assert dev is not None
 
+cap_cfg = dmcam.cap_cfg_t()
+cap_cfg.cache_frames_cnt = 10
+cap_cfg.on_error = None
+cap_cfg.on_frame_rdy = None
+cap_cfg.en_save_replay = False
+cap_cfg.en_save_dist_u16 = False
+cap_cfg.en_save_gray_u16 = False
+cap_cfg.fname_replay = None
+
+dmcam.cap_config_set(dev, cap_cfg)
+
 # print(" Config capture param ..")
 # set 10 frames framebuffer
-dmcam.cap_set_frame_buffer(dev, None, 10 * 320 * 240 * 4)
+# dmcam.cap_set_frame_buffer(dev, None, 10 * 320 * 240 * 4)
 # dmcam.cap_set_callback_on_frame_ready(dev, on_frame_rdy)
 dmcam.cap_set_callback_on_error(dev, on_cap_err)
 

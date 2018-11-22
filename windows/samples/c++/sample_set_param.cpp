@@ -29,6 +29,9 @@
     #include <windows.h>
 #define sleep(s) Sleep(s)
 #else
+	
+#include <unistd.h>
+
 #endif
 dmcam_dev_t *dev;
 /*------------PARAM RANGE discription(For product TM-TI)-------------------*/
