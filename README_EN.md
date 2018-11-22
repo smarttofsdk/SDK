@@ -10,6 +10,7 @@ SmartToF SDK is the general development kit for TOF 3D cameras，which has the f
 So far, SmartToF SDK support the following TOF 3D camera models：
 - TCM-E1 model
 - TCM-E2 model
+- TC series
 
 SmartToF SDK mainly includes the following modules:
 - DMCAM core C library and language extensions
@@ -33,10 +34,10 @@ The supported platforms of SmartToF SDK are shown below：
 | :----------------- | :------ | :------ | :------ |
 | Core API C library | &radic; | &radic; | &radic; |
 | Python             | &radic; | &radic; |         |
-| Java               | &radic; |         | &radic; |
+| Java               | &radic; | &radic; | &radic; |
 | Ros                |         | &radic; |         |
-| C#                 |         |         |         |
-| Matlab             |         |         |         |
+| C#                 | &radic; | &radic; |         |
+| Matlab             | &radic; |         |         |
 | usbdriver          | &radic; | &radic; | &radic; |
 | SmartTofAnalyzer   | &radic; | &radic; |         |
 | SmartTofCli        | &radic; | &radic; |         |
