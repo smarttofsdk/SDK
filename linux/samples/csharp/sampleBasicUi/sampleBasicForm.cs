@@ -30,12 +30,15 @@ namespace sampleBasicUi
                 tbLog.AppendText(msg);
         }
 
-        private void RefreshUi(Bitmap img)
+        private void RefreshUi(Bitmap img_depth, Bitmap img_ir)
         {
             if (InvokeRequired)
-                Invoke(new MethodInvoker(delegate { RefreshUi(img); }));
+                Invoke(new MethodInvoker(delegate { RefreshUi(img_depth, img_ir); }));
             else
-                pbPreview.Image = img;
+            {
+                pbDepth.Image = img_depth;
+                pbIR.Image = img_ir;
+            }
         }
 
         private void CaptureThread()
@@ -65,7 +68,17 @@ namespace sampleBasicUi
                 return;
             }
 
-            dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
+            cap_cfg_t cfg = new cap_cfg_t();
+            cfg.cache_frames_cnt = 10;
+            cfg.on_error = null;
+            cfg.on_frame_ready = null;
+            cfg.en_save_replay = 0;
+            cfg.en_save_dist_u16 = 0;
+            cfg.en_save_gray_u16 = 0;
+            cfg.fname_replay = null;
+
+            dmcam.cap_config_set(dev, cfg);
+            //dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
             Log(" Start capture ...");
             dmcam.cap_start(dev);
 
@@ -92,40 +105,52 @@ namespace sampleBasicUi
 
                     Console.Write("]\n");
 
-                    var dist = new float[img_w * img_h];
+                    var dist = new ushort[img_w * img_h];
+                    var gray = new ushort[img_w * img_h];
 
                     /* calc distance */
-                    dmcam.frame_get_distance(dev, dist, dist.Length, f, f.Length, finfo.frame_info);
+                    dmcam.frame_get_dist_u16(dev, dist, dist.Length, f, f.Length, finfo.frame_info);
+                    dmcam.frame_get_gray_u16(dev, gray, gray.Length, f, f.Length, finfo.frame_info);
+
                     for (var n = 0; n < 16; n++) Console.Write("{0:F},", dist[n]);
 
-                    /* convert to pseudo color image */
+                    /* convert depth to pseudo color image */
                     var dist_rgb = new byte[3 * img_w * img_h];
-                    dmcam.cmap_float(dist_rgb, dist_rgb.Length, dist, dist.Length, cmap_outfmt_e.DMCAM_CMAP_OUTFMT_BGR,
-                        0f, 5.0f);
+                    dmcam.cmap_dist_u16_to_RGB(dist_rgb, dist_rgb.Length, dist, dist.Length,
+                        cmap_outfmt_e.DMCAM_CMAP_OUTFMT_BGR, 0, 5000);
+                    /* convert gray to IR image */
+                    var gray_u8 = new byte[img_w * img_h];
+                    dmcam.cmap_gray_u16_to_IR(gray_u8, gray_u8.Length, gray, gray.Length, 0);
+
                     {
-                        var w = img_w;
-                        var h = img_h;
+                        var img_depth = new Bitmap(img_w, img_h, PixelFormat.Format24bppRgb);
+                        var img_ir = new Bitmap(img_w, img_h, PixelFormat.Format24bppRgb);
 
-//                        var img = new Bitmap(w, h, 3 * w, PixelFormat.Format24bppRgb,
-//                            Marshal.UnsafeAddrOfPinnedArrayElement(dist_rgb, 0));
-
-                        var img = new Bitmap(w, h, PixelFormat.Format24bppRgb);
-                        BitmapData bmData = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), ImageLockMode.ReadWrite, img.PixelFormat);
+                        BitmapData bmData = img_depth.LockBits(new Rectangle(0, 0, img_depth.Width, img_depth.Height),
+                            ImageLockMode.ReadWrite, img_depth.PixelFormat);
                         IntPtr pNative = bmData.Scan0;
                         Marshal.Copy(dist_rgb, 0, pNative, dist_rgb.Length);
-                        img.UnlockBits(bmData);
-//                        for (int y = 0; y < h; y++)
-//                        {
-//                            for (int x = 0; x < w; x++)
-//                            {
-//                                int r = dist_rgb[(y*w+x) * 3] & 0xff;
-//                                int g = dist_rgb[(y*w+x) * 3 + 1] & 0xff;
-//                                int b = dist_rgb[(y*w+x) * 3 + 2] & 0xff;
-//                                img.SetPixel(x, y, Color.FromArgb(0, r, g, b));
-//                            }
-//                        }
+                        img_depth.UnlockBits(bmData);
 
-                        RefreshUi(img);
+//                        bmData = img_ir.LockBits(new Rectangle(0, 0, img_ir.Width, img_ir.Height),
+//                            ImageLockMode.ReadWrite, img_ir.PixelFormat);
+//                        pNative = bmData.Scan0;
+//                        Marshal.Copy(gray_u8, 0, pNative, gray_u8.Length);
+//                        img_depth.UnlockBits(bmData);
+                        var w = img_w;
+                        var h = img_h;
+                        for (int y = 0; y < h; y++)
+                        {
+                            for (int x = 0; x < w; x++)
+                            {
+                                int r = gray_u8[(y * w + x)] & 0xff;
+                                int g = gray_u8[(y * w + x)] & 0xff;
+                                int b = gray_u8[(y * w + x)] & 0xff;
+                                img_ir.SetPixel(x, y, Color.FromArgb(0, r, g, b));
+                            }
+                        }
+
+                        RefreshUi(img_depth, img_ir);
                     }
 
                     Console.Write("]\n");

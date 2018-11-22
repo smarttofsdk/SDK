@@ -28,39 +28,52 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pbPreview = new System.Windows.Forms.PictureBox();
+            this.pbDepth = new System.Windows.Forms.PictureBox();
             this.tbLog = new System.Windows.Forms.TextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
+            this.pbIR = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDepth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbIR)).BeginInit();
             this.SuspendLayout();
             // 
-            // pbPreview
+            // pbDepth
             // 
-            this.pbPreview.Location = new System.Drawing.Point(12, 12);
-            this.pbPreview.Name = "pbPreview";
-            this.pbPreview.Size = new System.Drawing.Size(456, 364);
-            this.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbPreview.TabIndex = 1;
-            this.pbPreview.TabStop = false;
+            this.pbDepth.Location = new System.Drawing.Point(12, 12);
+            this.pbDepth.Name = "pbDepth";
+            this.pbDepth.Size = new System.Drawing.Size(320, 240);
+            this.pbDepth.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbDepth.TabIndex = 1;
+            this.pbDepth.TabStop = false;
             // 
             // tbLog
             // 
-            this.tbLog.Location = new System.Drawing.Point(474, 13);
+            this.tbLog.Location = new System.Drawing.Point(338, 12);
             this.tbLog.Multiline = true;
             this.tbLog.Name = "tbLog";
             this.tbLog.ReadOnly = true;
-            this.tbLog.Size = new System.Drawing.Size(220, 363);
+            this.tbLog.Size = new System.Drawing.Size(184, 486);
             this.tbLog.TabIndex = 2;
+            // 
+            // pbIR
+            // 
+            this.pbIR.Location = new System.Drawing.Point(12, 258);
+            this.pbIR.Name = "pbIR";
+            this.pbIR.Size = new System.Drawing.Size(320, 240);
+            this.pbIR.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbIR.TabIndex = 1;
+            this.pbIR.TabStop = false;
             // 
             // SampleBasicForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(706, 382);
+            this.ClientSize = new System.Drawing.Size(526, 502);
             this.Controls.Add(this.tbLog);
-            this.Controls.Add(this.pbPreview);
+            this.Controls.Add(this.pbIR);
+            this.Controls.Add(this.pbDepth);
             this.Name = "SampleBasicForm";
             this.Text = "SampleBasicUi - SmartToF C#";
-            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDepth)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbIR)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -68,8 +81,9 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pbPreview;
+        private System.Windows.Forms.PictureBox pbDepth;
         private System.Windows.Forms.TextBox tbLog;
+        private System.Windows.Forms.PictureBox pbIR;
 
     }
 }

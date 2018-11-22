@@ -10,17 +10,7 @@ import java.nio.ByteBuffer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.smarttof.dmcam.dev_param_e;
-import com.smarttof.dmcam.dev_t;
-import com.smarttof.dmcam.dmcam;
-import com.smarttof.dmcam.dmcamDevArray;
-import com.smarttof.dmcam.dmcamParamArray;
-import com.smarttof.dmcam.frame_t;
-import com.smarttof.dmcam.log_level_e;
-import com.smarttof.dmcam.cmap_outfmt_e;
-import com.smarttof.dmcam.param_item_t;
-import com.smarttof.dmcam.filter_id_e;
-import com.smarttof.dmcam.filter_args_u;
+import com.smarttof.dmcam.*;
 
 public class sampleBasicUi {
 	public static class ResizableImagePanel extends JPanel {
@@ -184,8 +174,17 @@ public class sampleBasicUi {
 		if (!dmcam.param_batch_set(dev, wparams.cast(), 1)) {
 			System.out.printf(" set illu_power to %d %% failed\n", pwr_percent);
 		}
+        cap_cfg_t cfg = new cap_cfg_t();
+        cfg.setCache_frames_cnt(10);
+        cfg.setOn_error(null);
+        cfg.setOn_frame_ready(null);
+        cfg.setEn_save_replay((short)0);
+        cfg.setEn_save_dist_u16((short)0);
+        cfg.setEn_save_gray_u16((short)0);
+        cfg.setFname_replay(null);
 
-		dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
+        dmcam.cap_config_set(dev, cfg);
+		//dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
 		// dmcam.cap_set_callback_on_error(dev, null);
 		System.out.println(" Start capture ...");
 		dmcam.cap_start(dev);
@@ -226,63 +225,30 @@ public class sampleBasicUi {
                     continue;
                 }
 
-                float[] dist = new float[img_w * img_h];
+                //float[] dist = new float[img_w * img_h];
+                int [] dist = new int[img_w * img_h];
                 byte[] dist8U = new byte[img_w * img_h];
 
-                dmcam.frame_get_distance(dev, dist, dist.length, f, f.capacity(), finfo.getFrame_info());
+                dmcam.frame_get_dist_u16(dev, dist, dist.length, f, f.capacity(), finfo.getFrame_info());
 
                 /* ---- visualize ---- */
-                if (true) {
-                    ByteBuffer dist_rgb = ByteBuffer.allocateDirect(3 * img_w * img_h);
-                    dmcam.cmap_float(dist_rgb, dist_rgb.capacity(), dist, dist.length, cmap_outfmt_e.DMCAM_CMAP_OUTFMT_RGB, 0f, 5.0f);
-                    {
-                        int w = img_w;
-                        int h = img_h;
-                        BufferedImage img = new BufferedImage(w, h,
-                                BufferedImage.TYPE_3BYTE_BGR);
-                        for (int r = 0; r < h; r++)
-                            for (int c = 0; c < w; c++) {
-                                int index = r * w + c;
-                                int red = dist_rgb.get(3*index) & 0xFF;
-                                int green = dist_rgb.get(3*index+1) & 0xFF;
-                                int blue = dist_rgb.get(3*index+2) & 0xFF;
-                                int rgb = (red << 16) | (green << 8) | blue;
-                                img.setRGB(c, r, rgb);
-                            }
-                        showImage(img);
-                    }
-                } else {
-                    float max_dist = 5.0f, min_dist = 0.0f;
-                    for (int n = 0; n < dist.length; n++) {
-                        if (dist[n] > max_dist) {
-                            dist[n] = max_dist;
+                ByteBuffer dist_rgb = ByteBuffer.allocateDirect(3 * img_w * img_h);
+                dmcam.cmap_dist_u16_to_RGB(dist_rgb, dist_rgb.capacity(), dist, dist.length, cmap_outfmt_e.DMCAM_CMAP_OUTFMT_RGB, 0, 5000);
+                {
+                    int w = img_w;
+                    int h = img_h;
+                    BufferedImage img = new BufferedImage(w, h,
+                            BufferedImage.TYPE_3BYTE_BGR);
+                    for (int r = 0; r < h; r++)
+                        for (int c = 0; c < w; c++) {
+                            int index = r * w + c;
+                            int red = dist_rgb.get(3*index) & 0xFF;
+                            int green = dist_rgb.get(3*index+1) & 0xFF;
+                            int blue = dist_rgb.get(3*index+2) & 0xFF;
+                            int rgb = (red << 16) | (green << 8) | blue;
+                            img.setRGB(c, r, rgb);
                         }
-                        if (dist[n] < min_dist) {
-                            dist[n] = min_dist;
-                        }
-                    }
-
-                    /* convert to 8U to show image */
-                    for (int n = 0; n < dist.length; n++) {
-                        int v = (int)(255.0 * (dist[n] - min_dist) / (max_dist - min_dist + 0.0001));
-                        dist8U[n] = (byte) (v & 0xff);
-                    }
-                    {
-                        int w = img_w;
-                        int h = img_h;
-                        BufferedImage img = new BufferedImage(w, h,
-                                BufferedImage.TYPE_3BYTE_BGR);
-                        for (int r = 0; r < h; r++)
-                            for (int c = 0; c < w; c++) {
-                                int index = r * w + c;
-                                int red = dist8U[index] & 0xff;
-                                int green = dist8U[index] & 0xFF;
-                                int blue = dist8U[index] & 0xFF;
-                                int rgb = (red << 16) | (green << 8) | blue;
-                                img.setRGB(c, r, rgb);
-                            }
-                        showImage(img);
-                    }
+                    showImage(img);
                 }
                 count += 1;
                 if (count % 10 == 0) 

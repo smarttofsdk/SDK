@@ -65,26 +65,19 @@ int main(int argc, char **argv)
             printf(" open device failed\n");
             goto FINAL;
         }
-
-        /* setting some paraemters */
-        //{
-        //    dmcam_param_item_t wparam;
-        //
-        //    memset(&wparam, 0, sizeof(wparam));
-        //    wparam.param_id = PARAM_INTG_TIME;
-        //    wparam.param_val_len = 1;
-        //    wparam.param_val.intg.intg_us = intg_tim;
-        //    assert(dmcam_param_batch_set(dev, &wparam, 1));
-        //}
-
-        /* set frame buffer to use internal buffer */
-        dmcam_cap_set_frame_buffer(dev, NULL, FRAME_SIZE * FRAME_BUF_FCNT);
-
-        /* disable error callback for capturing */
-        dmcam_cap_set_callback_on_error(dev, NULL);
-
-        /* disable frame ready callback */
-        dmcam_cap_set_callback_on_frame_ready(dev, NULL);
+		
+		        /* set capture config */
+        dmcam_cap_cfg_t cap_cfg = {
+            .cache_frames_cnt = FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
+            .on_error = NULL,      /* No error callback */
+            .on_frame_ready = NULL, /* No frame ready callback*/
+            .en_save_replay = false, /* false save raw data stream to replay file */
+            .en_save_dist_u16 = false, /* disable save dist stream into replay file */
+            .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
+            .fname_replay = NULL, /* replay filename */
+        };
+		
+		dmcam_cap_config_set(dev,&cap_cfg);
 
         {
             dmcam_frame_t fbuf_info;

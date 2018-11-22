@@ -44,8 +44,18 @@ public class sampleBasic{
 			System.out.printf(" set illu_power to %d %% failed\n", pwr_percent);
 		}
 
-		dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
-		// dmcam.cap_set_callback_on_error(dev, null);
+        cap_cfg_t cfg = new cap_cfg_t();
+        cfg.setCache_frames_cnt(10);
+        cfg.setOn_error(null);
+        cfg.setOn_frame_ready(null);
+        cfg.setEn_save_replay((short)0);
+        cfg.setEn_save_dist_u16((short)0);
+        cfg.setEn_save_gray_u16((short)0);
+        cfg.setFname_replay(null);
+
+        dmcam.cap_config_set(dev, cfg);
+		//dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
+		dmcam.cap_set_callback_on_error(dev, null);
 		System.out.println(" Start capture ...");
 		dmcam.cap_start(dev);
 
