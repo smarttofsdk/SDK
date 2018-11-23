@@ -27,6 +27,7 @@ SmartToF SDK supports multiple OS including windows and linux. And it provides v
 - python samples
 - ROS samples
 - android sample
+- C# sample
 
 The supported platforms of SmartToF SDK are shown below：
 
@@ -59,16 +60,25 @@ dmcam_init(NULL);
 /*Open device*/
 dev = dmcam_dev_open(NULL);//Open the first device
 /*Setting acquisition buffer*/
-dmcam_cap_set_frame_buffer(dev,NULL,FRAME_SIZE*FRAME_BUF_FCNT);
+dmcam_cap_cfg_t cap_cfg = {
+    .cache_frames_cnt = FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
+    .on_error = NULL,      /* No error callback */
+    .on_frame_ready = NULL, /* No frame ready callback*/
+    .en_save_replay = false, /* false save raw data stream to replay file */
+    .en_save_dist_u16 = false, /* disable save dist stream into replay file */
+    .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
+    .fname_replay = NULL, /* replay filename */
+};
+dmcam_cap_config_set(dev,&cap_cfg);
 ...
 /*Start acquisition*/
 dmcam_cap_start(dev);//Start acquisition
 /*Obtaining data*/
 fr_cnt = dmcam_cap_get_frames(dev,20,fbuf,FRAME_SIZE*20,&fbuf_info);//Acquire 20 frames
 /*Acquire depth data*/
-dmcam_frame_get_distance(dev,dist,dist_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//Transform one frame to depth data
+dmcam_frame_get_dist_u16(dev,dist,dist_len,fbuf,fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);//Transform one frame to depth data
 /*Acquire gray data*/
-dmcam_frame_get_gray(dev,gray,gray_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//Transform one frame to gray data
+dmcam_frame_get_gray_u16(dev,gray,gray_len,fbuf,fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);;//Transform one frame to gray data
 /*Acquire pointcloud data*/
 dmcam_frame_get_pcl(dev,pcl,pcl_len,dist,dist_len,img_w,img_h,NULL);//Transform the depth data to pointcloud data
 /*Stop acquisition*/
@@ -146,7 +156,21 @@ dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *frame_data, 
 
 #### 3.2.8 Transform to depth data
 ~~~C
-dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+dmcam_frame_get_dist_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+~~~
+| Parameter | Description                              |
+| :-------- | :--------------------------------------- |
+| dev       | Designated device                        |
+| dst       | Destination for the transformed depth data |
+| dst_len   | Buffer size of depth data                |
+| src       | Original data obtained                   |
+| src_len   | Size of original data                    |
+| finfo     | Information of original frame            |
+
+~~~C
+dmcam_frame_get_dist_f32(dmcam_dev_t *dev, float *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 ~~~
 | Parameter | Description                              |
 | :-------- | :--------------------------------------- |
@@ -159,8 +183,20 @@ dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,uint8_t *src,
 
 #### 3.2.9 Transform to gray data
 ~~~C
-dmcam_frame_get_gray(dmcam_dev_t *dev, float *dst, int dst_len,
-uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+~~~
+| Parameter | Description                              |
+| :-------- | :--------------------------------------- |
+| dev       | Designated device                        |
+| dst       | Destination for the transformed gray data |
+| dst_len   | Buffer size of gray data                 |
+| src       | Original data obtained                   |
+| src_len   | Size of original data                    |
+| finfo     | Information of original frame            |
+
+dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 ~~~
 | Parameter | Description                              |
 | :-------- | :--------------------------------------- |

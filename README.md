@@ -32,6 +32,7 @@ SmartToF SDK支持windows和linux等多种操作系统，同时提供多种参�
 - python样例
 - ROS样例
 - android样例
+- C#样例
 
 SmartToF SDK的各个平台支持情况：
 
@@ -60,7 +61,6 @@ SmartToF SDK的使用需要进行所在系统的环境配置，包括
 ------
 
 ## 3、主要API介绍和样例说明
-**注意 目前API接口不是线程安全的，建议在同一个线程中使用API接口**
 
 SmartToF SDK中所有相关结构体定义和函数声明都位于lib\include文件夹下的dmcam.h中，例如windows下在SDK/windows/dmcam/lib/include下，里面对函数的主要功能和参数都有详细说明,在wiki下也有[《SmartToF SDK 重要API接口说明》](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-%E9%87%8D%E8%A6%81API%E8%AF%B4%E6%98%8E)
 
@@ -72,17 +72,26 @@ dmcam_init(NULL);
 ...
 /*打开设备*/
 dev = dmcam_dev_open(NULL);//打开第一个设备
-/*设置采集缓存*/
-dmcam_cap_set_frame_buffer(dev,NULL,FRAME_SIZE*FRAME_BUF_FCNT);
+/*采集设置*/
+dmcam_cap_cfg_t cap_cfg = {
+    .cache_frames_cnt = FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
+    .on_error = NULL,      /* No error callback */
+    .on_frame_ready = NULL, /* No frame ready callback*/
+    .en_save_replay = false, /* false save raw data stream to replay file */
+    .en_save_dist_u16 = false, /* disable save dist stream into replay file */
+    .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
+    .fname_replay = NULL, /* replay filename */
+};
+dmcam_cap_config_set(dev,&cap_cfg);
 ...
 /*开始采集*/
 dmcam_cap_start(dev);//开始采集
 /*获得采集数据*/
 fr_cnt = dmcam_cap_get_frames(dev,20,fbuf,FRAME_SIZE*20,&fbuf_info);//采集20帧数据
 /*获得深度数据*/
-dmcam_frame_get_distance(dev,dist,dist_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//解析出一帧深度数据
+dmcam_frame_get_dist_u16(dev,dist,dist_len,fbuf,fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);//解析出一帧深度数据
 /*获得灰度数据*/
-dmcam_frame_get_gray(dev,gray,gray_len,fbuf,fbuf_info.frame_info.frame_size,&fbuf_info.frame_info);//解析出一帧灰度数据
+dmcam_frame_get_gray_u16(dev,gray,gray_len,fbuf,fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);//解析出一帧灰度数据
 /*获取点云数据*/
 dmcam_frame_get_pcl(dev,pcl,pcl_len,dist,dist_len,img_w,img_h,NULL);//将转换的深度数据转换成点云数据
 /*停止采集*/
@@ -177,7 +186,22 @@ dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *frame_data, 
 #### 3.2.8解析出深度数据
 
 ```c
-dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+dmcam_frame_get_dist_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+```
+
+| 参数    | 描述             |
+| :------ | :--------------- |
+| dev     | 指定设备         |
+| dst     | 转换出的深度数据 |
+| dst_len | 深度数据缓存大小 |
+| src     | 采集的原始数据   |
+| src_len | 原始数据大小     |
+| finfo   | 原始帧信息       |
+
+```c
+dmcam_frame_get_dist_f32(dmcam_dev_t *dev, float *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 ```
 
 | 参数    | 描述             |
@@ -192,8 +216,22 @@ dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,uint8_t *src,
 #### 3.2.9解析出灰度数据
 
 ```c
-dmcam_frame_get_gray(dmcam_dev_t *dev, float *dst, int dst_len,
-uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+```
+
+| 参数    | 描述             |
+| :------ | :--------------- |
+| dev     | 指定设备         |
+| dst     | 转换出的灰度数据 |
+| dst_len | 灰度数据缓存大小 |
+| src     | 采集的原始数据   |
+| src_len | 原始数据大小     |
+| finfo   | 原始帧信息       |
+
+```c
+int dmcam_frame_get_gray_f32(dmcam_dev_t *dev, float *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 ```
 
 | 参数    | 描述             |
