@@ -1,9 +1,46 @@
+# 版本号：1.60
+
+## 发布时间：2018/9/23
+
+### 固件部分
+
+- [**New**] 帧数据信息增加时间戳信息，精确到0.1ms
+- [**New**] 支持系统校准参数存储、读取
+- [**Enhance**]  运动模式优化
+- [**Bugfix**] 修复上电红外灯闪烁一次问题
+
+### SDK软件部分
+- dmcam lib
+  - [**New**] 采集设置API接口变更，增加dmcam_cap_config_set()接口，可统一设置帧缓冲和是否开启录像
+  - [**New**] 增加dmcam_dev_open_by_uri， 可通过URI 打开指定的USB或ETHERNET或录像文件设备
+  - [**New**] 支持录像和播放录像文件功能
+  - [**New**] 增加应用端系统校准参数存取
+  - [**New**] 增加帧获取时间戳，时间戳位于dmcam_frame_info_t
+  - [**New**] 修改获取深度和灰度数据接口(dmcam_frame_get_dist/gray_u16/f32，增加更多的颜色转换接口(dmcam_cmap_dist_u16/f32_to_RGB, dmcam_cmap_gray_u16/f32_to_IR)
+  - [**Enhance**] 优化运动模式接口
+  - [**Enhance**] gray下支持运动模式
+- tools
+  - smarttofviewer
+    - [**New**] 增加录像和播放录像功能
+    - [**New**] 增加支持多设备选择 
+  - smarttof_cli
+    - [**New**] 增加rx replay命令，可以进行dmcam录像的获取
+    - [**Enhance**] 优化help文字
+    - [**Bugfix**] 修复固件文件名带路径出错问题
+- samples
+  - [**Enhance**] 更新c/c++采集接口设置样例。增加sample_save_replay展示录像的例子
+  - [**Enhance**] 更新java采集接口样例
+  - [**Enhance**] 更新C#采集接口样例
+  - [**Enhance**] 更Android相关库和样例
+  - [**Enhance**] 更新OpenNI样例
+
+
+
 # 版本号：1.56
 
 ## 发布时间 ： 2018/09/21
 
 ### 固件部分
-
 - [**Bugfix**] 修复温度及帧率切换上层missing frame问题
 - [**Bugfix**]修复设置低帧率自动升帧问题
 - [**New**]增加运动模式支持
