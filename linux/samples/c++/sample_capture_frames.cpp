@@ -67,14 +67,24 @@ int main(int argc, char **argv)
         }
 
 		        /* set capture config */
-        dmcam_cap_cfg_t cap_cfg = {
-            .cache_frames_cnt = FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
-            .on_error = NULL,      /* No error callback */
-            .on_frame_ready = NULL, /* No frame ready callback*/
-            .en_save_replay = false, /* false save raw data stream to replay file */
-            .en_save_dist_u16 = false, /* disable save dist stream into replay file */
-            .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
-            .fname_replay = NULL, /* replay filename */
+        // dmcam_cap_cfg_t cap_cfg = {
+            // .cache_frames_cnt = FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
+            // .on_error = NULL,      /* No error callback */
+            // .on_frame_ready = NULL, /* No frame ready callback*/
+            // .en_save_replay = false, /* false save raw data stream to replay file */
+            // .en_save_dist_u16 = false, /* disable save dist stream into replay file */
+            // .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
+            // .fname_replay = NULL, /* replay filename */
+        // };
+		
+	    dmcam_cap_cfg_t cap_cfg = {
+            FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
+            NULL,      /* No error callback */
+            NULL, /* No frame ready callback*/
+            false, /* false save raw data stream to replay file */
+            false, /* disable save dist stream into replay file */
+            false, /* disable save gray stream into replay file*/
+            NULL, /* replay filename */
         };
 		
 		dmcam_cap_config_set(dev,&cap_cfg);
