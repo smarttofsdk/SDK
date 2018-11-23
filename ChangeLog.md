@@ -33,6 +33,8 @@
   - [**Enhance**] 更新C#采集接口样例
   - [**Enhance**] 更Android相关库和样例
   - [**Enhance**] 更新OpenNI样例
+- doc
+  - [**New**] 更新SmartToF SDK User Guide ,上传网上托管
 
 
 
