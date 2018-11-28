@@ -1,7 +1,7 @@
 #initialize tof with these parameters
   dev_mode: 0
   mod_freq: 12000000
-  format: 1
+  format: 2
   power_percent: 60
   fps: 40
   intg_us: 700
