@@ -87,13 +87,13 @@ int main(int argc, char **argv)
 
         /* - set capture config --*/
         dmcam_cap_cfg_t cap_cfg = {
-            .cache_frames_cnt = 4, /* 4 frames can be cached in frame buffer*/
-            .on_error = NULL,      /* No error callback */
-            .on_frame_ready = NULL, /* No frame ready callback*/
-            .en_save_replay = true, /* enable save raw data stream to replay file */
-            .en_save_dist_u16 = false, /* disable save dist stream into replay file */
-            .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
-            .fname_replay = fname_replay, /* replay filename */
+            4, /* 4 frames can be cached in frame buffer*/
+            NULL,      /* No error callback */
+            NULL, /* No frame ready callback*/
+            true, /* enable save raw data stream to replay file */
+            false, /* disable save dist stream into replay file */
+            false, /* disable save gray stream into replay file*/
+            fname_replay, /* replay filename */
         };
 
         dmcam_cap_config_set(dev, &cap_cfg);
@@ -103,7 +103,9 @@ int main(int argc, char **argv)
 
         {
             int i, r, w, h, n_frames = 100;
-            uint8_t *fbuf = malloc(MAX_FRAME_SIZE);
+//          uint8_t *fbuf = malloc(MAX_FRAME_SIZE);
+
+            uint8_t *fbuf = new uint8_t[MAX_FRAME_SIZE];
             dmcam_frame_t frinfo;
 
             for (i = 0; i < n_frames; i++) {
@@ -120,7 +122,9 @@ int main(int argc, char **argv)
                        frinfo.frame_info.frame_format, frinfo.frame_info.frame_size);
 
                 {
-                    uint16_t *buf_u16 = malloc(sizeof(uint16_t) * w * h);
+//                  uint16_t *buf_u16 = malloc(sizeof(uint16_t) * w * h);
+
+                    uint16_t *buf_u16 = new uint16_t[w * h];
                     /* decode one frame to gray
                      * -> trig to save gray into replay */
                     int buf_len = dmcam_frame_get_gray_u16(dev, buf_u16, w * h, fbuf, frinfo.frame_info.frame_size, &frinfo.frame_info);
@@ -132,10 +136,12 @@ int main(int argc, char **argv)
                     /* process  data */
                     (void)buf_len; 
 
-                    free(buf_u16);
+//                  free(buf_u16);
+                    delete[] buf_u16;
                 }
             }
-            free(fbuf);
+//          free(fbuf);
+            delete[] fbuf;
         }
 
         /* stop capturing */
