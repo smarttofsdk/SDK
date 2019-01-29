@@ -1,5 +1,5 @@
 import sys
-
+import os
 import dmcam
 import matplotlib
 import numpy as np
@@ -71,7 +71,7 @@ else:
         print("[#%d]: %s" % (i, dmcam.dev_get_uri(d, 256)[0]))
 
 if dev_uri:
-    dev = dmcam.dev_open_by_uri(sys.argv[1])
+    dev = dmcam.dev_open_by_uri(os.fsencode(sys.argv[1]))
 else:
     # open the first device
     # dev = dmcam.dev_open(devs[0])
@@ -91,7 +91,7 @@ cap_cfg.cache_frames_cnt = 10  # frame buffer = 10 frames
 cap_cfg.en_save_dist_u16 = False  # save dist into ONI file: which can be viewed in openni
 cap_cfg.en_save_gray_u16 = False  # save gray into ONI file: which can be viewed in openni
 cap_cfg.en_save_replay = False  # save raw into ONI file:  which can be simulated as DMCAM device
-cap_cfg.fname_replay = "replay_dist.oni"
+cap_cfg.fname_replay = os.fsencode("replay_dist.oni")
 
 dmcam.cap_config_set(dev, cap_cfg)
 
