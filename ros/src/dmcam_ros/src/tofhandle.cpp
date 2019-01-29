@@ -89,7 +89,7 @@ void TofHandle::tof_init(void)
     param_init(dev);
 
     dmcam_cap_set_frame_buffer(dev, NULL, FRAME_SIZE);
-    dmcam_cap_set_callback_on_error(dev, on_cap_err);
+    //dmcam_cap_set_callback_on_error(dev, on_cap_err);
 
     fbuf = (uint8_t *)malloc(FRAME_SIZE);
 

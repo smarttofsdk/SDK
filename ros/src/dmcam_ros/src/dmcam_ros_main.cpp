@@ -45,7 +45,7 @@ int main(int argc, char **argv)
           ROS_INFO("THE %d time...",cnt++);
       }
       ros::spinOnce();
-      loop_rate.sleep();
+      //loop_rate.sleep();
   }
 
   return 0;

@@ -42,9 +42,11 @@ include_directories(
   include
   ${PCL_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../../bin/linux/include
 )
 link_directories(
-  lib
+
+  ${PROJECT_SOURCE_DIR}/../../../bin/linux/lib
 )
 
 add_executable(dmcam_ros_main
@@ -60,7 +62,8 @@ set_target_properties(  dmcam_ros_main
 )
 
 # include dmcam 
-include_directories(dmcam_ros_main ${PROJECT_SOURCE_DIR}/../../../../bin/include)
+message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
+include_directories(dmcam_ros_main ${PROJECT_SOURCE_DIR}/../../../linux/include)
 target_link_libraries(dmcam_ros_main
   dmcam
   pthread
