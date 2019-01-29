@@ -18,42 +18,23 @@ cd $TARGET_DIR
 
 echo "`pwd`"
 
- 
- 
-ver=`./dmcam-cli_static143 --print info |grep "MCU" |awk -F' ' 'NR==1{print $5}'`
-hardver=`./dmcam-cli_static143 --print info |grep "Its Hardware" |awk -F' ' 'NR==1{print $5}'`
-tfcver=`./dmcam-cli_static143 --print info |grep "TFC Firmware" |awk -F' ' 'NR==1{print $5}'`
-
-# ver=146
-# hardver=30
-
-echo "now mcu version is $ver,hardver is $hardver,tfcver is $tfcver"
-
-if [ $tfcver -gt 0 -a $tfcver -le 145 ]; then
-	echo "your version is not correct for support,please contact the FAE for help"
+# ./dmcam-cli_static143 --print info
+product=`./dmcam-cli_static143 --print info |grep "Product" |awk -F' ' 'NR==1{print $3}'`
+echo "get product is $product"
+if [ "$product"x = "TM-E2-1.0"x ]; then
+	# ./dmcam-cli_static143 --print info
+	echo "upgrade E2"
+	./dmcam-cli -f TM-E2*.bin
 else
-	if [ $ver -le 131 ]; then
-		
-		echo "your version is too old,please first to the uploaddir to upgrade to 143,the do the next upgrade"
+	if [ "$product"x = "TM-E3-1.0"x ]; then
+		echo "upgrade E3"
+		./dmcam-cli -f TM-E3*.bin
 	else
-		if [ $ver -le 143 -a $hardver -eq 20 ]; then
-			echo "use in package_upgrade"
-			cd $package_DIR
-			./upgrade.sh
+		if [ "$product"x = "TM-E4-1.0"x ]; then
+			echo "upgrade E4"
+			./dmcam-cli -f TM-E4*.bin
 		else
-			if [ $hardver -eq 20 -a $ver -gt 143 ]; then
-				echo "use in nopack_HW20"
-				cd $nopackHW20_DIR
-				./upgrade.sh
-			else
-				if [ $hardver -eq 30 ]; then
-					echo "use in nopack_HW30"
-					cd $nopackHW30_DIR
-					./upgrade.sh
-				else
-					echo "not support upgrade,please contact the FAE"
-				fi
-			fi
+			echo "there's no suitable file for upgrade,please contact FAE"
 		fi
 	fi
 fi
