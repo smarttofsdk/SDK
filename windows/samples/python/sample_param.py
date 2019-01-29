@@ -43,11 +43,9 @@ def test_param_write(device):
     wparams = {
         dmcam.PARAM_DEV_MODE: dmcam.param_val_u(),
         dmcam.PARAM_FRAME_RATE: dmcam.param_val_u(),
-        dmcam.PARAM_ILLUM_POWER: dmcam.param_val_u(),
     }
-    wparams[dmcam.PARAM_DEV_MODE].dev_mode = 1
+    wparams[dmcam.PARAM_DEV_MODE].dev_mode = 0
     wparams[dmcam.PARAM_FRAME_RATE].frame_rate.fps = 30
-    wparams[dmcam.PARAM_ILLUM_POWER].illum_power.percent = 30
 
     ret = dmcam.param_batch_set(device, wparams)
     assert ret is True
@@ -56,15 +54,13 @@ def test_param_write(device):
 
 
 if __name__ == '__main__':
-    # ret = dmcam.param_batch_get_test(None, (dmcam.PARAM_INFO_PRODUCT, dmcam.PARAM_INFO_VENDOR))
-    # sys.exit(0)
     # init the lib with default log file
     dmcam.init(None)
 
     # set debug level
-    dmcam.log_cfg(dmcam.LOG_LEVEL_INFO,
-                  dmcam.LOG_LEVEL_DEBUG, dmcam.LOG_LEVEL_NONE)
+    dmcam.log_cfg(dmcam.LOG_LEVEL_INFO, dmcam.LOG_LEVEL_DEBUG, dmcam.LOG_LEVEL_NONE)
     print(" Open dmcam device ..")
+
     # open the first device
     # dev = dmcam.dev_open(dev_list[0])i
     dev = dmcam.dev_open(None)
@@ -76,4 +72,3 @@ if __name__ == '__main__':
     print(" Close dmcam device ..")
     dmcam.dev_close(dev)
     dmcam.uninit()
-    sys.exit(-1)

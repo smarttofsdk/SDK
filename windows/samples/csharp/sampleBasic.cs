@@ -22,19 +22,41 @@ namespace sampleBasic {
                 return;
             }
 
-            //int pwr_percent = 100;
-            //param_item_t wparam = new param_item_t();
-            //dmcamParamArray wparams = new dmcamParamArray(1);
+            /* set param */
+            param_item_t p_fps = new param_item_t();
+            p_fps.param_id = dev_param_e.PARAM_FRAME_RATE;
+            p_fps.param_val.frame_rate.fps = 10;
 
-            //wparam.setParam_id(dev_param_e.PARAM_ILLUM_POWER);
-            //wparam.getParam_val().getIllum_power().setPercent((short) pwr_percent);
+            param_item_t p_intg = new param_item_t();
+            p_intg.param_id = dev_param_e.PARAM_INTG_TIME;
+            p_intg.param_val.intg.intg_us = 1000;
+           
+            dmcamParamArray wparams = new dmcamParamArray(2);
+            wparams.setitem(0, p_fps);
+            wparams.setitem(1, p_intg);
 
-            //wparams.setitem(0, wparam);
-            //Console.Write(" pwr = %d\n", wparams.getitem(0).getParam_val()
-                    //.getIllum_power().getPercent());
-            //if (!dmcam.param_batch_set(dev, wparams.cast(), 1)) {
-                //Console.Write(" set illu_power to %d %% failed\n", pwr_percent);
-            //}
+            if (!dmcam.param_batch_set(dev, wparams.cast(), 2)) {
+                Console.WriteLine(" set param failed\n");
+            } 
+
+            /* get param */
+            param_item_t r_fps = new param_item_t();
+            r_fps.param_id = dev_param_e.PARAM_FRAME_RATE;
+            param_item_t r_intg = new param_item_t();
+            r_intg.param_id = dev_param_e.PARAM_INTG_TIME;
+           
+            dmcamParamArray rparams = new dmcamParamArray(2);
+            rparams.setitem(0, r_fps);
+            rparams.setitem(1, r_intg);
+
+            if (!dmcam.param_batch_get(dev, rparams.cast(), 2)) {
+                Console.WriteLine(" get param failed\n");
+            } else {
+                Console.WriteLine("fps = {0}, intg = {1}", 
+                        (int)rparams.getitem(0).param_val.frame_rate.fps,
+                        (int)rparams.getitem(1).param_val.intg.intg_us);
+            }
+
             cap_cfg_t cfg = new cap_cfg_t();
             cfg.cache_frames_cnt = 10;
             cfg.on_error= null;

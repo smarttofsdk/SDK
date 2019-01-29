@@ -27,10 +27,14 @@ extern "C"
 #ifdef _MSC_VER
 #define __API __declspec(dllexport)
 
+#if _MSC_VER >= 1800
+#include <stdbool.h>
+#else
 #define false   0
 #define true    1
 
 #define bool uint8_t
+#endif
 
 #else
 #define __API
@@ -40,8 +44,9 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 60
-#define DM_VERSION_STR "v1.60"
+#define DM_VERSION_MINOR 62
+#define DM_VERSION_REV   0
+#define DM_VERSION_STR "v1.62.0"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -210,6 +215,7 @@ typedef enum {
     PARAM_SYNC_DELAY,     //<delay ms for sync use
     PARAM_SYS_CALIB_COEFF, //system calibration coefficent
     PARAM_SYNC_SYS_TIME, //set/get module time
+    PARAM_AMBIENT_LIGHT_COEFF,//set ambient light calibration coeff.
     PARAM_ENUM_COUNT,
 }dmcam_dev_param_e;
 
@@ -250,6 +256,7 @@ typedef union {
     uint32_t mod_freq;
     char info_vendor[18];
     char info_product[18];
+    uint16_t ambient_light_coeff;
     struct {
         uint16_t max_frame_width;
         uint16_t max_frame_height;
@@ -838,11 +845,12 @@ __API int dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
 
 /**
  * get point cloud data from distance data. The distance data is
- * usually calcuated using dmcam_frame_get_distance.
+ * usually calcuated using dmcam_frame_get_dist_f32. 
  * 
  * @param dev [in] specified dmcam device
  * @param pcl [out] point clound buffer. each 3 element consists
- *            a (x,y,z) point
+ *            a (x,y,z) point, output is in (w,h,3) demension.
+ *            point in value (0,0,0) is invalid 
  * @param pcl_len [in] point cloud float element count
  * @param dist [in] distance image data buffer. The unit of 
  *             distance is meter (float)
@@ -855,9 +863,9 @@ __API int dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
  *                    used.
  * 
  * @return int [out] return number of points in point cloud 
- *         buffer. Note: n points means 3*n floats
+ *         buffer. Note: n points means 3*n floats. N should be
+ *         img_w * img_h
  */
-
 __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
                               const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
 
@@ -868,24 +876,26 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
  * @param dev [in] specified dmcam device
  * @param pcl [out] point clound buffer. each 4 element consists
  *            a (x,y,z,d) point. (x,y,z) is coordinate, d is
- *            distance or pseudo-color
+ *            distance or pseudo-color. output is in (w,h,4)
+ *            demension. point in value (0,0,0) is invalid 
  * @param pcl_len [in] point cloud float element count
- * @param dist [in] distance image data buffer. The unit of
+ * @param dist [in] distance image data buffer. The unit of 
  *             distance is meter (float)
- * @param dist_len [in] distance image data count (in
+ * @param dist_len [in] distance image data count (in 
  *                 sizeof(float))
  * @param img_w [in] distance image width in pixel
- * @param img_h [in] distance image height in pixel
+ * @param img_h [in] distance image height in pixel 
  * @param pseudo_color [in] if true, d is pseudo uint32 rgb 
  *                     color value; if false, d is the distance
- *                     in meter
- * @param p_cam_param [in] user specified camera lens parameter.
+ *                     in meter 
+ * @param p_cam_param [in] user specified camera lens parameter. 
  *                    if null, the internal camera parameter is
  *                    used.
- * @return int [out] return number of points in point cloud
- *         buffer. Note: n points means 4*n floats
+ * 
+ * @return int [out] return number of points in point cloud 
+ *         buffer. Note: n points means 4*n floats. N should be
+ *         img_w * img_h
  */
-
 int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
                              const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
 
@@ -905,6 +915,7 @@ typedef enum {
     DMCAM_FILTER_ID_OFFSET,       /**> set offset for calc distance */
     DMCAM_FILTER_ID_SPORT_MODE,   /**> set sport mode */
     DMCAM_FILTER_ID_SYS_CALIB,   /**> using system calibration param */
+    DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB,   /**> using ambient light calib calibration param */
     //-------------------
     DMCAM_FILTER_CNT,
 }dmcam_filter_id_e;
@@ -923,6 +934,7 @@ typedef union {
     uint8_t median_ksize;      /**> DMCAM_FILTER_ID_MEDIAN paramter:  kernel size. Normally use 3 or 5*/
     int32_t offset_mm;         /**> DMCAM_FILTER_ID_OFFSET paramter : offset in mm for DMCMA_FILTER_ID_OFFSET filter */
     uint8_t sport_mode;        /**> DMCAM_FILTER_ID_SPORT_MODE parameter: 0 = high motion mode, 1 = extrem high motion mode */
+    uint16_t k_ambient_light;  /**> DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB kcoeff of ambient light calibration */
 }dmcam_filter_args_u;
 
 
@@ -1174,7 +1186,6 @@ __API int dmcam_frame_load_distance(int fd, float *dst, int dst_len, int *dst_w,
  */
 
 __API int dmcam_frame_load_gray(int fd, float *dst, int dst_len, int *dst_w, int *dst_h);
-
 #ifdef __cplusplus
 }
 #endif

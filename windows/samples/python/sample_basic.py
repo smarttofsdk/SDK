@@ -1,33 +1,18 @@
-import sys
+import sys, os
 import numpy as np
 import time
 
 import dmcam
 
-
-def on_frame_rdy(dev, f):
-    # print("cap: idx=%d, num=%d" % (f.frame_fbpos, f.frame_count))
-    # time.sleep(0.5)
-    pass
-
-
-def on_cap_err(dev, errnumber, errarg):
-    print("caperr: %s" % dmcam.error_name(errnumber))
-    if errnumber == dmcam.DMCAM_ERR_CAP_FRAME_DISCARD:
-        print("   %d frame discarded" % int(errarg))
-    # if return false, the capture process will be stopped
-    return True
-
-
-# init the lib with default log file
+# --  init the lib with default log file
 dmcam.init(None)
-# init with specified log file
+# --  init with specified log file
 # dmcam.init("test.log")
-# set debug level
-dmcam.log_cfg(dmcam.LOG_LEVEL_INFO,
-              dmcam.LOG_LEVEL_DEBUG, dmcam.LOG_LEVEL_NONE)
 
-# list device (maximum 10 devices to store)
+# -- set debug level
+dmcam.log_cfg(dmcam.LOG_LEVEL_INFO, dmcam.LOG_LEVEL_DEBUG, dmcam.LOG_LEVEL_NONE)
+
+# -- list device
 print(" Scanning dmcam device ..")
 devs = dmcam.dev_list()
 if devs is None:
@@ -37,51 +22,36 @@ if devs is None:
 print("found %d device" % len(devs))
 
 for i in range(len(devs)):
-    print("DMCAM#%d [%03d:%03d:%03d]: VENDOR=%s, PROD=%s, SERIAL=%s"
-          % (i, devs[i].if_info.info.usb.usb_port_num, devs[i].if_info.info.usb.usb_bus_num,
-             devs[i].if_info.info.usb.usb_dev_addr, devs[i].vendor,
-             devs[i].product, devs[i].serial))
+    print("#%d: %s" % (i, dmcam.dev_get_uri(devs[i], 256)[0]))
 
 print(" Open dmcam device ..")
 # open the first device
-# dev = dmcam.dev_open(devs[0])
-dev = dmcam.dev_open(None)
+dev = dmcam.dev_open(devs[0])
+# Or open by URI
+# dev = dmcam.dev_open_by_uri("xxxx")
 assert dev is not None
 
+# - set capture config  -
 cap_cfg = dmcam.cap_cfg_t()
-cap_cfg.cache_frames_cnt = 10
-cap_cfg.on_error = None
-cap_cfg.on_frame_rdy = None
-cap_cfg.en_save_replay = False
-cap_cfg.en_save_dist_u16 = False
-cap_cfg.en_save_gray_u16 = False
-cap_cfg.fname_replay = None
+cap_cfg.cache_frames_cnt = 10  # framebuffer = 10
+cap_cfg.on_error = None        # use cap_set_callback_on_error to set cb
+cap_cfg.on_frame_rdy = None    # use cap_set_callback_on_frame_ready to set cb
+cap_cfg.en_save_replay = True  # True = save replay, False = not save
+cap_cfg.en_save_dist_u16 = False # True to save dist stream for openni replay
+cap_cfg.en_save_gray_u16 = False # True to save gray stream for openni replay
+cap_cfg.fname_replay = os.fsencode("dm_replay.oni")  # set replay filename
 
 dmcam.cap_config_set(dev, cap_cfg)
-
-# print(" Config capture param ..")
-# set 10 frames framebuffer
-# dmcam.cap_set_frame_buffer(dev, None, 10 * 320 * 240 * 4)
 # dmcam.cap_set_callback_on_frame_ready(dev, on_frame_rdy)
-dmcam.cap_set_callback_on_error(dev, on_cap_err)
-
-# write to ramp mode
-# dmcam.reg_batch_write(dev, dmcam.DEV_REG_TFC_DE, 0x31, np.array([0x1803], dtype="uint32"))
-# regval = dmcam.reg_batch_read(dev, dmcam.DEV_REG_TFC_DE, 0x31, 1)
-# print(regval)
-# assert regval[1] == 0x1803
+# dmcam.cap_set_callback_on_error(dev, on_cap_err)
 
 print(" Set paramters ...")
-# write illumination power: 100%
-pwr_percent = 100
 wparams = {
-    dmcam.PARAM_ILLUM_POWER: dmcam.param_val_u(),
     dmcam.PARAM_INTG_TIME: dmcam.param_val_u(),
-    dmcam.PARAM_FRAME_FORMAT: dmcam.param_val_u(),
+    dmcam.PARAM_FRAME_RATE: dmcam.param_val_u(),
 }
-wparams[dmcam.PARAM_ILLUM_POWER].illum_power.percent = pwr_percent
 wparams[dmcam.PARAM_INTG_TIME].intg.intg_us = 1000
-wparams[dmcam.PARAM_FRAME_FORMAT].frame_format.format = 2
+wparams[dmcam.PARAM_FRAME_RATE].frame_rate.fps = 20
 
 if not dmcam.param_batch_set(dev, wparams):
     print(" set parameter failed")
@@ -90,7 +60,6 @@ print(" Start capture ...")
 dmcam.cap_start(dev)
 
 f = bytearray(320 * 240 * 4 * 2)
-
 print(" sampling 100 frames ...")
 count = 0
 run = True
@@ -120,12 +89,10 @@ while run:
     time.sleep(0.01)
     # break
 
-# print("wait 3000ms")
-# dmcam.cap_wait(dev, 3000)
 print(" Stop capture ...")
 dmcam.cap_stop(dev)
 
 print(" Close dmcam device ..")
 dmcam.dev_close(dev)
+
 dmcam.uninit()
-sys.exit(-1)

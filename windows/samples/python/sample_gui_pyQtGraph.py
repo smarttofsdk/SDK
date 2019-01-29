@@ -120,6 +120,7 @@ class DmcamThread(QtCore.QThread):
         # You can change variables defined here after initialization - but before calling start()
 
     def stop_me(self):
+        print('stop me ..')
         self.run = False
 
     def run(self):
@@ -157,17 +158,6 @@ class DmcamThread(QtCore.QThread):
                 self.frameReadySignal.emit(0)
 
         self.captureDoneSignal.emit(int(self.run))
-
-
-def handle_capture_done():
-    global dev
-    print(" Stop capture ...")
-    dmcam.cap_stop(dev)
-
-    print(" Close dmcam device ..")
-    dmcam.dev_close(dev)
-    dev = None
-    dmcam.uninit()
 
 
 np_dist_buf = []
@@ -215,7 +205,7 @@ def handle_frame_ready():
         #np_dist_cmap = cmap(norm(np_dist))
         m = cm.ScalarMappable(norm=norm, cmap=cmap)
         np_dist_cmap = m.to_rgba(np_dist)
-        
+
         img_dist.setImage(np_dist_cmap.swapaxes(1, 0), autoLevels=True, autoDownsample=True)
         vb_dist.autoRange()
 
@@ -233,8 +223,8 @@ def handle_frame_ready():
         cdf_m = np.ma.masked_equal(cdf,0)
         cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
         cdf = np.ma.filled(cdf_m,0).astype('uint8')
-        np_gray_equ = cdf[np_gray]        
-        
+        np_gray_equ = cdf[np_gray]
+
         # convert to 320x240x3 gray
         np_gray = np.repeat(np_gray_equ, 3).reshape(np_gray_equ.shape[0], np_gray_equ.shape[1],-1)
         img_gray.setImage(np_gray.swapaxes(1, 0), autoLevels=True, autoDownsample=True, cmap="gray")
@@ -254,12 +244,27 @@ def handle_frame_ready():
 timer = QtCore.QTimer()
 cap_thread = DmcamThread()
 
+def handle_capture_done():
+    global dev, cap_thread
+    print(" Stop cap_thread ...")
+    cap_thread.stop_me()
+    cap_thread.wait()
+
+    print(" Stop capture ...")
+    dmcam.cap_stop(dev)
+
+    print(" Close dmcam device ..")
+    dmcam.dev_close(dev)
+    dev = None
+    dmcam.uninit()
+
+
 
 def start_capture():
     timer.stop()
     # --- start my thread ---
     if not cap_thread.isRunning():
-        cap_thread.captureDoneSignal.connect(handle_capture_done)
+        # cap_thread.captureDoneSignal.connect(handle_capture_done)
         cap_thread.frameReadySignal.connect(handle_frame_ready)
 
         cap_thread.start()
