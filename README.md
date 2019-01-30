@@ -8,11 +8,11 @@
 
 SmartToF TC系列模组是数迹公司采用TOF技术开发的3D视觉模组，采用业界领先的传感器芯片，具有测量精度高、抗干扰能力强、外观小巧等优点。模组可用于精确的人流统计、物流仓储、手势识别、机器人避障和车载控制等新兴技术领域。SmartToF SDK是配套SmartToF系列模组进行开发的软件工具包，支持windows、linux、Android等主流平台，SDK的总体架构图如下：
 
-！[框图](https://github.com/smarttofsdk/doctest/tree/master/source/Introduction/image/Overview.png)
+![框图](https://github.com/smarttofsdk/doctest/tree/master/source/Introduction/image/Overview.png)
 
 SDK中架构中的主要部分说明和特点如下图所示：
 
-！[架构图](https://github.com/smarttofsdk/doctest/tree/master/source/Introduction/image/Components.png)
+![架构图](https://github.com/smarttofsdk/doctest/tree/master/source/Introduction/image/Components.png)
 
 ------
 
