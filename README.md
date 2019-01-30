@@ -14,10 +14,9 @@ SDK中架构中的主要部分说明和特点如下图所示：
 
 ![架构图](https://github.com/smarttofsdk/doctest/raw/master/source/Introduction/image/Components.png)
 
-
 ------
 
-## 2、主要API介绍和样例说明
+## 2、最简采集和样例说明
 
 ### 2.1 最简化的采集数据例程
 
@@ -55,29 +54,29 @@ dmcam_cap_stop(dev);
 dmcam_dev_close(dev);
 dmcam_uninit();
 ```
-
 ------
 
 ### 2.2相关样例说明
 
 SmartToF SDK提供的主要样例如下：
 
-- C样例：参见（[C样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c)）
-  - sample_capture_frames.c:展示采集数据
-  - sample_set_param.c:展示进行参数的设置
-  - sample_filter.c:展示校准数据
-- C++样例：参见([C++样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c%2B%2B))
-  - sample_capture_frames.cpp:展示采集数据
-  - sample_set_param.cpp:展示进行参数的设置
-  - sample_filter.cpp:展示校准数据
-- python样例：参见（[python样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/python)）
-  - sample_gui_pyQtGraph.py:采集数据显示
-  - sample_gui_pygame.py:采集数据显示
-  - sample_param.py:展示参数设置和读取
-  - sample_basic:展示采集数据
-- java样例：参见([java样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
-  - sampleBasic.java:java采集样例
-  - sampleBasicUi.java:java采集显示样例
-- OpenNI样例：参见([OpenNI样例链接](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/openni2))
-- ROS样例：参见([ros样例链接](https://github.com/smarttofsdk/SDK/tree/master/ros))
+- C/C++样例：
+  - 使用说明参见（[教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/C_C++/index.html)）
+  - 核心C库说明参见（[核心库链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/C_C++/index.html)）
+- Python样例：
+  - 使用说明参见（[python教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Python/index.html)）
+  - Python扩展说明参见（[python扩展说明链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/Python/index.html)）
+- C#样例：
+  - 使用说明参见（[C#教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Csharp/index.html)）
+  - C#扩展说明参见（[C#扩展说明链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/Csharp/index.html)）
+- Java样例：
+  - 使用说明参见（[java教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Java/index.html)）
+  - Java扩展说明参见（[java扩展说明链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/Java/index.html)）
+- ROS样例：
+  - 使用说明参见（[ROS教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/ROS/index.html)）
+  - ROS扩展说明参见（[ROS扩展说明链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/ROS/index.html)）
+- Android样例：
+  - 使用说明参见（[Android教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Android/Androidapk.html)）
+  - Android扩展说明参见（[Android扩展说明链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/Android/index.html)）
+
 
