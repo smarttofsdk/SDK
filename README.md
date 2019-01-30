@@ -2,69 +2,23 @@
 
 ------
 
+**SmartToF SDK用户手册参考以下([网址链接](https://smarttofdoc.readthedocs.io/en/latest/))**
+
 ## 1、SmartToF SDK简介
 
-SmartToF SDK是TOF 3D相机的通用开发套件，具有下面所列功能:
+SmartToF TC系列模组是数迹公司采用TOF技术开发的3D视觉模组，采用业界领先的传感器芯片，具有测量精度高、抗干扰能力强、外观小巧等优点。模组可用于精确的人流统计、物流仓储、手势识别、机器人避障和车载控制等新兴技术领域。SmartToF SDK是配套SmartToF系列模组进行开发的软件工具包，支持windows、linux、Android等主流平台，SDK的总体架构图如下：
 
-- 支持深度、灰度数据采集与显示
-- 支持采集数据自动校准
-- 支持点云显示
+！[框图](https://github.com/smarttofsdk/doctest/tree/master/source/Introduction/image/Overview.png)
 
-目前SmartToF SDK支持以下型号的TOF 3D相机模组：
+SDK中架构中的主要部分说明和特点如下图所示：
 
-- TCM-E1模组
-- TCM-E2模组
-
-SmartToF SDK主要包括以下模块:
-
-- DMCAM核心C库及语言扩展
-  - lib
-  - python
-  - java
-- SmartToF 开发者工具
-  - SmartTofViewer
-  - SmartTofCli
-  - SmartTofAnalyzer
-
-SmartToF SDK支持windows和linux等多种操作系统，同时提供多种参考样例方便用户二次开发，包括：
-
-- C/C++样例
-- python样例
-- ROS样例
-- android样例
-- C#样例
-
-SmartToF SDK的各个平台支持情况：
-
-|                  | Windows | Linux   | Android |
-| :--------------- | :------ | :------ | :------ |
-| 核心API C库      | &radic; | &radic; | &radic; |
-| Python           | &radic; | &radic; |         |
-| Java             | &radic; |         | &radic; |
-| Ros              |         | &radic; |         |
-| C#               | &radic; | &radic; |         |
-| Matlab           | &radic; |         |         |
-| usbdriver        | &radic; | &radic; | &radic; |
-| SmartTofAnalyzer | &radic; | &radic; |         |
-| SmartTofCli      | &radic; | &radic; |         |
-| SmartToFViewer   | &radic; | &radic; | &radic; |
+！[架构图](https://github.com/smarttofsdk/doctest/tree/master/source/Introduction/image/Components.png)
 
 ------
 
-## 2、SmartToF SDK的使用
+## 2、主要API介绍和样例说明
 
-SmartToF SDK的使用需要进行所在系统的环境配置，包括
-
-- windows下的安装配置，详细步骤见([参考链接](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDKwindow%E4%B8%8B%E7%9A%84%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE))
-- linux下的安装配置,详细步骤见（[参考链接](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-Linux%E4%B8%8B%E7%9A%84%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE)）
-
-------
-
-## 3、主要API介绍和样例说明
-
-SmartToF SDK中所有相关结构体定义和函数声明都位于lib\include文件夹下的dmcam.h中，例如windows下在SDK/windows/dmcam/lib/include下，里面对函数的主要功能和参数都有详细说明,在wiki下也有[《SmartToF SDK 重要API接口说明》](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-%E9%87%8D%E8%A6%81API%E8%AF%B4%E6%98%8E)
-
-### 3.1 最简化的采集数据例程
+### 2.1 最简化的采集数据例程
 
 ```c
 /*初始化*/
@@ -101,168 +55,9 @@ dmcam_dev_close(dev);
 dmcam_uninit();
 ```
 
-### 3.2主要API介绍
-
-#### 3.2.1模组初始化
-
-```c
-dmcam_init(const char *log_fname);	//初始化
-```
-
-| 参数      | 描述                                            |
-| :-------- | :---------------------------------------------- |
-| log_fname | 日志文件名，如果为NULL,默认为dmcam_YYYYMMDD.log |
-
-#### 3.2.2列出所有模组
-
-```c 
-dmcam_dev_list(dmcam_dev_t *dev_list,int dev_list_num); 
-```
-
-| 参数         | 描述       |
-| :----------- | :--------- |
-| dev_list     | 连接设备表 |
-| dev_list_num | 设备表大小 |
-
-#### 3.2.3打开设备
-
-```c
-dmcam_dev_open(dmcam_dev_t *dev); 
-```
-
-| 参数 | 描述         |
-| :--- | :----------- |
-| dev  | 指定打开设备 |
-
-#### 3.2.4设置参数
-
-```c
-dmcam_param_batch_set(dmcam_dev_t *dev, const dmcam_param_item_t *param_items, int item_cnt);
-```
-
-| 参数        | 描述           |
-| :---------- | :------------- |
-| dev         | 指定设备       |
-| param_items | 设置的参数值   |
-| item_cnt    | 设置的参数个数 |
-
-#### 3.2.5设置采集帧缓存
-
-```c
-dmcam_cap_set_frame_buffer(dmcam_dev_t *dev, uint8_t *frame_buf, uint32_t frame_buf_size);
-```
-
-| 参数           | 描述         |
-| :------------- | :----------- |
-| dev            | 指定设备     |
-| frame_buf      | 缓存数组     |
-| frame_buf_size | 缓存数组大小 |
-
-#### 3.2.6设置错误回调
-
-```c
-dmcam_cap_set_callback_on_error(dmcam_dev_t *dev, dmcam_cap_err_f cb);
-```
-
-| 参数 | 描述         |
-| :--- | :----------- |
-| dev  | 指定设备     |
-| cb   | 错误回调函数 |
-
-#### 3.2.7采集帧数据
-
-```c
-dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *frame_data, uint32_t frame_dlen, dmcam_frame_t *first_frame_info);
-```
-
-| 参数             | 描述           |
-| :--------------- | :------------- |
-| dev              | 指定设备       |
-| frame_num        | 要采集的帧数   |
-| frame_data       | 采集的帧数据   |
-| frame_dlen       | 帧数据缓存大小 |
-| first_frame_info | 第一帧数据     |
-
-#### 3.2.8解析出深度数据
-
-```c
-dmcam_frame_get_dist_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
-                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
-```
-
-| 参数    | 描述             |
-| :------ | :--------------- |
-| dev     | 指定设备         |
-| dst     | 转换出的深度数据 |
-| dst_len | 深度数据缓存大小 |
-| src     | 采集的原始数据   |
-| src_len | 原始数据大小     |
-| finfo   | 原始帧信息       |
-
-```c
-dmcam_frame_get_dist_f32(dmcam_dev_t *dev, float *dst, int dst_len,
-                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
-```
-
-| 参数    | 描述             |
-| :------ | :--------------- |
-| dev     | 指定设备         |
-| dst     | 转换出的深度数据 |
-| dst_len | 深度数据缓存大小 |
-| src     | 采集的原始数据   |
-| src_len | 原始数据大小     |
-| finfo   | 原始帧信息       |
-
-#### 3.2.9解析出灰度数据
-
-```c
-dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
-                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
-```
-
-| 参数    | 描述             |
-| :------ | :--------------- |
-| dev     | 指定设备         |
-| dst     | 转换出的灰度数据 |
-| dst_len | 灰度数据缓存大小 |
-| src     | 采集的原始数据   |
-| src_len | 原始数据大小     |
-| finfo   | 原始帧信息       |
-
-```c
-int dmcam_frame_get_gray_f32(dmcam_dev_t *dev, float *dst, int dst_len,
-                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
-```
-
-| 参数    | 描述             |
-| :------ | :--------------- |
-| dev     | 指定设备         |
-| dst     | 转换出的灰度数据 |
-| dst_len | 灰度数据缓存大小 |
-| src     | 采集的原始数据   |
-| src_len | 原始数据大小     |
-| finfo   | 原始帧信息       |
-
-#### 3.2.10获取点云数据
-
-```c
-dmcam_frame_get_pcl(dmcam_dev_t * dev, float *pcl, int pcl_len,
-const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
-```
-
-| 参数        | 描述                                     |
-| :---------- | :--------------------------------------- |
-| dev         | 指定设备                                 |
-| pcl         | 输出的点云数据，每三个元素构成一点的坐标 |
-| dist        | 输入图像的深度数据                       |
-| dist_len    | 输入图像深度数据的长度                   |
-| img_w       | 深度图像的宽度                           |
-| img_h       | 深度图像的高度                           |
-| p_cam_param | 相机内参                                 |
-
 ------
 
-### 3.3相关样例说明
+### 2.2相关样例说明
 
 SmartToF SDK提供的主要样例如下：
 
