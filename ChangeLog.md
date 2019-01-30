@@ -1,3 +1,51 @@
+# 版本号：1.62
+
+## 发布时间：2019/1/30
+
+### 固件部分 固件版本：164
+
+- [**New**] 增加行ROI支持
+- [**New**] 增加环境光补偿支持
+- [**NEW**] 调整缓冲RAM布局
+- [**Bugfix**] 修复时间戳毫秒部分错误
+- [**Bugfix**] 支持温度高自动降帧
+
+### SDK软件部分
+- dmcam lib
+  - [**New**] 采集设置API接口变更，增加dmcam_cap_config_set()接口，可统一设置帧缓冲和是否开启录像
+  - [**New**] 增加环境光补偿
+  - [**Enhance**] 大幅优化计算处理速度
+  - [**Enhance**] 调整get_pcl接口输出和深度图一样的画幅（一一映射），如深度值无效则为（0,0,0）或（0,0,0,0）
+  - [**Enhance**] 更新系统校准计算
+  - [**Bugfix**] 修复调用接口复位时usb锁住问题
+  - [**Bugfix**] 修复get_frames在处理平台速度较慢的时候请求多帧只返回1帧的问题。
+  - [**Bugfix**] 修复TC-E3录制和回放帧数不对的问题
+- tools
+  - smarttofviewer
+    - [**New**] 录像增加支持OpenNI兼容模式
+    - [**Enhance**] 优化linux显示布局
+    - [**Bugfix**] 修复中文路径问题，修复切换设备和录像之间状态不正常的问题
+    - [**Bugfix**] 修复固件文件名带路径出错问题
+    - [**Bugfix**] 修复距离偏移启动时不更新的问题
+  - smarttof_cli
+    - [**New**] 增加HDR积分时间设置，采集存储按行扫描存储
+    - [**New**] info命令增加打印URI信息
+    - [**New**] 增加filter、采集等命令
+    - [**New**] 复位增加提示信息
+    - [**Bugfix**] 修复多参数异常及像素坐标点问题
+- ros
+  - [**Bugfix**] 修复ros运行时深度图和点云图显示时卡顿问题
+- Openni
+  - [**New**] 发布Openni支持模组驱动的源码
+- samples
+  - [**New**] 增加C#样例get/set param 代码片段
+  - [**New**] 更新python下样例使用最新的接口
+  - [**Enhance**] 更Android相关库和样例
+  - [**Enhance**] 更新OpenNI样例
+- doc
+  - [**New**] 改版SmartToF SDK User Guide ,在readthedoc上托管
+  - [**New**] 增加运动模式场景说明
+
 # 版本号：1.60
 
 ## 发布时间：2018/9/23
