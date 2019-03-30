@@ -79,6 +79,11 @@ else()
     endif()
 
     list(APPEND DMCAM_STATIC_LIBRARY uv usb-1.0 m)
+
+    # libdl should not linked in static: exclude dl 
+    if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+      list(APPEND DMCAM_STATIC_LIBRARY -Wl,-Bdynamic dl -Wl,-Bstatic )
+    endif()
 endif()
 
 set ( DMCAM_LIBRARIES ${DMCAM_LIBRARY} )

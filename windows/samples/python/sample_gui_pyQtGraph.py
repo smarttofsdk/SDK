@@ -1,4 +1,5 @@
-# import cv2
+import sys
+import os
 import time
 import dmcam
 import matplotlib.pyplot as plt
@@ -7,6 +8,7 @@ import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 
+dev_uri = sys.argv[1] if len(sys.argv) >= 2 else None
 # from scipy import ndimage
 
 # map the normalized data to colors
@@ -75,15 +77,46 @@ dmcam.init(None)
 dmcam.log_cfg(dmcam.LOG_LEVEL_INFO,
               dmcam.LOG_LEVEL_DEBUG, dmcam.LOG_LEVEL_NONE)
 
-print(" Open dmcam device ..")
-# open the first device
-# dev = dmcam.dev_open(dev_list[0])
-dev = dmcam.dev_open(None)
-assert dev is not None
+print(" Scanning dmcam device ..")
+devs = dmcam.dev_list()
+
+if devs is None:
+    print(" No device found")
+else:
+    print("found %d device" % len(devs))
+    print(" Device URIs:")
+    for i, d in enumerate(devs):
+        print("[#%d]: %s" % (i, dmcam.dev_get_uri(d, 256)[0]))
+
+if dev_uri:
+    dev = dmcam.dev_open_by_uri(os.fsencode(sys.argv[1]))
+else:
+    # open the first device
+    # dev = dmcam.dev_open(devs[0])
+    dev = dmcam.dev_open(None)
+
+if dev is None:
+    print(" Open device failed")
+    sys.exit(-1)
+else:
+    print(" Open dmcam device: %s " % dmcam.dev_get_uri(dev, 256)[0])
 
 # print(" Config capture param ..")
 # set 10 frames framebuffer
-dmcam.cap_set_frame_buffer(dev, None, 10 * 320 * 240 * 4 * 2)
+# dmcam.cap_set_frame_buffer(dev, None, 10 * 320 * 240 * 4 * 2)
+
+#replace dmcam.cap_set_frame_buffer
+cap_cfg = dmcam.cap_cfg_t()
+cap_cfg.cache_frames_cnt = 10  # frame buffer = 10 frames
+# cap_cfg.on_frame_ready = None  # callback should be set by dmcam.cap_set_callback_on_frame_ready
+# cap_cfg.on_cap_err = None      # callback should be set by dmcam.cap_set_callback_on_error
+cap_cfg.en_save_dist_u16 = False  # save dist into ONI file: which can be viewed in openni
+cap_cfg.en_save_gray_u16 = False  # save gray into ONI file: which can be viewed in openni
+cap_cfg.en_save_replay = False  # save raw into ONI file:  which can be simulated as DMCAM device
+cap_cfg.fname_replay = os.fsencode("replay_dist.oni")
+
+dmcam.cap_config_set(dev, cap_cfg)
+
 # dmcam.cap_set_callback_on_frame_ready(dev, on_frame_rdy)
 dmcam.cap_set_callback_on_error(dev, on_cap_err)
 

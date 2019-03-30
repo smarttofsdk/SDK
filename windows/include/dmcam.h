@@ -44,9 +44,9 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 62
+#define DM_VERSION_MINOR 68
 #define DM_VERSION_REV   0
-#define DM_VERSION_STR "v1.62.0"
+#define DM_VERSION_STR "v1.68.0"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -56,6 +56,10 @@ extern "C"
 #define DMCAM_ERR_CAP_ERROR   (-8)
 #define DMCAM_ERR_CAP_EOF   (-9) // cap replay related error
 #define DMCAM_ERR_CAP_UNKNOWN  (-10)
+
+#define DM_SEEK_SET 0
+#define DM_SEEK_CUR 1
+#define DM_SEEK_END 2
 
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #define API_DEPRECATED_FOR(f) \
@@ -150,7 +154,8 @@ typedef struct {
     float cy;           //center point y
     float fx;           //focal length x
     float fy;           //focal length y
-    float scale;    //ratio between image value and real distance
+
+    float dcoeff[5];   // distortion coef
 }dmcam_camera_para_t;
 
 typedef enum {
@@ -215,7 +220,8 @@ typedef enum {
     PARAM_SYNC_DELAY,     //<delay ms for sync use
     PARAM_SYS_CALIB_COEFF, //system calibration coefficent
     PARAM_SYNC_SYS_TIME, //set/get module time
-    PARAM_AMBIENT_LIGHT_COEFF,//set ambient light calibration coeff.
+    PARAM_AMBIENT_LIGHT_COEFF, //set ambient light calibration coeff.
+    PARAM_DUAL_MOD_FREQ, //set mod_freq
     PARAM_ENUM_COUNT,
 }dmcam_dev_param_e;
 
@@ -329,6 +335,10 @@ typedef union {
         uint32_t sec;
         uint32_t us;
     }sync_time;
+    struct {
+        uint32_t mod_freq0;
+        uint32_t mod_freq1;
+    }dual_freq;
 }dmcam_param_val_u;
 #pragma pack(pop)
 
@@ -340,7 +350,7 @@ typedef struct {
 
 
 typedef enum {
-    DM_FRAME_FMT_RAW = 0,
+    DM_FRAME_FMT_RAW_DIST = 0,
     DM_FRAME_FMT_DISTANCE,
     DM_FRAME_FMT_GRAY,
     DM_FRAME_FMT_PCLOUD,
@@ -383,6 +393,8 @@ typedef struct {
     uint8_t en_save_gray_u16;    /* enable saving gray_u16 file during capturing. saving happends in dmcam_cap_get_gray_xx */
 
     char *fname_replay;       /* replay file name */
+
+    uint8_t en_fdev_rewind;  /** only used when type of the device is reaply-file. if true, capture will auto rewind when the EOF of file is met */
 }dmcam_cap_cfg_t;
 
 /*---------------------------------------------------------------------------*
@@ -395,9 +407,10 @@ typedef struct {
  * @param log_fname [in] specified log file name of dmcam layer. 
  *                  if NULL, the default log
  *                  (dmcam_YYYYMMDD.log) is used.
+ *                  if empty string "" is used, no log will
+ *                  generated
  *                      
  */
-
 __API void dmcam_init(const char *log_fname);
 
 /**
@@ -635,22 +648,6 @@ __API bool dmcam_cap_config_set(dmcam_dev_t *dev, const dmcam_cap_cfg_t *cfg);
 __API void dmcam_cap_config_get(dmcam_dev_t *dev, dmcam_cap_cfg_t *cfg);
 
 /**
- * set frame buffer during capturing.
- * 
- * @param dev [in] dmcam device handler
- * @param frame_buf [in] framebuffer assigned by user. if null, 
- *                  the frame_buf will be alloced internally
- * @param frame_buf_size [in] frame buffer size, which will be 
- *                       rouned to frame size boundary.
- * 
- * @return bool [out] return true = set ok.
- */
-
-API_DEPRECATED_FOR(dmcam_cap_config_set)
-__API bool dmcam_cap_set_frame_buffer(dmcam_dev_t *dev, uint8_t *frame_buf, uint32_t frame_buf_size);
-
-
-/**
 * register frame ready callback function
 *
 * @param dev [in] dmcam device handler
@@ -746,6 +743,27 @@ __API int dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *fr
 */
 __API int dmcam_cap_get_frame(dmcam_dev_t *dev, uint8_t *frame_data, uint32_t frame_dlen, dmcam_frame_t *frame_info);
 
+
+/**
+ * seek frame inside replay device. it only has effect on replay 
+ * file simulated dmcam device. it'll return -1 if dev is not a 
+ * replay device. 
+ * 
+ * @param dev [in] dmcam device handler
+ * @param frame_cnt_offset [in] specified frames to seek 
+ *                         afterward or forward. negative value
+ *                         = seek forward
+ * @param whence [in] SEEK_SET: beginning of the replay. 
+ *                    SEEK_CUR: current frame of the replay.
+ *                    SEEK_END: end of the replay.
+ * 
+ * @return int return the current frame pos (0 = at the 
+ *         beginning, 1 = at the end of first frame). -1 =
+ *         failed.
+ */
+
+__API int dmcam_cap_seek_frame(dmcam_dev_t *dev, int frame_cnt_offset, int whence);
+
 /**
 * Firmware upgrade for different type target.
 *
@@ -768,6 +786,26 @@ __API int dmcam_data_upload(dmcam_dev_t *dev, uint8_t type, const char *file_nam
 __API int dmcam_frame_get_distance(dmcam_dev_t *dev, float *dst, int dst_len,
                                    uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 
+
+/**
+ * convert to raw distance data in uint16 from raw frame data. 
+ * the raw distance is calculated without any calibration and 
+ * pixel reorder. 
+ * 
+ * @param dev [in] specified dmcam device
+ * @param dst [out] distance buffer. The unit of distance is in 
+ *            millimeter (uint16)
+ * @param dst_len [in] distance buffer length in number of 
+ *                uint16
+ * @param src [in] raw frame data buffer
+ * @param src_len [in] raw frame data length in byte
+ * @param finfo [in] raw frame information 
+ * 
+ * @return int [out] return the number for distance points in 
+ *         dst
+ */
+__API int dmcam_frame_get_dist_raw(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
 /**
  * convert to distance data to float32 from raw frame data. 
  * 
@@ -896,16 +934,48 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
  *         buffer. Note: n points means 4*n floats. N should be
  *         img_w * img_h
  */
-int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
-                             const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
+__API int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
+                                   const float *dist, int dist_len, int img_w, int img_h, bool pseudo_color, const dmcam_camera_para_t *p_cam_param);
 
+/**
+ * get point cloud data from distance data and gray(confid) data 
+ * . 
+ * @param dev [in] specified dmcam device
+ * @param pcl [out] point clound buffer. each 4 element consists
+ *            a (x,y,z,i) point.
+ *   (x,y,z) is coordinate,
+ *   IR value can be get from i by ((uint32_t)i) 0xff .
+ *   output is in (w,h,4) demension.
+ *   point with (x,y,z)=(0,0,0) is invalid
+ *  
+ * @param pcl_len [in] point cloud float element count
+ * @param dist [in] distance image data buffer. The unit of 
+ *             distance is meter (float)
+ * @param dist_len [in] distance image data count (in 
+ *                 sizeof(float))
+ * @param gray [in] gray image data buffer.
+ * @param gray_len [in] gray image data count (in sizeof(float))
+ * @param img_w [in] distance image width in pixel
+ * @param img_h [in] distance image height in pixel 
+ * @param ir_balance [in] [-1024, 1024] -> [darkest, brightest]
+ * @param p_cam_param [in] user specified camera lens parameter. 
+ *                    if null, the internal camera parameter is
+ *                    used.
+ * 
+ * @return int [out] return number of points in point cloud 
+ *         buffer. Note: n points means 4*n floats. N should be
+ *         img_w * img_h
+ */
+__API int dmcam_frame_get_pcl_xyzi(dmcam_dev_t *dev, float *pcl, int pcl_len,
+                                   const float *dist, int dist_len, const float *gray, int gray_len,
+                                   int img_w, int img_h, int16_t ir_balance, const dmcam_camera_para_t *p_cam_param);
 /*---------------------------------------------------------------------------*
  * filter API section                                                                      
  *---------------------------------------------------------------------------*/
 typedef enum {
     DMCAM_FILTER_ID_LEN_CALIB,    /**>lens calibration*/
     DMCAM_FILTER_ID_PIXEL_CALIB,  /**>pixel calibration*/
-    DMCAM_FILTER_ID_MEDIAN,       /**>Median filter for distance data*/
+    DMCAM_FILTER_ID_DEPTH_FILTER,  /**> Depth filter */
     DMCAM_FILTER_ID_RESERVED,        /**>Gauss filter for distance data*/
     DMCAM_FILTER_ID_AMP,          /**>Amplitude filter control*/
     DMCAM_FILTER_ID_AUTO_INTG,    /**>auto integration filter enable : use sat_ratio to adjust */
@@ -918,6 +988,8 @@ typedef enum {
     DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB,   /**> using ambient light calib calibration param */
     //-------------------
     DMCAM_FILTER_CNT,
+
+    DMCAM_FILTER_ID_MEDIAN = DMCAM_FILTER_ID_DEPTH_FILTER,  /* MEDIAN is replaced with depth filter */
 }dmcam_filter_id_e;
 
 typedef union {
@@ -1032,6 +1104,36 @@ __API int dmcam_cmap_gray_u16_to_IR(uint8_t *dst, int dst_len, const uint16_t *s
  * @return int [out] the count of IR image
  */
 __API int dmcam_cmap_gray_f32_to_IR(uint8_t *dst, int dst_len, const float *src, int src_len, int balance);
+
+
+/**
+ * convert gray_u16 image to gray RGB32 image whose pixel is in 
+ * uint32_t B in [23:16], G in [15:8], R in [7:0]
+ * 
+ * @param dst [out] IR image buffer
+ * @param dst_len [in] IR image buffer in size of uint32_t
+ * @param src [in] gray_u16 image
+ * @param src_len [in] count of u16 points in gray_u16 image
+ * @param balance [in] [-1024, 1024] -> [darkest, brightest]
+ * 
+ * @return int [out] the count of IR image
+ */
+__API int dmcam_cmap_gray_u16_to_RGB32(uint32_t *dst, int dst_len, const uint16_t *src, int src_len, int balance);
+
+/**
+ * convert gray_u16 image to gray RGB32 image whose pixel is in 
+ * uint32_t B in [23:16], G in [15:8], R in [7:0]
+ * 
+ * @param dst [out] IR image buffer
+ * @param dst_len [in] IR image buffer in size of uint32_t
+ * @param src [in] gray_f32 image
+ * @param src_len [in] count of f32 points in gray_f32 image
+ * @param balance [in] [-1024, 1024] -> [darkest, brightest]
+ * 
+ * @return int [out] the count of IR image
+ */
+__API int dmcam_cmap_gray_f32_to_RGB32(uint32_t *dst, int dst_len, const float *src, int src_len, int balance);
+
 /*---------------------------------------------------------------------------*
  * File save/load API section                                                                         
  *---------------------------------------------------------------------------*/
