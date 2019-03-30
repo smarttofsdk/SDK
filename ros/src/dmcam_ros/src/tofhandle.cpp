@@ -88,7 +88,7 @@ void TofHandle::tof_init(void)
     //init the device opened
     param_init(dev);
 
-    dmcam_cap_set_frame_buffer(dev, NULL, FRAME_SIZE);
+    //dmcam_cap_set_frame_buffer(dev, NULL, FRAME_SIZE);
     //dmcam_cap_set_callback_on_error(dev, on_cap_err);
 
     fbuf = (uint8_t *)malloc(FRAME_SIZE);
@@ -213,8 +213,8 @@ void TofHandle::param_init(dmcam_dev_t *dev_0)
     cam_int_param.fx = tmp_param;
     nh->getParam("fy", tmp_param);
     cam_int_param.fy = tmp_param;
-    nh->getParam("scale", tmp_param);
-    cam_int_param.scale = tmp_param;
+    //nh->getParam("scale", tmp_param);
+    //cam_int_param.scale = tmp_param;
 
     //camera info init
     cam_inf_msg.height = 240;
