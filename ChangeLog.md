@@ -1,3 +1,47 @@
+# 版本号：1.68
+
+## 发布时间：2019/3/30
+
+### 固件部分 固件版本：168
+
+- [**Bugfix**] 新MCU升级兼容性
+- [**Bugfix**] 修复时间戳误差大和滞后问题
+- [**Bugfix**] E3固件帧率问题修复
+- [**Bugfix**] 运动模式灰度帧大小计算问题
+
+### SDK软件部分
+- dmcam lib
+  - [**New**] 增加dmcam_frame_get_pcl_xyzi接口获得包括灰度纹理的点云
+  - [**New**] 增加dmcam_cap_seek_frame接口以便在播放录像文件时查找帧
+  - [**New**] 增加dmcam_frame_get_dist_raw接口获得原始的不带校准数据的深度数据
+    - 索尼传感器部分
+      - [**New**] 为索尼传感器增加压缩支持
+      - [**New**] 增加索尼传感器的滤波器优化
+      - [**New**] 索尼部分校准
+  - [**Enhance**] 从固件164版本后录像支持环境光校准的灰度帧
+  - [**Enhance**] 录像支持HDR模式和普通模式的切换
+  - [**Enhance**] 对网络设备dmcam_dev_get_uri返回带token标志的URI
+  - [**Enhance**] 提高dmcam_frame_get_pcl_xyzd和dmcam_frame_get_pcl_xyzi的计算性能
+  - [**Bugfix**] 修复镜头参数文件打开后未关闭的问题
+  - [**Bugfix**] 修复录像文件没有时间戳的问题
+  - [**Bugfix**] 针对固件164版本设备有时不能正常关闭的问题
+- tools
+  - smarttofviewer
+    - [**New**] 界面增加开启点云显示选项
+    - [**New**] 界面增加”上下反转选项“，去掉“抗干扰检测”
+    - [**New**] 增加深度图-原始视图，显示raw格式
+    - [**New**] 增加“重复播放“选项，回放时候默认选中
+    - [**Enhance**] 优化帧率界面设置方式
+    - [**Bugfix**] 修复HDR开启的录像播放问题
+- ros
+  - [**Enhance**] 丢弃使用相关废弃接口，同步到最新的库
+- samples
+  - [**New**] 更新python下样例使用最新的接口
+  - [**Enhance**] 更Android相关库和样例
+  - [**Enhance**] 更新OpenNI样例
+- doc
+  - [**Enhance**] 更新版SmartToF SDK User Guide ,在readthedoc上托管
+
 # 版本号：1.62
 
 ## 发布时间：2019/1/30
