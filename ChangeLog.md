@@ -1,3 +1,51 @@
+# 版本号：1.70
+
+## 发布时间：2019/8/5
+
+### 固件部分 固件版本：170
+
+- [**New**] Binning设置支持 
+- [**New**] 增加EPC635支持
+- [**New**] 固件名称修改
+- [**New**] 调整binning设置，可通过ROI参数中binning参数设置，统一ROI参数设置
+- [**Bugfix**] 修复ROI 列问题
+- [**Bugfix**] 修复笔记本采集超时问题
+
+### SDK软件部分
+- dmcam lib
+  - [**New**] 增加binning设置功能
+  - [**New**] 修改EPC部分roi的row设置，ROI参数设置含义调整
+  - [**New**] 增加EPC635的支持
+    - 索尼传感器部分
+      - [**New**] imx双频计算模式支持
+      - [**New**] 降低bpf滤波强度
+      - [**New**] 
+  - [**Enhance**] 优化dm_stream的TRACE打印
+  - [**Enhance**] 提升roi相关的打印信息
+  - [**Bugfix**] 丢掉废弃的API:dmcam_cmap_float
+  - [**Bugfix**] 修复EPC的binning录像问题
+  - [**Bugfix**] 修复初始参数为HDR模式录像回放的问题
+- tools
+  - smarttofviewer
+    - [**New**] 更新封面图片
+    - [**New**] 增加binning设置功能
+    - [**New**] 增加dmcam_dist_u16 录像
+    - [**Bugfix**] 修复binning模式回放问题
+    - [**Bugfix**] 修复校准拟合不正确的问题，增加校准值校验和修复功能
+    - [**Bugfix**] 修复pclviewer和smarttofviewer视角不一致的问题
+  - smarttof_cli
+    - [**New**] 支持-u方式指定device_uri,支持ONI录像设备的使用
+    - [**Enhance**] 修改ROI设置更新
+    - [**Bugfix**] 修复capture命令在file replay时候的部分问题
+- ros
+  - [**New**] ros增加查找dmcam库的cmake
+  - [**Enhance**] 丢弃使用相关废弃接口，同步到最新的库
+- samples
+  - [**Enhance**] 更Android相关库和样例
+  - [**Enhance**] 更新OpenNI样例
+
+
+
 # 版本号：1.68
 
 ## 发布时间：2019/3/30
@@ -41,6 +89,7 @@
   - [**Enhance**] 更新OpenNI样例
 - doc
   - [**Enhance**] 更新版SmartToF SDK User Guide ,在readthedoc上托管
+
 
 # 版本号：1.62
 
