@@ -44,9 +44,9 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 68
+#define DM_VERSION_MINOR 70
 #define DM_VERSION_REV   0
-#define DM_VERSION_STR "v1.68.0"
+#define DM_VERSION_STR "v1.70.0"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -222,6 +222,7 @@ typedef enum {
     PARAM_SYNC_SYS_TIME, //set/get module time
     PARAM_AMBIENT_LIGHT_COEFF, //set ambient light calibration coeff.
     PARAM_DUAL_MOD_FREQ, //set mod_freq
+    PARAM_INFO_LENS, //Get lens param
     PARAM_ENUM_COUNT,
 }dmcam_dev_param_e;
 
@@ -230,6 +231,15 @@ typedef enum {
     BIN_DATA_TYPE_TFC, //TOF controller IC firmware
     BIN_DATA_TYPE_CALIB, //>TOF calibration data
 }dmcam_bin_data_type_e;
+typedef enum {
+    DM_BINNING_1X1,
+    DM_BINNING_2X2,
+    DM_BINNING_4X4,
+    DM_BINNING_8X8,
+    DM_BINNING_2X4,
+    //---
+    DM_BINNING_CNT,
+}dmcam_binning_mode_e;
 /** 
  * Frame size and Max frame size can be get from paramter 
  * interface using the PRAM_INFO_ROI parameter. 
@@ -244,18 +254,28 @@ typedef enum {
  * 
 
  */
+
+
+#pragma pack(push)
+#pragma pack(1)
 typedef struct {
     uint16_t srow; /*start address for row,multiple of 16*/
     uint16_t erow; /*end address for row,multiple of 16*/
     uint16_t scol; /*start address for columon,multiple of 16*/
     uint16_t ecol; /*end address for columon,multiple of 16*/
     //   uint8_t pix_width;/*pixel data width,number of bytes*/
-    uint32_t cur_fsize; /*current frame size*/
+    uint8_t binning; //binning mode for some sensor
     uint32_t max_fsize; /*MAX frame size*/
 }dmcam_param_roi_t;
 
-#pragma pack(push)
-#pragma pack(1)
+typedef struct dmcam_cap{
+    uint16_t max_frame_width;
+    uint16_t max_frame_height;
+    uint16_t max_frame_depth;
+    uint16_t max_fps;
+    uint16_t max_intg_us;
+} dmcam_param_cap_t;
+
 typedef union {
     uint8_t raw[18]; // raw data
     uint32_t dev_mode;
@@ -263,13 +283,7 @@ typedef union {
     char info_vendor[18];
     char info_product[18];
     uint16_t ambient_light_coeff;
-    struct {
-        uint16_t max_frame_width;
-        uint16_t max_frame_height;
-        uint16_t max_frame_depth;
-        uint16_t max_fps;
-        uint16_t max_intg_us;
-    } info_capability;
+    dmcam_param_cap_t info_capability;
     struct {
         uint32_t serial[3];
     } info_serial;
@@ -339,6 +353,12 @@ typedef union {
         uint32_t mod_freq0;
         uint32_t mod_freq1;
     }dual_freq;
+    struct {
+        float cx;           //center point x
+        float cy;           //center point y
+        float fx;           //focal length x
+        float fy;           //focal length y
+    }lens_param;
 }dmcam_param_val_u;
 #pragma pack(pop)
 
@@ -909,7 +929,7 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
 
 /**
  * get point cloud data from distance data. The distance data is
- * usually calcuated using dmcam_frame_get_distance.
+ * usually calcuated using dmcam_frame_get_dist_f32.
  * 
  * @param dev [in] specified dmcam device
  * @param pcl [out] point clound buffer. each 4 element consists
@@ -924,8 +944,9 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
  * @param img_w [in] distance image width in pixel
  * @param img_h [in] distance image height in pixel 
  * @param pseudo_color [in] if true, d is pseudo uint32 rgb 
- *                     color value; if false, d is the distance
- *                     in meter 
+ *                     color value (can be retrieve by
+ *                     (uint32)pcl[4*i + 3]); if false, d is
+ *                     the distance in meter
  * @param p_cam_param [in] user specified camera lens parameter. 
  *                    if null, the internal camera parameter is
  *                    used.
@@ -976,7 +997,7 @@ typedef enum {
     DMCAM_FILTER_ID_LEN_CALIB,    /**>lens calibration*/
     DMCAM_FILTER_ID_PIXEL_CALIB,  /**>pixel calibration*/
     DMCAM_FILTER_ID_DEPTH_FILTER,  /**> Depth filter */
-    DMCAM_FILTER_ID_RESERVED,        /**>Gauss filter for distance data*/
+    DMCAM_FILTER_ID_RESERVED,        /**>RESERVED */
     DMCAM_FILTER_ID_AMP,          /**>Amplitude filter control*/
     DMCAM_FILTER_ID_AUTO_INTG,    /**>auto integration filter enable : use sat_ratio to adjust */
     DMCAM_FILTER_ID_SYNC_DELAY,   /**> sync delay */
@@ -986,10 +1007,11 @@ typedef enum {
     DMCAM_FILTER_ID_SPORT_MODE,   /**> set sport mode */
     DMCAM_FILTER_ID_SYS_CALIB,   /**> using system calibration param */
     DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB,   /**> using ambient light calib calibration param */
-    //-------------------
-    DMCAM_FILTER_CNT,
+    DMCAM_FILTER_ID_BINNING, /**>Binning mode ctrl*/
 
     DMCAM_FILTER_ID_MEDIAN = DMCAM_FILTER_ID_DEPTH_FILTER,  /* MEDIAN is replaced with depth filter */
+    DMCAM_FILTER_CNT,
+    //-------------------
 }dmcam_filter_id_e;
 
 typedef union {
@@ -1007,6 +1029,10 @@ typedef union {
     int32_t offset_mm;         /**> DMCAM_FILTER_ID_OFFSET paramter : offset in mm for DMCMA_FILTER_ID_OFFSET filter */
     uint8_t sport_mode;        /**> DMCAM_FILTER_ID_SPORT_MODE parameter: 0 = high motion mode, 1 = extrem high motion mode */
     uint16_t k_ambient_light;  /**> DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB kcoeff of ambient light calibration */
+    struct {
+        uint8_t col_reduction; /**> column binning:0 no binning, 1 by half  */
+        uint8_t row_reduction; /**> row binning: 0 no binning, 1 by half, 2 a quarter*/
+    }binning_info;
 }dmcam_filter_args_u;
 
 
@@ -1060,9 +1086,6 @@ typedef enum {
  * @return int [out] the count of pseudo RGB points
  */
 __API int dmcam_cmap_dist_f32_to_RGB(uint8_t *dst, int dst_len, const float *src, int src_len, dmcam_cmap_outfmt_e outfmt, float range_min_m, float range_max_m);
-
-API_DEPRECATED_FOR(dmcam_cmap_dist_f32_to_RGB)
-__API int dmcam_cmap_float(uint8_t *dst, int dst_len, const float *src, int src_len, dmcam_cmap_outfmt_e outfmt, float range_min_m, float range_max_m);
 
 /**
  * convert dist_u16 image (pixel in milimeter) to pesudo-RGB 
