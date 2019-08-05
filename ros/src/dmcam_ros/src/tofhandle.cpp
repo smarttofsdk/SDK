@@ -38,9 +38,9 @@ TofHandle::TofHandle(ros::NodeHandle *_n)
     if (tof_state) {
         topic_init();
         server_init();
-        exchange = new float[roi.cur_fsize ];
-        dist_pseudo_rgb = new uint8_t[roi.cur_fsize*3];
-        pcl_exchange = new float[3 * roi.cur_fsize];
+        exchange = new float[m_curfsize];
+        dist_pseudo_rgb = new uint8_t[m_curfsize*3];
+        pcl_exchange = new float[3 * m_curfsize];
     }
 }
 
@@ -95,8 +95,22 @@ void TofHandle::tof_init(void)
 
     dmcam_cap_start(dev);
 
+    dmcam_param_item_t rparam;
+    memset(&rparam, 0, sizeof(rparam));
+    rparam.param_id = PARAM_ROI;
+    dmcam_param_batch_get(dev, &rparam, 1);
+    dmcam_param_roi_t frameInfo = rparam.param_val.roi;
+
+    int width = frameInfo.erow - frameInfo.srow + 1;
+    int height = frameInfo.ecol - frameInfo.scol + 1;
+    height = height * 2;
+    m_curfsize= width*height*2;
     tof_state = 1;
 }
+
+
+
+
 
 //initialize server
 void TofHandle::server_init(void)
@@ -147,7 +161,7 @@ void TofHandle::param_init(dmcam_dev_t *dev_0)
     roi.erow         = param_value[7];
     roi.scol         = param_value[8];
     roi.ecol         = param_value[9];
-    roi.cur_fsize    = param_value[10];
+    m_curfsize       = param_value[10];
     roi.max_fsize    = param_value[11];
     sync_delay       = param_value[12];
     
@@ -249,7 +263,7 @@ void TofHandle::param_init(dmcam_dev_t *dev_0)
         printf("get roi is (%d,%d;%d,%d)\n",
                get_param1.param_val.roi.srow, get_param1.param_val.roi.scol,
                get_param1.param_val.roi.erow, get_param1.param_val.roi.ecol);
-        printf("cur_fsize is %d\n", get_param1.param_val.roi.cur_fsize);
+        //printf("cur_fsize is %d\n", get_param1.param_val.roi.cur_fsize);
 
         get_param1.param_id = PARAM_MOD_FREQ;
         flag = dmcam_param_batch_get(dev_0, &get_param1, 1);
@@ -332,8 +346,8 @@ bool TofHandle::get_test_mode(void)
 //get one frame
 void TofHandle::get_one_frame(void)
 {
-    if (1 != dmcam_cap_get_frames(dev, 1, fbuf, roi.cur_fsize * 4, &fbuf_info)) {
-        printf("Get frame failed:%d\n", roi.cur_fsize * 4);
+    if (1 != dmcam_cap_get_frames(dev, 1, fbuf, m_curfsize * 4, &fbuf_info)) {
+        printf("Get frame failed:%d\n", m_curfsize * 4);
     }
 }
 
@@ -346,7 +360,7 @@ void TofHandle::pub_image(void)
     int image_height     = fbuf_info.frame_info.height;
 
     /*publish image_gray*/
-    dmcam_frame_get_gray(dev, exchange, roi.cur_fsize/2, fbuf, fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);
+    dmcam_frame_get_gray(dev, exchange, m_curfsize/2, fbuf, fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);
     cv::Mat img_gray((roi.erow-roi.srow), (roi.ecol-roi.scol), CV_32FC1, exchange);
     //img_gray *=255*255;
     img_gray.convertTo(img_gray,CV_8UC1);
@@ -388,7 +402,7 @@ void TofHandle::pub_image(void)
     dmcam_filter_enable(dev, DMCAM_FILTER_CNT, &filter_args, sizeof(filter_args));
 #endif
 
-    int pix_cnt = dmcam_frame_get_distance(dev, exchange, roi.cur_fsize/2, 
+    int pix_cnt = dmcam_frame_get_distance(dev, exchange, m_curfsize/2, 
             fbuf, fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);
     if (pix_cnt != image_height * image_width) 
     {
@@ -401,7 +415,8 @@ void TofHandle::pub_image(void)
     sensor_msgs::Image img_msg; // message to be sent
 
     /* convert dist to pseudo img */
-    dmcam_cmap_float(dist_pseudo_rgb, roi.cur_fsize * 3, exchange, pix_cnt, DMCAM_CMAP_OUTFMT_RGB, 0.0, 5.0);
+  
+    dmcam_cmap_dist_f32_to_RGB(dist_pseudo_rgb, m_curfsize  * 3, exchange, pix_cnt, DMCAM_CMAP_OUTFMT_RGB, 0.0, 5.0);
 
     cv::Mat img_dist_rgb(image_height, image_width, CV_8UC3, dist_pseudo_rgb);
     img_bridge = cv_bridge::CvImage(img_head_msg, sensor_msgs::image_encodings::RGB8, img_dist_rgb);
@@ -418,9 +433,9 @@ void TofHandle::pub_image(void)
 //publish point cloud
 void TofHandle::pub_pointCloud(float* pcl_buff)
 {
-    dmcam_frame_get_pcl(dev,pcl_exchange,3*roi.cur_fsize/2,pcl_buff,fbuf_info.frame_info.frame_size,fbuf_info.frame_info.width,fbuf_info.frame_info.height,&cam_int_param);
+    dmcam_frame_get_pcl(dev,pcl_exchange,3*m_curfsize/2,pcl_buff,fbuf_info.frame_info.frame_size,fbuf_info.frame_info.width,fbuf_info.frame_info.height,&cam_int_param);
     pclPointCloudXYZ::Ptr pCloud(new pclPointCloudXYZ);
-    for (int m = 0; m < roi.cur_fsize / 2; m++) {
+    for (int m = 0; m < m_curfsize/2; m++) {
         pCloud->points.push_back(pcl::PointXYZ(pcl_exchange[3 * m], pcl_exchange[3 * m + 1], pcl_exchange[3 * m + 2]));
     }
     pCloud->height = 1;

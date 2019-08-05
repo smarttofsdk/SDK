@@ -87,12 +87,12 @@ public:
     bool change_parameters(dmcam_param_item_t params);
     bool change_power(dmcam_ros::change_power::Request& req, dmcam_ros::change_power::Response& res);
     bool change_intg(dmcam_ros::change_intg::Request& req, dmcam_ros::change_intg::Response& res);
-	bool change_frame_rate(dmcam_ros::change_frame_rate::Request& req, dmcam_ros::change_frame_rate::Response& res);
-	bool change_mod_freq(dmcam_ros::change_mod_freq::Request& req, dmcam_ros::change_mod_freq::Response& res);
-	bool change_sync_delay(dmcam_ros::change_sync_delay::Request& req, dmcam_ros::change_sync_delay::Response& res);	
-	bool change_filter(dmcam_ros::change_filter::Request& req, dmcam_ros::change_filter::Response& res);
-	bool disable_filter(dmcam_ros::disable_filter::Request& req, dmcam_ros::disable_filter::Response& res);
-	
+    bool change_frame_rate(dmcam_ros::change_frame_rate::Request& req, dmcam_ros::change_frame_rate::Response& res);
+    bool change_mod_freq(dmcam_ros::change_mod_freq::Request& req, dmcam_ros::change_mod_freq::Response& res);
+    bool change_sync_delay(dmcam_ros::change_sync_delay::Request& req, dmcam_ros::change_sync_delay::Response& res);	
+    bool change_filter(dmcam_ros::change_filter::Request& req, dmcam_ros::change_filter::Response& res);
+    bool disable_filter(dmcam_ros::disable_filter::Request& req, dmcam_ros::disable_filter::Response& res);
+
 private:
     //node handler from main
     ros::NodeHandle *nh;
@@ -116,36 +116,36 @@ private:
     //parameters of tof
     uint32_t dev_mode;
     uint32_t mod_freq;
-	uint32_t sync_delay;
+    uint32_t sync_delay;
     dmcam_param_roi_t roi;
     uint32_t format;
     uint8_t power_percent;
     uint32_t fps;
     uint16_t intg_us;
     //parameters of camera
-	dmcam_camera_para_t cam_int_param;
+    dmcam_camera_para_t cam_int_param;
     //publisher
     image_transport::Publisher image_gray_pub;
     image_transport::Publisher image_dist_pub;
     image_transport::Publisher image_amb_pub;
-	image_transport::Publisher image_color;
+    image_transport::Publisher image_color;
     ros::Publisher cam_info_pub;
     ros::Publisher pcl_pub;
     //message
     sensor_msgs::CameraInfo cam_inf_msg;
     std_msgs::Header img_head_msg;
     sensor_msgs::PointCloud2  cloud_msg;
-	
+
     //server
     ros::ServiceServer change_power_ser;
     ros::ServiceServer change_intg_ser;
-	ros::ServiceServer change_frame_ser;
-	ros::ServiceServer change_modFreq_ser;
-	ros::ServiceServer change_syncDelay_ser;
-	//server fliter
-	ros::ServiceServer change_filter_ser;
-	ros::ServiceServer disable_filter_ser;
-	
+    ros::ServiceServer change_frame_ser;
+    ros::ServiceServer change_modFreq_ser;
+    ros::ServiceServer change_syncDelay_ser;
+    //server fliter
+    ros::ServiceServer change_filter_ser;
+    ros::ServiceServer disable_filter_ser;
+
     //get one frame from tof
     void get_one_frame(void);
     //initialize tof
@@ -165,8 +165,10 @@ private:
     //publish camera info
     void pub_caminfo(void);
 
+    int m_curfsize;
+
 private:
-	std::map<std::string,dmcam_filter_id_e> m_filterType;
+    std::map<std::string,dmcam_filter_id_e> m_filterType;
 };
 
 #endif // TOFHANDLE_H

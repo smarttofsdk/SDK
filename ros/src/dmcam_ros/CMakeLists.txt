@@ -11,7 +11,17 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_conversions
   pcl_ros
 )
+
+# - add modules path -
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+# - find DMCAM lib -
+
 find_package(OpenCV REQUIRED)
+find_package(DMCAM REQUIRED)
+message(STATUS "DMCAM inc: ${DMCAM_INCLUDE_DIRS}")
+message(STATUS "DMCAM lib: ${DMCAM_LIBRARIES}")
+message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 find_package(PCL REQUIRED COMPONENTS common io filters)
 
 ################################################
@@ -42,11 +52,14 @@ include_directories(
   include
   ${PCL_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/../../../bin/linux/include
+  ${DMCAM_INCLUDE_DIRS}
+  #${PROJECT_SOURCE_DIR}/../../../bin/linux/include
+  #${PROJECT_SOURCE_DIR}/../../../../../bin/linux/include
 )
 link_directories(
-
-  ${PROJECT_SOURCE_DIR}/../../../bin/linux/lib
+  ${DMCAM_LIBRARIES} 
+  #${PROJECT_SOURCE_DIR}/../../../bin/linux/lib
+  #${PROJECT_SOURCE_DIR}/../../../../../bin/linux/lib
 )
 
 add_executable(dmcam_ros_main
@@ -63,12 +76,12 @@ set_target_properties(  dmcam_ros_main
 
 # include dmcam 
 message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
-include_directories(dmcam_ros_main ${PROJECT_SOURCE_DIR}/../../../linux/include)
+include_directories(dmcam_ros_main   ${DMCAM_INCLUDE_DIRS})
 target_link_libraries(dmcam_ros_main
-  dmcam
   pthread
   ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
+  ${DMCAM_LIBRARIES}
+  ${DMCAM_STATIC_LIBRARY}
 )
-
