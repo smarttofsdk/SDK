@@ -14,17 +14,17 @@ if %Product% == TM-E4-1.0 goto E4
 
 :E2
 echo now upgrade for E2
-call dmcam-cli.exe -f TM-E2*.bin
+call dmcam-cli.exe -f TC-General-1.0_HW30*.bin
 goto end
 
 :E3
 echo now upgrade for E3
-call dmcam-cli.exe -f TM-E3*.bin
+call dmcam-cli.exe -f TC-General-2.0*.bin
 goto end
 
 :E4
 echo now upgrade for E4
-call dmcam-cli.exe -f TM-E4*.bin
+call dmcam-cli.exe -f TC-General-1.0*.bin
 goto end
 
 :end
