@@ -165,6 +165,9 @@ private:
     //publish camera info
     void pub_caminfo(void);
 
+
+    int m_width;
+    int m_height;
     int m_curfsize;
 
 private:

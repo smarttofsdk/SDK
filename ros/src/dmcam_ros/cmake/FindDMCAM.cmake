@@ -14,19 +14,19 @@ endif()
 
 find_path ( DMCAM_INCLUDE_DIR names dmcam.h PATHS
     ${DMCAM_SDK_DIR}/linux/include
-    ../../../bin/linux/include
+    ../../../linux/include
     ../../../../../bin/linux/include
     )
  
 find_library ( DMCAM_LIBRARY NAMES dmcam PATHS
     ${DMCAM_SDK_DIR}/Linux/lib/linux${ENV_ARCH}
-    ../../../bin/linux/lib/linux${ENV_ARCH}
+    ../../../linux/lib/linux${ENV_ARCH}
     ../../../../../bin/linux/lib/linux${ENV_ARCH}
     )
 
 find_library ( DMCAM_STATIC_LIBRARY NAMES libdmcam.a PATHS
     ${DMCAM_SDK_DIR}/Linux/lib/linux${ENV_ARCH}
-    ../../../bin/linux/lib/linux${ENV_ARCH}
+    ../../../linux/lib/linux${ENV_ARCH}
     ../../../../../bin/linux/lib/linux${ENV_ARCH}
     )
 
