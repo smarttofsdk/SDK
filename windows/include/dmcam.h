@@ -45,8 +45,8 @@ extern "C"
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
 #define DM_VERSION_MINOR 70
-#define DM_VERSION_REV   0
-#define DM_VERSION_STR "v1.70.0"
+#define DM_VERSION_REV   2
+#define DM_VERSION_STR "v1.70.2"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -907,8 +907,9 @@ __API int dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
  * 
  * @param dev [in] specified dmcam device
  * @param pcl [out] point clound buffer. each 3 element consists
- *            a (x,y,z) point, output is in (w,h,3) demension.
- *            point in value (0,0,0) is invalid 
+ *            a (x,y,z) point, output is in (w,h,3) dimension
+ *            and in meter unit. point in value (0,0,0) is
+ *            invalid
  * @param pcl_len [in] point cloud float element count
  * @param dist [in] distance image data buffer. The unit of 
  *             distance is meter (float)
@@ -933,9 +934,10 @@ __API int dmcam_frame_get_pcl(dmcam_dev_t *dev, float *pcl, int pcl_len,
  * 
  * @param dev [in] specified dmcam device
  * @param pcl [out] point clound buffer. each 4 element consists
- *            a (x,y,z,d) point. (x,y,z) is coordinate, d is
- *            distance or pseudo-color. output is in (w,h,4)
- *            demension. point in value (0,0,0) is invalid 
+ *            a (x,y,z,d) point. (x,y,z) is coordinate in meter
+ *            unit, d is distance in meter unit or pseudo-color.
+ *            output is in (w,h,4) dimension. point in value
+ *            (0,0,0) is invalid
  * @param pcl_len [in] point cloud float element count
  * @param dist [in] distance image data buffer. The unit of 
  *             distance is meter (float)
@@ -964,10 +966,9 @@ __API int dmcam_frame_get_pcl_xyzd(dmcam_dev_t *dev, float *pcl, int pcl_len,
  * @param dev [in] specified dmcam device
  * @param pcl [out] point clound buffer. each 4 element consists
  *            a (x,y,z,i) point.
- *   (x,y,z) is coordinate,
- *   IR value can be get from i by ((uint32_t)i) 0xff .
- *   output is in (w,h,4) demension.
- *   point with (x,y,z)=(0,0,0) is invalid
+ *   (x,y,z) is coordinate in meter unit, IR value can be get
+ *   from i by ((uint32_t)i) 0xff . output is in (w,h,4)
+ *   dimension. point with (x,y,z)=(0,0,0) is invalid
  *  
  * @param pcl_len [in] point cloud float element count
  * @param dist [in] distance image data buffer. The unit of 
@@ -1007,7 +1008,6 @@ typedef enum {
     DMCAM_FILTER_ID_SPORT_MODE,   /**> set sport mode */
     DMCAM_FILTER_ID_SYS_CALIB,   /**> using system calibration param */
     DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB,   /**> using ambient light calib calibration param */
-    DMCAM_FILTER_ID_BINNING, /**>Binning mode ctrl*/
 
     DMCAM_FILTER_ID_MEDIAN = DMCAM_FILTER_ID_DEPTH_FILTER,  /* MEDIAN is replaced with depth filter */
     DMCAM_FILTER_CNT,
@@ -1025,7 +1025,7 @@ typedef union {
         uint16_t intg_3d;      /**> intg_3d: exposure time 0 */
         uint16_t intg_3dhdr;   /**> intg_3dhdr: exposure time 1 */
     }intg;                     /**> DMCAM_FILTER_ID_HDR paramter */
-    uint8_t median_ksize;      /**> DMCAM_FILTER_ID_MEDIAN paramter:  kernel size. Normally use 3 or 5*/
+    uint8_t median_ksize;      /**> DMCAM_FILTER_ID_MEDIAN paramter:  DEPRECATED, please use  DMCAM_FILTER_ID_DEPTH_FILTER*/
     int32_t offset_mm;         /**> DMCAM_FILTER_ID_OFFSET paramter : offset in mm for DMCMA_FILTER_ID_OFFSET filter */
     uint8_t sport_mode;        /**> DMCAM_FILTER_ID_SPORT_MODE parameter: 0 = high motion mode, 1 = extrem high motion mode */
     uint16_t k_ambient_light;  /**> DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB kcoeff of ambient light calibration */
@@ -1033,6 +1033,12 @@ typedef union {
         uint8_t col_reduction; /**> column binning:0 no binning, 1 by half  */
         uint8_t row_reduction; /**> row binning: 0 no binning, 1 by half, 2 a quarter*/
     }binning_info;
+
+    struct {
+        uint8_t depth_filter_mode;     /**> 0xF0 = filter strength controlled by depth_filter_strength
+                                            Other values = filter controlled automatically */
+        uint8_t depth_filter_strength; /**> DMCAM_FILTER_ID_DEPTH_FILTER strength: [0, 100]*/
+    };
 }dmcam_filter_args_u;
 
 
