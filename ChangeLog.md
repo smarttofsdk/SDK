@@ -1,3 +1,36 @@
+# 版本号：1.72
+
+## 发布时间：2019/8/23
+
+### 固件部分 固件版本：172
+
+- [**Bugfix**] 修复运动模式图像异常问题
+
+### SDK软件部分
+- dmcam lib
+  - [**New**] 增加“深度滤波强度” 参数的支持
+    - 索尼传感器部分
+      - [**Enhance**] 优化频率切换逻辑
+      - [**Bugfix**] 修复原始深度图qi_shift计算问题
+      - [**Bugfix**] 修复有校准数据的双频向无校准数据的单频切换的问题
+  - [**Enhance**] 优化dev_open速度：PARAM_INFO_CAPABILITY获取并入get_info
+  - [**Bugfix**] 修复多线程进行采集和停止时候，usb cancle导致的无法采集问题
+- tools
+  - smarttofviewer
+    - [**New**] 调整binning设置到basic setting； fmt 设置到adv setting
+    - [**New**] UI支持FILTER_STRENGTH , offset设置放入高级参数
+    - [**Enhance**] 优化viewer打开速度和scan设备的卡顿
+    - [**Bugfix**] 修复设备切换无效问题
+    - [**Bugfix**] 修复首次设备打开选择不正确的问题
+    - [**Bugfix**] 修复binning控件属性问题
+- ros
+  - [**Bugfix**] 修复编译时的路径问题
+- samples
+  - [**Enhance**] 更Android相关库和样例
+  - [**Enhance**] 更新OpenNI样例
+
+
+
 # 版本号：1.70
 
 ## 发布时间：2019/8/5
