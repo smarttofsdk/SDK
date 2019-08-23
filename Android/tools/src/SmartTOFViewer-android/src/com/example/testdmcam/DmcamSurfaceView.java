@@ -195,7 +195,7 @@ public class DmcamSurfaceView extends SurfaceView implements Runnable, Callback 
 						/* cmap to pseudo color map */
 						ByteBuffer dist_rgb = ByteBuffer.allocateDirect(3 * w
 								* h);
-						dmcam.cmap_float(dist_rgb, dist_rgb.capacity(), dist,
+						dmcam.cmap_dist_f32_to_RGB(dist_rgb, dist_rgb.capacity(), dist,
 								dist.length,
 								cmap_outfmt_e.DMCAM_CMAP_OUTFMT_RGB, min_dist,
 								max_dist);
@@ -216,7 +216,7 @@ public class DmcamSurfaceView extends SurfaceView implements Runnable, Callback 
 						/* cmap to pseudo color map */
 						ByteBuffer dist_rgb = ByteBuffer.allocateDirect(3 * w
 								* h);
-						dmcam.cmap_float(dist_rgb, dist_rgb.capacity(), dist,
+						dmcam.cmap_dist_f32_to_RGB(dist_rgb, dist_rgb.capacity(), dist,
 								dist.length,
 								cmap_outfmt_e.DMCAM_CMAP_OUTFMT_RGB, min_dist,
 								max_dist);

@@ -40,6 +40,9 @@ import com.smarttof.dmcam.filter_id_e;
 import com.smarttof.dmcam.log_level_e;
 import com.smarttof.dmcam.param_item_t;
 
+import com.smarttof.dmcam.cap_cfg_t;
+//import com.smarttof.dmcam.*;
+
 public class TestDmcam extends Activity implements OnClickListener {
 	public static TestDmcam td;
 	// private Context context;
@@ -48,6 +51,7 @@ public class TestDmcam extends Activity implements OnClickListener {
 	@SuppressWarnings("unused")
 	private Button btnCapture, btnExit;
 
+	
 	private TextView tvBase, tvAdvance;
 	private TextView tvLog;
 	private CheckBox checkBox;
@@ -459,6 +463,9 @@ public class TestDmcam extends Activity implements OnClickListener {
 			UsbDeviceConnection connection = usbManager.openDevice(usbDevice);
 			fd = connection.getFileDescriptor();// 获取文件描述符
 			Log.w("device", "MyThread3  " + fd);
+			
+			dmcam.log_cfg(log_level_e.LOG_LEVEL_INFO,log_level_e.LOG_LEVEL_TRACE,log_level_e.LOG_LEVEL_NONE);
+			
 			dev = dmcam.dev_open_by_fd(fd);
 			if (dev == null) {
 				logUI("device", "open failed!\n");
@@ -470,6 +477,20 @@ public class TestDmcam extends Activity implements OnClickListener {
 				return;
 			}
 			logUI("DMCAM", "device open ok with fd!\n");
+			
+			
+//	filter_args_u pix_args = new filter_args_u();
+//	short case_idx =1;
+//	pix_args.setCase_idx(case_idx);
+//	logUI("DMCAM",
+//			String.format("enable filter pix_calible\n"));
+//	if (dmcam.filter_enable(dev, filter_id_e.DMCAM_FILTER_ID_PIXEL_CALIB,
+//			pix_args, 4) == 0) {
+//
+//	}
+
+
+
 
 			dev_minamp = Dialog1.getMinAmp();
 			dev_exp = Dialog1.getExp();
@@ -477,7 +498,19 @@ public class TestDmcam extends Activity implements OnClickListener {
 			devSetMinAmp(dev, dev_minamp);
 			devSetExposure(dev, dev_exp);
 
-			dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
+//			dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
+			
+	        cap_cfg_t cfg = new cap_cfg_t();
+	        cfg.setCache_frames_cnt(10);
+	        cfg.setOn_error(null);
+	        cfg.setOn_frame_ready(null);
+	        cfg.setEn_save_replay((short)0);
+	        cfg.setEn_save_dist_u16((short)0);
+	        cfg.setEn_save_gray_u16((short)0);
+	        cfg.setFname_replay(null);
+
+	        dmcam.cap_config_set(dev, cfg);
+			
 			// dmcam.cap_set_callback_on_error(dev, null);
 			logUI("DMCAM", " Start dmcam view ...");
 
