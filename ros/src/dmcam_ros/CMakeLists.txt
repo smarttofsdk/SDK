@@ -86,6 +86,5 @@ target_link_libraries(dmcam_ros_main
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
   ${DMCAM_LIBRARIES}
-  ${DMCAM_STATIC_LIBRARY}
 )
 
