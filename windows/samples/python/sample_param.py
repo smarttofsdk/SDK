@@ -12,7 +12,7 @@ def test_param_read(device):
 
     print("\n->test batch parameter reading...")
     # alloc reading request to read every params
-    params_to_read = list(range(dmcam.PARAM_ENUM_COUNT))
+    params_to_read = list(range(dmcam.PARAM_ENUM_COUNT-1))
     params_val = dmcam.param_batch_get(device, params_to_read)  # type: list[dmcam.param_val_u]
     assert params_val is not None
     # printing each params

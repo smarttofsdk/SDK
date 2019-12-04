@@ -26,7 +26,6 @@
 
 #include "tofhandle.h"
 
-
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "dmcam_ros");
@@ -36,18 +35,17 @@ int main(int argc, char **argv)
   TofHandle th(&n);
 
   int cnt=0;
-  if(th.get_tof_state())
+  if (th.getTofState()) {
       ROS_INFO("[SMART TOF]RUNNING...");
-
-  while(ros::ok() && th.get_tof_state()){
-      th.pub_all();
-      if(th.get_test_mode()){
+  }
+  while(ros::ok() && th.getTofState()){
+      th.publicAll();
+      if(th.getTestMode()){
           ROS_INFO("THE %d time...",cnt++);
       }
       ros::spinOnce();
       //loop_rate.sleep();
   }
-
   return 0;
 }
 

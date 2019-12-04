@@ -59,7 +59,7 @@ if not dmcam.param_batch_set(dev, wparams):
 print(" Start capture ...")
 dmcam.cap_start(dev)
 
-f = bytearray(320 * 240 * 4 * 2)
+f = bytearray(640 * 480 * 4 * 2)
 print(" sampling 100 frames ...")
 count = 0
 run = True

@@ -16,6 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # - find DMCAM lib -
+if(NOT DMCAM_SDK_DIR)
+set (DMCAM_SDK_DIR "../../../")
+endif()
 
 find_package(OpenCV REQUIRED)
 find_package(DMCAM REQUIRED)
@@ -85,3 +88,4 @@ target_link_libraries(dmcam_ros_main
   ${DMCAM_LIBRARIES}
   ${DMCAM_STATIC_LIBRARY}
 )
+

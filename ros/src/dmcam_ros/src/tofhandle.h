@@ -61,14 +61,10 @@
 #include "dmcam_ros/change_filter.h"
 #include "dmcam_ros/disable_filter.h"
 
-
-
-#define FRAME_SIZE (320*240*2*4)
 //switch to chmod tof device
 #define NEEDSUDO 1
 
 typedef pcl::PointCloud<pcl::PointXYZ> pclPointCloudXYZ;
-
 static bool on_cap_err(dmcam_dev_t *_dev, int _err, void *_err_arg);
 
 
@@ -78,97 +74,100 @@ public:
     TofHandle(ros::NodeHandle *_n);
     ~TofHandle(void);
     //publish all topics, image_transport::ImageTransport *_it
-    void pub_all(void);
-    //get tof state(can it be used?)
-    bool get_tof_state(void);
+    void publicAll(void);
+    //get tof state(can m_imageTransport be used?)
+    bool getTofState(void);
     //get test mode state
-    bool get_test_mode(void);
+    bool getTestMode(void);
     //call back for server
-    bool change_parameters(dmcam_param_item_t params);
-    bool change_power(dmcam_ros::change_power::Request& req, dmcam_ros::change_power::Response& res);
-    bool change_intg(dmcam_ros::change_intg::Request& req, dmcam_ros::change_intg::Response& res);
-    bool change_frame_rate(dmcam_ros::change_frame_rate::Request& req, dmcam_ros::change_frame_rate::Response& res);
-    bool change_mod_freq(dmcam_ros::change_mod_freq::Request& req, dmcam_ros::change_mod_freq::Response& res);
-    bool change_sync_delay(dmcam_ros::change_sync_delay::Request& req, dmcam_ros::change_sync_delay::Response& res);	
-    bool change_filter(dmcam_ros::change_filter::Request& req, dmcam_ros::change_filter::Response& res);
-    bool disable_filter(dmcam_ros::disable_filter::Request& req, dmcam_ros::disable_filter::Response& res);
+    bool changeParameters(dmcam_param_item_t params);
+    bool changePower(dmcam_ros::change_power::Request& req, dmcam_ros::change_power::Response& res);
+    bool changeIntgTime(dmcam_ros::change_intg::Request& req, dmcam_ros::change_intg::Response& res);
+    bool changeFrameRate(dmcam_ros::change_frame_rate::Request& req, dmcam_ros::change_frame_rate::Response& res);
+    bool changeModFreq(dmcam_ros::change_mod_freq::Request& req, dmcam_ros::change_mod_freq::Response& res);
+    bool changeSyncDelay(dmcam_ros::change_sync_delay::Request& req, dmcam_ros::change_sync_delay::Response& res);	
+    bool changeFilter(dmcam_ros::change_filter::Request& req, dmcam_ros::change_filter::Response& res);
+    bool disableFilter(dmcam_ros::disable_filter::Request& req, dmcam_ros::disable_filter::Response& res);
 
 private:
     //node handler from main
-    ros::NodeHandle *nh;
+    ros::NodeHandle *m_nodeHandle;
     //image transport handle
-    image_transport::ImageTransport *it;
+    image_transport::ImageTransport *m_imageTransport;
     //the opened device
-    dmcam_dev_t *dev;
+    dmcam_dev_t *m_dev;
     //0 means not good, and will do nothing later on
-    bool tof_state;
+    bool m_cameraState;
     //switch of showing picture and some test information
-    bool test_mode;
+    bool m_testMode;
     //frame info
-    dmcam_frame_t fbuf_info;
+    dmcam_frame_t m_frameInfo;
     //buffer for storing raw data from tof
-    uint8_t *fbuf;
+    uint8_t *m_frameBuffer;
     uint8_t *dist_pseudo_rgb;
     //buffer for storing gray\dist\amb image temporarily
-    float *exchange;
+    float *m_rbgBuffer;
     //array to store point cloud
-    float *pcl_exchange;
+    float *m_pclBuffer;
     //parameters of tof
-    uint32_t dev_mode;
-    uint32_t mod_freq;
-    uint32_t sync_delay;
-    dmcam_param_roi_t roi;
-    uint32_t format;
+    uint32_t m_devMode;
+    uint32_t m_modFreq;
+    uint32_t m_syncDelay;
+    bool m_enbaleFlip;
+    int m_flipCode;
+    dmcam_param_roi_t m_roi;
+    uint32_t m_format;
     uint8_t power_percent;
-    uint32_t fps;
-    uint16_t intg_us;
+    uint32_t m_fps;
+    uint16_t m_intgTime;
     //parameters of camera
     dmcam_camera_para_t cam_int_param;
     //publisher
-    image_transport::Publisher image_gray_pub;
-    image_transport::Publisher image_dist_pub;
-    image_transport::Publisher image_amb_pub;
-    image_transport::Publisher image_color;
-    ros::Publisher cam_info_pub;
-    ros::Publisher pcl_pub;
+    image_transport::Publisher m_imageGrayPub;
+    image_transport::Publisher m_imageDistPub;
+    ros::Publisher m_cameraInfoPublic;
+    ros::Publisher m_pointCloudPublic;
     //message
-    sensor_msgs::CameraInfo cam_inf_msg;
-    std_msgs::Header img_head_msg;
-    sensor_msgs::PointCloud2  cloud_msg;
+    sensor_msgs::CameraInfo m_cameraInfoMessage;
+    std_msgs::Header m_imgHeadMsg;
+    sensor_msgs::PointCloud2  m_pointCloudMsg;
 
     //server
-    ros::ServiceServer change_power_ser;
-    ros::ServiceServer change_intg_ser;
-    ros::ServiceServer change_frame_ser;
-    ros::ServiceServer change_modFreq_ser;
-    ros::ServiceServer change_syncDelay_ser;
+    ros::ServiceServer m_changePowerServer;
+    ros::ServiceServer m_changeIntgServer;
+    ros::ServiceServer m_changeFrameServer;
+    ros::ServiceServer m_changeModfreqServer;
+    ros::ServiceServer m_changeSyncDelayServer;
     //server fliter
-    ros::ServiceServer change_filter_ser;
-    ros::ServiceServer disable_filter_ser;
+    ros::ServiceServer m_changeFilterServer;
+    ros::ServiceServer m_disableFilterServer;
 
     //get one frame from tof
-    void get_one_frame(void);
+    uint32_t epcGetPartType();
+    std::string checkDeviceType();
+    void getFrameInfo(std::string deviceType);
+    void getOneFrame(void);
     //initialize tof
-    void tof_init(void);
+    void tofInitialize(void);
     //initialize parameters
-    void param_init(dmcam_dev_t *dev_0);
+    void paramInitialize(dmcam_dev_t *dev_0);
     //initialize topics
-    void topic_init(void);
+    void topicInitialize(void);
     //init server
-    void server_init(void);
+    void serverInitialize(void);
     //sudo device
     void sudodev(dmcam_dev_t *_dev);
     //publish image(including point cloud inside)
-    void pub_image(void);
+    void publicImage(void);
     //publish point cloud
-    void pub_pointCloud(float* pcl_buff);
+    void publicPointCloud(float* pcl_buff);
     //publish camera info
-    void pub_caminfo(void);
-
-
+    void publicCaminfo(void);
     int m_width;
     int m_height;
     int m_curfsize;
+    int m_frameSize;
+    std::string m_deviceType;
 
 private:
     std::map<std::string,dmcam_filter_id_e> m_filterType;

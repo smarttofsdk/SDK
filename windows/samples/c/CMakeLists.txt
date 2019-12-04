@@ -6,6 +6,10 @@ project (dmcam_c_samples)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 # - find DMCAM lib -
+if (NOT DMCAM_SDK_DIR)
+    set(DMCAM_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+endif()
+
 find_package(DMCAM REQUIRED)
 message(STATUS "DMCAM inc: ${DMCAM_INCLUDE_DIRS}")
 message(STATUS "DMCAM lib: ${DMCAM_LIBRARIES}")
@@ -14,7 +18,7 @@ if (NOT WIN32)
     # - under linux find pthread and libusb
     find_package(PkgConfig)
     find_package(Threads)
-    find_package(LibUSB REQUIRED)
+    #find_package(LibUSB REQUIRED)
 
     # - set rpath -
     set(CMAKE_INSTALL_RPATH "'\$ORIGIN'")
@@ -39,6 +43,6 @@ foreach(S ${C_SAMPLES})
         target_compile_options(${S_FILENAME} PUBLIC -Wall)
     endif()
     #set_target_properties(${S_FILENAME} PROPERTIES  LINK_FLAGS "${static_link_flags}")
-    target_link_libraries(${S_FILENAME} ${DMCAM_LIBRARIES} ${LibUSB_LIBRARIES})
+    target_link_libraries(${S_FILENAME} ${DMCAM_LIBRARIES} )
 endforeach(S)
 

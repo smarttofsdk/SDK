@@ -25,15 +25,26 @@
 
 #include "dmcam.h"
 
-#define FRAME_SIZE (320*240*4 * 2)
 #define FRAME_BUF_FCNT 10
 
 static dmcam_dev_t *dev;
 
+int get_frame_size(dmcam_dev_t* dev) 
+{
+    dmcam_param_item_t rparam;
+    memset(&rparam, 0, sizeof(rparam));
+    rparam.param_id = PARAM_ROI;
+    dmcam_param_batch_get(dev, &rparam, 1);
+    dmcam_param_roi_t frameInfo = rparam.param_val.roi;
+    int height = frameInfo.erow - frameInfo.srow + 1;
+    int width = frameInfo.ecol - frameInfo.scol + 1;
+    return width * height * 4 * 2;
+}
+
 int main(int argc, char **argv)
 {
     int debug_level = 0;
-
+    int frame_size = 0;
     if (argc > 1) {
         debug_level = atoi(argv[1]);
         printf(" debug level set to %d\n", debug_level);
@@ -58,15 +69,15 @@ int main(int argc, char **argv)
             goto FINAL;
 
         /* open the first present devic */
-        /*   you can also use NULL for dmcam_dev_open to open the
-         *   first device e.g. dev =  dmcam_dev_open(NULL); */
+        /*   you can also use NULL for dmcam_dev_open to open the*/
+        /*   first device e.g. dev =  dmcam_dev_open(NULL); */
         dev = dmcam_dev_open(&dev_list[0]);
         if (!dev) {
             printf(" open device failed\n");
             goto FINAL;
         }
-		
-		        /* set capture config */
+
+        /* set capture config */
         dmcam_cap_cfg_t cap_cfg = {
             .cache_frames_cnt = FRAME_BUF_FCNT, /* FRAME_BUF_FCNT frames can be cached in frame buffer*/
             .on_error = NULL,      /* No error callback */
@@ -76,27 +87,23 @@ int main(int argc, char **argv)
             .en_save_gray_u16 = false, /* disable save gray stream into replay file*/
             .fname_replay = NULL, /* replay filename */
         };
-		
-		dmcam_cap_config_set(dev,&cap_cfg);
-
+        dmcam_cap_config_set(dev,&cap_cfg);
         {
             dmcam_frame_t fbuf_info;
             int n;
             int total_fr = 0;
             int fr_cnt;
             int rd_fr_once = 10;
-            uint8_t *fbuf = malloc(FRAME_SIZE * rd_fr_once);
-
+            frame_size = get_frame_size(dev);
+            uint8_t *fbuf = malloc(frame_size * rd_fr_once);
             assert(fbuf);
 
             /* start capturing frames */
             dmcam_cap_start(dev);
-
             for (n = 0; n < 10; n++) {
                 int w, h;
-
                 /* get 20 frames */
-                fr_cnt = dmcam_cap_get_frames(dev, rd_fr_once, fbuf, FRAME_SIZE * rd_fr_once, &fbuf_info);
+                fr_cnt = dmcam_cap_get_frames(dev, rd_fr_once, fbuf, frame_size * rd_fr_once, &fbuf_info);
                 if (fr_cnt < rd_fr_once) { // less frames means sampling is stopped.
                     printf("capturing is stopped due to some error!\n");
                     break;
@@ -106,20 +113,17 @@ int main(int argc, char **argv)
                        fr_cnt, fbuf_info.frame_info.frame_idx,
                        fbuf_info.frame_info.width, fbuf_info.frame_info.height, fbuf_info.frame_info.frame_format);
 
-
                 /* stop capture if get enough frames */
                 if (total_fr > 100) {
                     printf("get enough frames, we stop\n");
                     break;
                 }
 
-
                 /* proc frames in fbuf */
                 printf("proc frames ....\n"); 
 
                 w = fbuf_info.frame_info.width;
                 h = fbuf_info.frame_info.height;
-
                 /* decode one frame to distance */
                 {
                     int dist_len = fbuf_info.frame_info.width * fbuf_info.frame_info.height;
@@ -152,7 +156,9 @@ int main(int argc, char **argv)
                     float *gray = malloc(sizeof(float) * gray_len);
                     int calc_len = dmcam_frame_get_gray(dev, gray, gray_len, fbuf, fbuf_info.frame_info.frame_size, &fbuf_info.frame_info);
 
-                    assert(calc_len == gray_len);
+                    if(calc_len != gray_len) {
+						printf("the frame is not valid !\n");
+                    }
                     printf("proc gray data ....\n"); 
 
                     /* process gray data */
@@ -177,3 +183,4 @@ FINAL:
     dmcam_uninit();
     return 0;
 }
+

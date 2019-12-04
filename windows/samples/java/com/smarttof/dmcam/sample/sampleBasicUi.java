@@ -126,10 +126,10 @@ public class sampleBasicUi {
 	}
 
 	public static void main(String[] args) {
+        int n_frame = 100;
 		// System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
 		// Mat img = Highgui.imread("test.png");
-		// showImage(img);
 		// return;
 		dmcam.init(null);
 		dmcam.log_cfg(log_level_e.LOG_LEVEL_NONE, log_level_e.LOG_LEVEL_DEBUG,
@@ -150,7 +150,10 @@ public class sampleBasicUi {
 		if (cnt == 0) {
 			return;
 		}
+		System.out.println(" GUI init ..");
 		guiInit();
+
+        showImage(new BufferedImage(640, 480, BufferedImage.TYPE_3BYTE_BGR));
 
 		System.out.println(" Open dmcam device ..");
 		dev_t dev = dmcam.dev_open(null);
@@ -160,28 +163,42 @@ public class sampleBasicUi {
 			return;
 		}
 
-		// write illumination power: 100%
-		int pwr_percent = 100;
-		param_item_t wparam = new param_item_t();
-		dmcamParamArray wparams = new dmcamParamArray(1);
+        {
+            final int fps = 20;
 
-		wparam.setParam_id(dev_param_e.PARAM_ILLUM_POWER);
-		wparam.getParam_val().getIllum_power().setPercent((short) pwr_percent);
+            dmcamParamArray params = new dmcamParamArray(1) {{
+                setitem(0, new param_item_t() {{
+                    setParam_id(dev_param_e.PARAM_FRAME_RATE);
+                    getParam_val().getFrame_rate().setFps((short) fps);
+                }});
+            }};
 
-		wparams.setitem(0, wparam);
-		System.out.printf(" pwr = %d\n", wparams.getitem(0).getParam_val()
-				.getIllum_power().getPercent());
-		if (!dmcam.param_batch_set(dev, wparams.cast(), 1)) {
-			System.out.printf(" set illu_power to %d %% failed\n", pwr_percent);
-		}
-        cap_cfg_t cfg = new cap_cfg_t();
-        cfg.setCache_frames_cnt(10);
-        cfg.setOn_error(null);
-        cfg.setOn_frame_ready(null);
-        cfg.setEn_save_replay((short)0);
-        cfg.setEn_save_dist_u16((short)0);
-        cfg.setEn_save_gray_u16((short)0);
-        cfg.setFname_replay(null);
+            System.out.printf(" set fps: %d\n", params.getitem(0).getParam_val().getFrame_rate().getFps());
+            if (!dmcam.param_batch_set(dev, params.cast(), 1)) {
+                System.out.printf(" set fps to %d failed\n", fps);
+            }
+
+            // get fps
+            params.setitem(0, new param_item_t() {{
+                setParam_id(dev_param_e.PARAM_FRAME_RATE);
+                getParam_val().getFrame_rate().setFps((short) 0);
+            }});
+
+            if (!dmcam.param_batch_get(dev, params.cast(), 1)) {
+                System.out.printf(" set fps to %d failed\n", params.getitem(0).getParam_val().getFrame_rate().getFps());
+            }
+
+            System.out.printf(" get fps: %d\n", params.getitem(0).getParam_val().getFrame_rate().getFps());
+        }
+        cap_cfg_t cfg = new cap_cfg_t() {{
+            setCache_frames_cnt(10);
+            setOn_error(null);
+            setOn_frame_ready(null);
+            setEn_save_replay((short)0);
+            setEn_save_dist_u16((short)0);
+            setEn_save_gray_u16((short)0);
+            setFname_replay(null);
+        }};
 
         dmcam.cap_config_set(dev, cfg);
 		//dmcam.cap_set_frame_buffer(dev, null, 10 * 320 * 240 * 4);
@@ -190,7 +207,7 @@ public class sampleBasicUi {
 		dmcam.cap_start(dev);
 
 		ByteBuffer f = ByteBuffer.allocateDirect(1920 * 1080 * 3); /* should be large enough to have one frame */
-		System.out.println(" sampling 100 frames ...");
+		System.out.printf(" sampling %d frames ...\n", n_frame);
 		int count = 0;
         boolean run = true;
 
@@ -233,7 +250,7 @@ public class sampleBasicUi {
 
                 /* ---- visualize ---- */
                 ByteBuffer dist_rgb = ByteBuffer.allocateDirect(3 * img_w * img_h);
-                dmcam.cmap_dist_u16_to_RGB(dist_rgb, dist_rgb.capacity(), dist, dist.length, cmap_outfmt_e.DMCAM_CMAP_OUTFMT_RGB, 0, 5000);
+                dmcam.cmap_dist_u16_to_RGB(dist_rgb, dist_rgb.capacity(), dist, dist.length, cmap_outfmt_e.DMCAM_CMAP_OUTFMT_RGB, 0, 5000, null);
                 {
                     int w = img_w;
                     int h = img_h;
@@ -253,7 +270,7 @@ public class sampleBasicUi {
                 count += 1;
                 if (count % 10 == 0) 
                     System.out.printf("  frm_count=%d\n", count);
-                if (count >= 30)
+                if (count >= n_frame)
                     break;
             }
         }

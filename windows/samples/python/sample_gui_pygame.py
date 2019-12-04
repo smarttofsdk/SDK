@@ -112,7 +112,7 @@ if not dmcam.param_batch_set(dev, wparams):
 print(" Start capture ...")
 dmcam.cap_start(dev)
 
-f = bytearray(320 * 240 * 4 * 2)
+f = bytearray(640 * 480 * 4 * 2)
 run = True
 while run:
     # get one frame
@@ -152,7 +152,7 @@ while run:
         if dist is not None:
             dist_cnt, dist_img = dmcam.cmap_dist_u16_to_RGB(len(dist) * 3, dist,
                                                             dmcam.DMCAM_CMAP_OUTFMT_RGB,
-                                                            0, 4000)
+                                                            0, 4000, None)
             Z = dist_img.reshape(h, w, 3)
             # Z = (255.0 * (Z - Z.min()) / (Z.max() - Z.min())).astype(int)
             # convert to 320x240x3 gray

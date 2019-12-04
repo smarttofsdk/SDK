@@ -1,3 +1,67 @@
+
+
+# SDK Version: 1.80.4
+
+## Release date: 2019/12/2
+
+####  DMCAM library
+
+* **API change**
+  * **New**: *dmcam_cmap_palette_set/get*
+    * set and get default color palette for pesudo RGB image convertion colormap
+    * support 60+ color palette (naming similar with matplotlib) in *dmcam_cmap_palette_e*
+  * **Change**:  *dmcam_cmap_dist_f32_to_RGB/dmcam_cmap_dist_u16_to_RGB* 
+    * add a *dmcam_cmap_cfg_t* parameter to support user specified color palette. 
+    * For compatible, user can simply set this parameter to NULL to use the default color palette.
+  * **New**:  *PARAM_FLIP*
+    * added in *dmcam_dev_param_e* to support image flip in sensor side (currently IMX556 only).
+  * **New**: *dmcam_cap_save_frame*
+    * use to choose which frame to be saved into ONI replay file.
+  * **New**: *en_save_manually*
+    * added in *dmcam_cap_cfg_t* to enable user to use *dmcam_cap_save_frame*  to save specified frame.
+  * **New**: *DMCAM_FILTER_ID_FLYNOISE* 
+    * Added in *dmcam_filter_id_e* as fly noise filter id.
+    * *fly_noise_threshold* is added in *dmcam_filter_args_u* as fly noise threshold, valid range from 0 to 255
+  * **Enhance**: add parameter for *DMCAM_FILTER_ID_DEPTH_FILTER*  to fine control the filter strength
+    * *depth_filter_mode/depth_filter_strength* is added to *dmcam_filter_args_u*
+  * **REMOVE**: *dmcam_cmap_gray_u16_to_RGB32/dmcam_cmap_gray_f32_to_RGB32*
+* **Main features:**
+  * All linux python wheel are generated with manylinux2010 standard
+  * Support NEW SmartToF TC-S3 (SONY IMX556 VGA TOF) device.
+  * Support Dual-freq mode for SONY TOF devices.
+  * Support 60+ color palette which is similar with the colormap defined in matplotlib.
+  * Add SSE2 optimization on depth filter/colormap conversion.
+  * Make fly-noise filter accessible and the filter strength can be controlled by *DMCAM_FILTER_ID_FLYNOISE*  filter.
+  * Enhance recording  function: *dmcam_cap_config_set* can be used to start/stop recording during capturing without the need to stop capturing.
+* **BUG fix:**
+  * Fix stall of USB layer sometimes when cap_start/cap_stop are invoked in multi-thread  app.
+  * Fix wrong value in IR image under ARM-v7 platform.
+
+#### Tools
+
+-  **SmartTOFViewer**
+  - [**NEW**] 60+ colormap support. The colormap is similar with colormaps in matplotlib
+  - [**NEW**] new 'Enhanced Depth map' and 'Enhanced IR' view.
+  - [**NEW**] Support TC-S3 Dual-frequency selection during capturing.
+  - [**Enhance**]  PCLViewer is embedded into smartTOFViewer, and use random local socket port to communicate with each other 
+- **SmartTOFCli**
+  - [**NEW**] Support TC-S3
+  - [**Enhance**] Support more commands in cli scripts
+
+#### **Samples**
+
+  - [**Enhance**] Update all samples to support TC-S3
+
+#### ROS
+
+- [**NEW**] Support TC-S3
+-  [**Enhance**] CMake building scripts enhanced
+-  [**Enhance**] Support image flip in config file.
+
+#### Android
+
+- [**NEW**] Support TC-S3
+
 # 版本号：1.72
 
 ## 发布时间：2019/8/23
@@ -7,6 +71,7 @@
 - [**Bugfix**] 修复运动模式图像异常问题
 
 ### SDK软件部分
+
 - dmcam lib
   - [**New**] 增加“深度滤波强度” 参数的支持
     - 索尼传感器部分
@@ -45,6 +110,7 @@
 - [**Bugfix**] 修复笔记本采集超时问题
 
 ### SDK软件部分
+
 - dmcam lib
   - [**New**] 增加binning设置功能
   - [**New**] 修改EPC部分roi的row设置，ROI参数设置含义调整

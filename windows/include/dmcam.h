@@ -44,9 +44,9 @@ extern "C"
 
 #define DM_NAME "DMCAM"
 #define DM_VERSION_MAJOR 1
-#define DM_VERSION_MINOR 70
-#define DM_VERSION_REV   2
-#define DM_VERSION_STR "v1.70.2"
+#define DM_VERSION_MINOR 80
+#define DM_VERSION_REV   4
+#define DM_VERSION_STR "v1.80.4"
 
 #define DMCAM_ERR_CAP_FRAME_DISCARD (3)
 #define DMCAM_ERR_CAP_WRONG_STATE (-2)
@@ -223,6 +223,8 @@ typedef enum {
     PARAM_AMBIENT_LIGHT_COEFF, //set ambient light calibration coeff.
     PARAM_DUAL_MOD_FREQ, //set mod_freq
     PARAM_INFO_LENS, //Get lens param
+    PARAM_FLIP,
+    PARAM_RESERVED,
     PARAM_ENUM_COUNT,
 }dmcam_dev_param_e;
 
@@ -240,6 +242,7 @@ typedef enum {
     //---
     DM_BINNING_CNT,
 }dmcam_binning_mode_e;
+
 /** 
  * Frame size and Max frame size can be get from paramter 
  * interface using the PRAM_INFO_ROI parameter. 
@@ -254,8 +257,6 @@ typedef enum {
  * 
 
  */
-
-
 #pragma pack(push)
 #pragma pack(1)
 typedef struct {
@@ -268,7 +269,7 @@ typedef struct {
     uint32_t max_fsize; /*MAX frame size*/
 }dmcam_param_roi_t;
 
-typedef struct dmcam_cap{
+typedef struct dmcam_cap {
     uint16_t max_frame_width;
     uint16_t max_frame_height;
     uint16_t max_frame_depth;
@@ -407,6 +408,8 @@ typedef struct {
     uint32_t cache_frames_cnt; /* max frame count in frame buffer (cache) */
     dmcam_cap_frdy_f on_frame_ready; /* callback when frame is ready in the frame buffer; invoked in dmcam_cap_get_frames */
     dmcam_cap_err_f on_error;        /* callback when error happens during capturing; invoked in dmcam_cap_get_frames */
+
+    uint8_t en_save_manually;  /* if set to 1, saving is manually controlled by dmcam_cap_save_frame/dist/gray */
 
     uint8_t en_save_replay;      /* enable saving replay file during capturing. saving happens in dmcam_cap_get_frames */
     uint8_t en_save_dist_u16;    /* enable saving dist_u16 file during capturing. saving happends in dmcam_cap_get_dist_xx */
@@ -765,6 +768,25 @@ __API int dmcam_cap_get_frame(dmcam_dev_t *dev, uint8_t *frame_data, uint32_t fr
 
 
 /**
+ * save specified raw frame data into replay file. This function
+ * is only functional when @ref en_save_replay and 
+ * @ref en_save_manually in @ref dmcam_cap_cfg_t is set to true.
+ * 
+ * @param dev [in] dmcam device handler
+ * @param frame_data [in] raw frame data to be saved. 
+ * @param frame_dlen [in] raw frame data len
+ * @param frame_info [in] frame info of the raw frame data
+ * 
+ * @return __API int return 0 if saving is ok, else return 
+ *         negative number 
+ */
+
+__API int dmcam_cap_save_frame(dmcam_dev_t *dev, const uint8_t *frame_data, uint32_t frame_dlen, const dmcam_frame_info_t *frame_info);
+
+
+//__API int dmcam_cap_save_dist_u16(dmcam_dev_t * dev, const uint8_t *src, int src_len, const dmcam_frame_info_t *frame_info);
+//__API int dmcam_cap_save_gray_u16(dmcam_dev_t * dev, const uint8_t *src, int src_len, const dmcam_frame_info_t *frame_info);
+/**
  * seek frame inside replay device. it only has effect on replay 
  * file simulated dmcam device. it'll return -1 if dev is not a 
  * replay device. 
@@ -1008,6 +1030,7 @@ typedef enum {
     DMCAM_FILTER_ID_SPORT_MODE,   /**> set sport mode */
     DMCAM_FILTER_ID_SYS_CALIB,   /**> using system calibration param */
     DMCAM_FILTER_ID_AMBIENT_LIGHT_CALIB,   /**> using ambient light calib calibration param */
+    DMCAM_FILTER_ID_FLYNOISE,   /**> fly noise filter */
 
     DMCAM_FILTER_ID_MEDIAN = DMCAM_FILTER_ID_DEPTH_FILTER,  /* MEDIAN is replaced with depth filter */
     DMCAM_FILTER_CNT,
@@ -1037,7 +1060,11 @@ typedef union {
     struct {
         uint8_t depth_filter_mode;     /**> 0xF0 = filter strength controlled by depth_filter_strength
                                             Other values = filter controlled automatically */
-        uint8_t depth_filter_strength; /**> DMCAM_FILTER_ID_DEPTH_FILTER strength: [0, 100]*/
+        uint8_t depth_filter_strength; /**> DMCAM_FILTER_ID_DEPTH_FILTER strength: [0, 31]*/
+    };
+
+    struct {
+        uint8_t fly_noise_threshold;  /**> fly noise threshold 0~255*/
     };
 }dmcam_filter_args_u;
 
@@ -1070,44 +1097,142 @@ __API int dmcam_filter_disable(dmcam_dev_t *dev,  dmcam_filter_id_e filter_id);
  * CMAP utils section                                                                       
  *---------------------------------------------------------------------------*/
 
+typedef enum {
+    DMCAM_CMAP_EPC = 0, // EPC type colormap
+    DMCAM_CMAP_HSV,
+    DMCAM_CMAP_BWR,
+    DMCAM_CMAP_JET,
+    DMCAM_CMAP_GIST_RAINBOW,
+    DMCAM_CMAP_RAINBOW,
+    DMCAM_CMAP_SPECTRAL,
+    DMCAM_CMAP_VIRIDIS,
+    DMCAM_CMAP_INFERNO,
+    DMCAM_CMAP_PLASMA,
+    DMCAM_CMAP_MAGMA,
+    DMCAM_CMAP_BLUES,
+    DMCAM_CMAP_BUGN,
+    DMCAM_CMAP_BUPU,
+    DMCAM_CMAP_GNBU,
+    DMCAM_CMAP_GREENS,
+    DMCAM_CMAP_GREYS,
+    DMCAM_CMAP_ORANGES,
+    DMCAM_CMAP_ORRD,
+    DMCAM_CMAP_PUBU,
+    DMCAM_CMAP_PUBUGN,
+    DMCAM_CMAP_PURD,
+    DMCAM_CMAP_PURPLES,
+    DMCAM_CMAP_RDPU,
+    DMCAM_CMAP_REDS,
+    DMCAM_CMAP_YLGN,
+    DMCAM_CMAP_YLGNBU,
+    DMCAM_CMAP_YLORBR,
+    DMCAM_CMAP_YLORRD,
+    DMCAM_CMAP_AFMHOT,
+    DMCAM_CMAP_AUTUMN,
+    DMCAM_CMAP_BONE,
+    DMCAM_CMAP_COOL,
+    DMCAM_CMAP_COPPER,
+    DMCAM_CMAP_GIST_HEAT,
+    DMCAM_CMAP_GRAY,
+    DMCAM_CMAP_HOT,
+    DMCAM_CMAP_PINK,
+    DMCAM_CMAP_SPRING,
+    DMCAM_CMAP_SUMMER,
+    DMCAM_CMAP_WINTER,
+    DMCAM_CMAP_BRBG,
+    DMCAM_CMAP_COOLWARM,
+    DMCAM_CMAP_PIYG,
+    DMCAM_CMAP_PRGN,
+    DMCAM_CMAP_PUOR,
+    DMCAM_CMAP_RDBU,
+    DMCAM_CMAP_RDGY,
+    DMCAM_CMAP_RDYLBU,
+    DMCAM_CMAP_RDYLGN,
+    DMCAM_CMAP_SEISMIC,
+    DMCAM_CMAP_GIST_EARTH,
+    DMCAM_CMAP_TERRAIN,
+    DMCAM_CMAP_OCEAN,
+    DMCAM_CMAP_GIST_STERN,
+    DMCAM_CMAP_BRG,
+    DMCAM_CMAP_CMRMAP,
+    DMCAM_CMAP_CUBEHELIX,
+    DMCAM_CMAP_GNUPLOT,
+    DMCAM_CMAP_GNUPLOT2,
+    DMCAM_CMAP_GIST_NCAR,
+    DMCAM_CMAP_NIPY_SPECTRAL,
+    DMCAM_CMAP_FLAG,
+    DMCAM_CMAP_PRISM,
+    //---------------------
+    DMCAM_CMAP_COUNT,
+}dmcam_cmap_palette_e;
+
 /** DMCAM color map output format definition   */
 typedef enum {
     DMCAM_CMAP_OUTFMT_RGB,
     DMCAM_CMAP_OUTFMT_RGBA,
     DMCAM_CMAP_OUTFMT_BGR,
+    //---------------------
+    DMCAM_CMAP_OUTFMT_COUNT, 
 }dmcam_cmap_outfmt_e;
 
+typedef struct dmcam_cmap_cfg {
+    dmcam_cmap_palette_e color_palette; // color pallete index used during convertion
+    uint8_t histeq_en;  // 1 = enable histogram equalization during convertion
+}dmcam_cmap_cfg_t; 
+
 /**
- * convert dist_f32 image (pixel in meter) to pesudo-RGB points 
- * with specified pixel format 
+ * set default color palette used inside dmcam_cmap_ apis.
+ * 
+ * @param cm [in] color palette
+ * 
+ * @return bool true = set is ok. false = set failed
+ */
+__API bool dmcam_cmap_palette_set(dmcam_cmap_palette_e cm);
+
+/**
+ * get default color palette currently used.
+ * 
+ * @return dmcam_cmap_palette_e current color palette
+ */
+__API dmcam_cmap_palette_e dmcam_cmap_palette_get(void);
+
+/**
+ * convert dist_f32 image (pixel in meter) to pesudo-RGB points
+ * with specified pixel format
  * 
  * @param dst [out] pseudo-RGB point buffer
  * @param dst_len [in] point buffer size in bytes
  * @param src [in] float points buffer
  * @param src_len [in] count of float points
- * @param outfmt [in] pixel format of the pseudo-RGB 
- * @param min_val [in] minimum range of source point
- * @param max_val [in] max range of source point
+ * @param outfmt [in] pixel format of the pseudo-RGB
+ * @param range_min_m [in] minimum range of source point
+ * @param range_max_m [in] max range of source point
+ * @param cfg [in] refer dmcam_cmap_cfg_t. if NULL, default 
+ *            config is used.
  * 
  * @return int [out] the count of pseudo RGB points
  */
-__API int dmcam_cmap_dist_f32_to_RGB(uint8_t *dst, int dst_len, const float *src, int src_len, dmcam_cmap_outfmt_e outfmt, float range_min_m, float range_max_m);
+__API int dmcam_cmap_dist_f32_to_RGB(uint8_t *dst, int dst_len, const float *src, int src_len, 
+                                     dmcam_cmap_outfmt_e outfmt, float range_min_m, float range_max_m, const dmcam_cmap_cfg_t* cfg);
 
 /**
- * convert dist_u16 image (pixel in milimeter) to pesudo-RGB 
- * points with specified pixel format 
+ * convert dist_u16 image (pixel in milimeter) to pesudo-RGB
+ * points with specified pixel format
  * 
  * @param dst [out] pseudo-RGB point buffer
  * @param dst_len [in] point buffer size in bytes
  * @param src [in] dist_u16 image buffer
  * @param src_len [in] count of u16 points
- * @param outfmt [in] pixel format of the pseudo-RGB 
- * @param min_val [in] minimum range of source point
- * @param max_val [in] max range of source point
+ * @param outfmt [in] pixel format of the pseudo-RGB
+ * @param range_min_mm [in] minimum range of source point
+ * @param range_max_mm [in] max range of source point
+ * @param cfg [in] refer dmcam_cmap_cfg_t. if NULL, default 
+ *            config is used.
  * 
  * @return int [out] the count of pseudo RGB points
  */
-__API int dmcam_cmap_dist_u16_to_RGB(uint8_t *dst, int dst_len, const uint16_t *src, int src_len, dmcam_cmap_outfmt_e outfmt, uint16_t range_min_mm, uint16_t range_max_mm);
+__API int dmcam_cmap_dist_u16_to_RGB(uint8_t *dst, int dst_len, const uint16_t *src, int src_len,
+                               dmcam_cmap_outfmt_e outfmt, uint16_t range_min_mm, uint16_t range_max_mm, const dmcam_cmap_cfg_t *cfg);
 /**
  * convert gray_u16 image to IR image whose pixel is in [0~255] 
  * 
@@ -1134,34 +1259,6 @@ __API int dmcam_cmap_gray_u16_to_IR(uint8_t *dst, int dst_len, const uint16_t *s
  */
 __API int dmcam_cmap_gray_f32_to_IR(uint8_t *dst, int dst_len, const float *src, int src_len, int balance);
 
-
-/**
- * convert gray_u16 image to gray RGB32 image whose pixel is in 
- * uint32_t B in [23:16], G in [15:8], R in [7:0]
- * 
- * @param dst [out] IR image buffer
- * @param dst_len [in] IR image buffer in size of uint32_t
- * @param src [in] gray_u16 image
- * @param src_len [in] count of u16 points in gray_u16 image
- * @param balance [in] [-1024, 1024] -> [darkest, brightest]
- * 
- * @return int [out] the count of IR image
- */
-__API int dmcam_cmap_gray_u16_to_RGB32(uint32_t *dst, int dst_len, const uint16_t *src, int src_len, int balance);
-
-/**
- * convert gray_u16 image to gray RGB32 image whose pixel is in 
- * uint32_t B in [23:16], G in [15:8], R in [7:0]
- * 
- * @param dst [out] IR image buffer
- * @param dst_len [in] IR image buffer in size of uint32_t
- * @param src [in] gray_f32 image
- * @param src_len [in] count of f32 points in gray_f32 image
- * @param balance [in] [-1024, 1024] -> [darkest, brightest]
- * 
- * @return int [out] the count of IR image
- */
-__API int dmcam_cmap_gray_f32_to_RGB32(uint32_t *dst, int dst_len, const float *src, int src_len, int balance);
 
 /*---------------------------------------------------------------------------*
  * File save/load API section                                                                         
@@ -1317,6 +1414,7 @@ __API int dmcam_frame_load_distance(int fd, float *dst, int dst_len, int *dst_w,
  */
 
 __API int dmcam_frame_load_gray(int fd, float *dst, int dst_len, int *dst_w, int *dst_h);
+
 #ifdef __cplusplus
 }
 #endif

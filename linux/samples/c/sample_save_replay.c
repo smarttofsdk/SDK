@@ -24,13 +24,23 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "pthread.h"
 #include "dmcam.h"
-
-#define MAX_FRAME_SIZE (320 * 240 * 4 * 2)
 
 static dmcam_dev_t *dev;
 static dmcam_dev_t dev_list[4];
+
+int get_frame_size(dmcam_dev_t* dev)
+{
+    dmcam_param_item_t rparam;
+    memset(&rparam, 0, sizeof(rparam));
+    rparam.param_id = PARAM_ROI;
+    dmcam_param_batch_get(dev, &rparam, 1);
+    dmcam_param_roi_t frameInfo = rparam.param_val.roi;
+    int height = frameInfo.erow - frameInfo.srow + 1;
+    int width = frameInfo.ecol - frameInfo.scol + 1;
+    return width * height * 4 * 2;
+}
+
 
 static int list_all_devices(void)
 {
@@ -52,7 +62,7 @@ int main(int argc, char **argv)
 {
     char *fname_replay = "sample_replay.oni";
     char uri_str[64];
-
+    int frame_size = 0;
     if (argc > 1) {
         fname_replay = argv[1];
     }
@@ -103,14 +113,15 @@ int main(int argc, char **argv)
 
         {
             int i, r, w, h, n_frames = 100;
-            uint8_t *fbuf = malloc(MAX_FRAME_SIZE);
-            dmcam_frame_t frinfo;
 
+            dmcam_frame_t frinfo;
+            frame_size = get_frame_size(dev);
+            uint8_t* fbuf = malloc(frame_size);
             for (i = 0; i < n_frames; i++) {
                 /* Get 1 frame from device. 
                  * - dmcam_cap_get_frames is blocking wait all frames are ready,
                  * - dmcam_cap_get_frame is the non-blocking version*/
-                r = dmcam_cap_get_frames(dev, 1, fbuf, MAX_FRAME_SIZE, &frinfo);
+                r = dmcam_cap_get_frames(dev, 1, fbuf, frame_size, &frinfo);
                 if (r <= 0) {
                     printf("capture frame failed: r = %d\n", r);
                     break;

@@ -3,14 +3,8 @@
   mod_freq: 12000000
   format: 2
   power_percent: 60
-  fps: 40
+  fps: 20
   intg_us: 700
-  srow: 0
-  erow: 240
-  scol: 0
-  ecol: 320
-  cur_fsize: 153600
-  max_fsize: 153600
   sync_delay: 0
 
 #camera parameter
@@ -19,6 +13,11 @@
   fx: 319.33169
   fy: 319.25846
   scale: 1.0
+
+#image flip code:  0: 垂直翻转, 1: 水平翻转, -1: 水平垂直翻转转
+#翻转使能 enableflip 0:false,1:true
+  enableflip: 0
+  flipcode: 1
 
 #switch test mode(under test mode, you can see more information in terminal and images)
   testmode: FALSE

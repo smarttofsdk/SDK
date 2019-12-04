@@ -1,24 +1,72 @@
-
 # SmartToF SDK User Guide
 
 ------
-**The Detailed SmartToF SDK User Guide see ([the link](https://smarttofdoc.readthedocs.io/en/latest/))**
 
-## 1、Brief Introduction on SmartToF SDK 
-SmartToF TC series module is a 3D vision module developed by Digital company with TOF technology. It adopts industry-leading sensor chip and has the advantages of high measurement accuracy, strong anti-interference ability and compact structure. The module can be applied to people counting、gesture recognition、logistics storage、robot obstacle avoidance、vehicle controlling system and other frontier creative technologies. SmartToF SDK is a development kit based on SmartToF TC series module,which is currently supporting Windows,Linux,Android and other mainstream platforms. The overall architecture of the SDK is shown below:
+## 1、Brief Introduction on SmartToF SDK
 
-![Block diagram](https://github.com/smarttofsdk/doctest/raw/master/source/Introduction/image/Overview.png)
+SmartToF SDK is the general development kit for TOF 3D cameras，which has the following functions:
 
-Main instructions and features of the architecture in the SDK are shown in the following figure:
+- Support depth, gray data acquisition and display
+- Support automatic calibration of data acquired
+- Support pointcloud view
 
-![Architecture](https://github.com/smarttofsdk/doctest/raw/master/source/Introduction/image/Components.png)
+So far, SmartToF SDK support the following TOF 3D camera models：
+
+- TCM-E1 model
+- TCM-E2 model
+- TC series
+- TC-S series (SONY TOF Sensor)
+
+SmartToF SDK mainly includes the following modules:
+
+- DMCAM core C library and language extensions
+  - lib
+  - python
+  - java
+- SmartToF developer tools
+  - SmartTofViewer
+  - SmartTofCli
+
+SmartToF SDK supports multiple OS including windows and linux. And it provides various samples so that users' software development，including：
+
+- C/C++ samples
+- python samples
+- ROS samples
+- android sample
+- C# sample
+
+The supported platforms of SmartToF SDK are shown below：
+
+|                    | Windows | Linux   | Android |
+| :----------------- | :------ | :------ | :------ |
+| Core API C library | &radic; | &radic; | &radic; |
+| Python             | &radic; | &radic; |         |
+| Java               | &radic; | &radic; | &radic; |
+| Ros                |         | &radic; |         |
+| C#                 | &radic; | &radic; |         |
+| Matlab             | &radic; |         |         |
+| usbdriver          | &radic; | &radic; | &radic; |
+| SmartTofCli        | &radic; | &radic; |         |
+| SmartToFViewer     | &radic; | &radic; | &radic; |
 
 ------
 
-## 2. Introduction on samples and simplified data acquisition
+## 2、The Use of SmartToF SDK
 
-### 2.1 Simplified data acquisition sample
-~~~C
+The use of SmartToF SDK requires system configuration for the working OS，including
+
+- Windows configurations. Please see ([reference link](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-configuration-in-Windows_EN))
+- Linux configurations. Please see（[reference link](https://github.com/smarttofsdk/SDK/wiki/SmartToF-SDK-configuration-in-Linux_EN)）
+
+------
+
+## 3、Introduction on Main APIs and Samples
+
+All definitions of structures and declarations of functions in SmartToF SDK are located in dmcam.h under lib\include. For example for Windows, the definitions and declarations are under SDK/windows/dmcam/lib/include. There are detailed explanation of the functions and their parameters in it.
+
+### 3.1 Simplified data acquisition sample
+
+```c
 /*Initialization*/
 dmcam_init(NULL);
 ...
@@ -51,28 +99,188 @@ dmcam_cap_stop(dev);
 ...
 dmcam_dev_close(dev);
 dmcam_uninit();
-~~~
+```
+
+### 3.2 Introduction on main APIs
+
+#### 3.2.1 Initialize module
+
+```c
+dmcam_init(const char *log_fname);	//Initialization
+```
+
+| Parameter | Description                                                  |
+| :-------- | :----------------------------------------------------------- |
+| log_fname | File name of log. If it is NULL, the default file name is dmcam_YYYYMMDD.log |
+
+#### 3.2.2 List all modules
+
+```c 
+dmcam_dev_list(dmcam_dev_t *dev_list,int dev_list_num); 
+```
+
+| Parameter    | Description                            |
+| :----------- | :------------------------------------- |
+| dev_list     | List for connected devices             |
+| dev_list_num | Size of the list for connected devices |
+
+#### 3.2.3 Open device
+
+```c
+dmcam_dev_open(dmcam_dev_t *dev); 
+```
+
+| Parameter | Description               |
+| :-------- | :------------------------ |
+| dev       | Designated device to open |
+
+#### 3.2.4 Set parameters
+
+```c
+dmcam_param_batch_set(dmcam_dev_t *dev, const dmcam_param_item_t *param_items, int item_cnt);
+```
+
+| Parameter   | Description                |
+| :---------- | :------------------------- |
+| dev         | Designated device          |
+| param_items | Parameter of device        |
+| item_cnt    | Count of device parameters |
+
+#### 3.2.5 Set buffer
+
+```c
+dmcam_cap_set_frame_buffer(dmcam_dev_t *dev, uint8_t *frame_buf, uint32_t frame_buf_size);
+```
+
+| Parameter      | Description          |
+| :------------- | :------------------- |
+| dev            | Designated device    |
+| frame_buf      | Array of buffer      |
+| frame_buf_size | Size of buffer array |
+
+#### 3.2.6 Set callback function on error
+
+```c
+dmcam_cap_set_callback_on_error(dmcam_dev_t *dev, dmcam_cap_err_f cb);
+```
+
+| Parameter | Description                |
+| :-------- | :------------------------- |
+| dev       | Designated device          |
+| cb        | Callback function on error |
+
+#### 3.2.7 Acquire frames
+
+```c
+dmcam_cap_get_frames(dmcam_dev_t *dev, uint32_t frame_num, uint8_t *frame_data, uint32_t frame_dlen, dmcam_frame_t *first_frame_info);
+```
+
+| Parameter        | Description                    |
+| :--------------- | :----------------------------- |
+| dev              | Designated device              |
+| frame_num        | Number of frames to acquire    |
+| frame_data       | Acquired frame data            |
+| frame_dlen       | Size of frame data             |
+| first_frame_info | Information of the first frame |
+
+#### 3.2.8 Transform to depth data
+
+```c
+dmcam_frame_get_dist_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+```
+
+| Parameter | Description                                |
+| :-------- | :----------------------------------------- |
+| dev       | Designated device                          |
+| dst       | Destination for the transformed depth data |
+| dst_len   | Buffer size of depth data                  |
+| src       | Original data obtained                     |
+| src_len   | Size of original data                      |
+| finfo     | Information of original frame              |
+
+```c
+dmcam_frame_get_dist_f32(dmcam_dev_t *dev, float *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+```
+
+| Parameter | Description                                |
+| :-------- | :----------------------------------------- |
+| dev       | Designated device                          |
+| dst       | Destination for the transformed depth data |
+| dst_len   | Buffer size of depth data                  |
+| src       | Original data obtained                     |
+| src_len   | Size of original data                      |
+| finfo     | Information of original frame              |
+
+#### 3.2.9 Transform to gray data
+
+```c
+dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+```
+
+| Parameter | Description                               |
+| :-------- | :---------------------------------------- |
+| dev       | Designated device                         |
+| dst       | Destination for the transformed gray data |
+| dst_len   | Buffer size of gray data                  |
+| src       | Original data obtained                    |
+| src_len   | Size of original data                     |
+| finfo     | Information of original frame             |
+
+dmcam_frame_get_gray_u16(dmcam_dev_t *dev, uint16_t *dst, int dst_len,
+                                   uint8_t *src, int src_len, const dmcam_frame_info_t *finfo);
+
+```
+| Parameter | Description                              |
+| :-------- | :--------------------------------------- |
+| dev       | Designated device                        |
+| dst       | Destination for the transformed gray data |
+| dst_len   | Buffer size of gray data                 |
+| src       | Original data obtained                   |
+| src_len   | Size of original data                    |
+| finfo     | Information of original frame            |
+
+#### 3.2.10 Acquire pointcloud data
+~~~C
+dmcam_frame_get_pcl(dmcam_dev_t * dev, float *pcl, int pcl_len,
+const float *dist, int dist_len, int img_w, int img_h, const dmcam_camera_para_t *p_cam_param);
+```
+
+| Parameter   | Description                                                  |
+| :---------- | :----------------------------------------------------------- |
+| dev         | Designated device                                            |
+| pcl         | Pointcloud data output. Each point's coordinate consists of three elements |
+| dist        | Depth data of input image                                    |
+| dist_len    | Size of depth data of input image                            |
+| img_w       | Width of depth image                                         |
+| img_h       | Height of depth image                                        |
+| p_cam_param | Internal parameter of camera                                 |
+
 ------
 
-### 2.2 Introduction on samples
+### 3.3 Introduction on relevant samples
 
-The main examples provided with the SmartToF SDK are as follows:
+The main samples provided by SmartToF SDK are following：
 
-- C/C++ sample:
-  - Introduction see ([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/C_C++/index.html))
-  - Detailed introduction see ([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Python/index.html))
-- Python sample:
-  - Introduction see ([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Python/index.html))
-  - Detailed introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Reference/Python/index.html))
-- C# sample:
-  - Introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Csharp/index.html))
-  - Detailed introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Reference/Csharp/index.html))
-- Java sample:
-  - Introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Java/index.html))
-  - Detailed introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Reference/Java/index.html))
-- ROS sample:
-  - Introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/ROS/index.html))
-  - Detailed introduction see ([the link](https://smarttofdoc.readthedocs.io/en/latest/Reference/ROS/index.html))
-- Android sample:
-  - Introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Android/Androidapk.html))
-  - Detailed introduction see([the link](https://smarttofdoc.readthedocs.io/en/latest/Reference/Android/index.html))
+- C samples：See（[C samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c)）
+  - sample_capture_frames.c: Demonstrate data acquired
+  - sample_set_param.c: Demonstrate setting parameters
+  - sample_filter.c: Demonstrate data calibration
+- C++ samples:See([C++ samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/c%2B%2B))
+  - sample_capture_frames.cpp: Demonstrate data acquired
+  - sample_set_param.cpp: Demonstrate setting parameters
+  - sample_filter.cpp: Demonstrate data calibration 
+- python samples：See（[python samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/python)）
+  - sample_gui_pyQtGraph.py: Demonstrate data acquired
+  - sample_gui_pygame.py: Demonstrate data acquired
+  - sample_param.py: Demonstrate parameters setting and reading
+  - sample_basic: Demonstrate data acquired
+- java samples: See([java samples link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/java/com/smarttof/dmcam/sample))
+  - sampleBasic.java: java acquisition sample
+  - sampleBasicUi.java: java acquisition and demonstration sample
+- OpenNI sample:see([OpenNI sample link](https://github.com/smarttofsdk/SDK/tree/master/windows/samples/openni2))
+- ROS sample: See([ros sample link](https://github.com/smarttofsdk/SDK/tree/master/ros))
+  - tof_sample: Demonstrate how to acquire image and pointcloud
+

@@ -78,5 +78,3 @@ SmartToF SDK提供的主要样例如下：
 - Android样例：
   - 使用说明参见（[Android教程说明链接](https://smarttofdoc.readthedocs.io/en/latest/Tutorial/Android/Androidapk.html)）
   - Android扩展说明参见（[Android扩展说明链接](https://smarttofdoc.readthedocs.io/en/latest/Reference/Android/index.html)）
-
-

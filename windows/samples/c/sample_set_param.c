@@ -366,7 +366,7 @@ void test_frame_size(dmcam_dev_t *dev)
     assert(dmcam_param_batch_get(dev, &rparam[0], 1));
     memcpy(&groi, rparam[0].param_val.raw, rparam[0].param_val_len);
     //   assert(groi.cur_fsize == (sroi.erow - sroi.srow) * (sroi.ecol - sroi.scol) * 4);
-    // printf("frame size:%d\n", groi.cur_fsize);
+
     printf("max frame size:%d\n", groi.max_fsize);
     printf("len:%d get roi:(%d,%d),(%d,%d)\n",  rparam[0].param_val_len, groi.srow, groi.erow, groi.scol, groi.ecol);
 #if 0
@@ -381,8 +381,8 @@ void test_frame_size(dmcam_dev_t *dev)
     printf("set roi:(%d,%d),(%d,%d)\n", sroi.scol, sroi.ecol, sroi.erow, sroi.ecol);
     assert(dmcam_set_frame_size(dev, &sroi));
     assert(dmcam_get_frame_size(dev, &groi));
-    assert(groi.cur_fsize == (sroi.erow - sroi.srow)*(sroi.ecol-sroi.scol) * 4);
-    printf("frame size:%d, pixel size:%d bytes\n", groi.cur_fsize,groi.pix_width);
+    //assert(groi.cur_fsize == (sroi.erow - sroi.srow)*(sroi.ecol-sroi.scol) * 4);
+    //printf("frame size:%d, pixel size:%d bytes\n", groi.cur_fsize,groi.pix_width);
     printf("max frame size:%d\n", groi.max_fsize);
     printf("get roi:(%d,%d),(%d,%d)\n", groi.scol, groi.ecol, groi.erow, groi.ecol);
 #endif

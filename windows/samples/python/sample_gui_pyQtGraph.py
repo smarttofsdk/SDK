@@ -52,7 +52,8 @@ vb_ambient.addItem(img_ambient)
 vb_ambient.autoRange()
 
 # mutex for exchange frame_data
-frame_data = bytearray(320 * 240 * 4 * 4)
+frame_info = None
+frame_data = bytearray(640 * 480 * 4 * 4)
 f_dist = None
 f_gray = None
 dev = None
@@ -130,14 +131,16 @@ print(" Set paramters ...")
 # write illumination power: 100%
 pwr_percent = 100
 wparams = {
-    dmcam.PARAM_ILLUM_POWER: dmcam.param_val_u(),
+    # dmcam.PARAM_ILLUM_POWER: dmcam.param_val_u(),
     dmcam.PARAM_INTG_TIME: dmcam.param_val_u(),
-    dmcam.PARAM_FRAME_FORMAT: dmcam.param_val_u(),
+    # dmcam.PARAM_FRAME_FORMAT: dmcam.param_val_u(),
+    # dmcam.PARAM_MOD_FREQ: dmcam.param_val_u(),
 }
-wparams[dmcam.PARAM_ILLUM_POWER].illum_power.percent = pwr_percent
+# wparams[dmcam.PARAM_ILLUM_POWER].illum_power.percent = pwr_percent
 wparams[dmcam.PARAM_INTG_TIME].intg.intg_us = 1000
 # wparams[dmcam.PARAM_FRAME_FORMAT].frame_format.format = dmcam.DM_FRAME_FMT_DISTANCE
-wparams[dmcam.PARAM_FRAME_FORMAT].frame_format.format = 2
+# wparams[dmcam.PARAM_FRAME_FORMAT].frame_format.format = 2
+# wparams[dmcam.PARAM_MOD_FREQ].mod_freq = 50000000
 if not dmcam.param_batch_set(dev, wparams):
     print(" set parameter failed")
 
@@ -157,6 +160,7 @@ class DmcamThread(QtCore.QThread):
         self.run = False
 
     def run(self):
+        global frame_info
         print(" Start capture ...")
         dmcam.cap_start(dev)
         # blocking code goes here
@@ -180,6 +184,7 @@ class DmcamThread(QtCore.QThread):
                 #        finfo.frame_info.frame_size))
 
                 f_mutex.lock()
+                frame_info = finfo.frame_info
                 dist_cnt, f_dist = dmcam.frame_get_distance(dev, w * h, frame_data, finfo.frame_info)
                 gray_cnt, f_gray = dmcam.frame_get_gray(dev, w * h, frame_data, finfo.frame_info)
                 if dist_cnt != w * h:
@@ -197,10 +202,14 @@ np_dist_buf = []
 
 
 def handle_frame_ready():
+    if frame_info is None or frame_info.width > 1920 or frame_info.height > 1920:
+        return
     # print("ready...")
     f_mutex.lock()
-    np_dist = f_dist.reshape(240, 320) if f_dist is not None else None
-    np_gray = f_gray.reshape(240, 320) if f_gray is not None else None
+    w = frame_info.width
+    h = frame_info.height
+    np_dist = f_dist.reshape(h, w) if f_dist is not None else None
+    np_gray = f_gray.reshape(h, w) if f_gray is not None else None
     f_mutex.unlock()
     # np_dist = np.flipud(np.fliplr(np_dist))
     # np_gray = np.flipud(np.fliplr(np_gray))
@@ -208,7 +217,7 @@ def handle_frame_ready():
 
     if np_dist is not None:
         # -- correct value
-        np_dist = np_dist - 2.0
+        np_dist = np_dist
         # -- show dist
         # np_dist = (255.0 * np_dist / np_dist.max()).astype(int)
         # convert to 320x240x3 gray
@@ -232,9 +241,9 @@ def handle_frame_ready():
 
         # np_dist = np.concatenate((np_dist, np_dist, np_dist), axis=2)
         # norm = plt.Normalize(vmin=np_dist.min(), vmax=np_dist.max())
-        norm = plt.Normalize(vmin=0, vmax=5)
+        norm = plt.Normalize(vmin=0, vmax=4)
         # a colormap and a normalization instance
-        cmap = plt.get_cmap("hsv")  # seismic
+        cmap = plt.get_cmap("jet")  # seismic
         #np_dist_cmap = cmap(norm(np_dist))
         m = cm.ScalarMappable(norm=norm, cmap=cmap)
         np_dist_cmap = m.to_rgba(np_dist)
@@ -243,12 +252,12 @@ def handle_frame_ready():
         vb_dist.autoRange()
 
         # -- show hist
-        y, x = np.histogram(np_dist.ravel(), bins=np.linspace(0.02, 5, 100))
+        y, x = np.histogram(np_dist.ravel(), bins=np.linspace(0.02, 5, 64))
         plot_data.setData(x, y)
 
     if np_gray is not None:
         # -- scale to (0,255)
-        np_gray = (65535.0 * (np_gray - np_gray.min()) / (np_gray.max() - np_gray.min()) + 0.5).astype(int)
+        np_gray = (65535.0 * (np_gray - np_gray.min()) / (np_gray.max() - np_gray.min() + 0.001) + 0.5).astype(int)
         # -- Histograms Equalization
         hist,bins = np.histogram(np_gray.flatten(),65536,[0,65536])
         cdf = hist.cumsum()
