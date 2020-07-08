@@ -19,12 +19,14 @@ cd $TARGET_DIR
 echo "`pwd`"
 
 # ./dmcam-cli_static143 --print info
-product=`./dmcam-cli_static143 --print info |grep "Product" |awk -F' ' 'NR==1{print $3}'`
+product=`./dmcam-cli --print info |grep "Product" |awk -F' ' 'NR==1{print $3}'`
 echo "get product is $product"
 if [ "$product"x = "TM-E2-1.0"x ]; then
-	# ./dmcam-cli_static143 --print info
 	echo "upgrade E2"
 	./dmcam-cli -f TC-General-1.0_HW30*.bin
+elif [ "$product"x = "TC-S3-1.0"x ]; then
+	echo "upgrade TC-S3-1.0"
+	./dmcam-cli -f TS-General-1.0_HW30*.bin
 else
 	if [ "$product"x = "TM-E3-1.0"x ]; then
 		echo "upgrade E3"
