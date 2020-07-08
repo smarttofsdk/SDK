@@ -1,4 +1,5 @@
 import sys
+import os
 
 import dmcam
 
@@ -27,6 +28,8 @@ def test_param_read(device):
              params_val[dmcam.PARAM_INFO_CAPABILITY].info_capability.max_fps,
              params_val[dmcam.PARAM_INFO_CAPABILITY].info_capability.max_intg_us))
     print([hex(v) for v in params_val[dmcam.PARAM_INFO_SERIAL].info_serial.serial])
+    
+    print(bytes(params_val[dmcam.PARAM_INFO_SERIAL].calib_freq.freq))
     print("version: sw:%d, hw:%d, sw2:%d, hw2:%d"
           % (params_val[dmcam.PARAM_INFO_VERSION].info_version.sw_ver,
              params_val[dmcam.PARAM_INFO_VERSION].info_version.hw_ver,
@@ -55,15 +58,21 @@ def test_param_write(device):
 
 if __name__ == '__main__':
     # init the lib with default log file
+    dev_uri = sys.argv[1] if len(sys.argv) >= 2 else None
+
     dmcam.init(None)
 
     # set debug level
     dmcam.log_cfg(dmcam.LOG_LEVEL_INFO, dmcam.LOG_LEVEL_DEBUG, dmcam.LOG_LEVEL_NONE)
     print(" Open dmcam device ..")
 
-    # open the first device
-    # dev = dmcam.dev_open(dev_list[0])i
-    dev = dmcam.dev_open(None)
+    if dev_uri:
+        dev = dmcam.dev_open_by_uri(os.fsencode(sys.argv[1]))
+    else:
+        # open the first device
+        # dev = dmcam.dev_open(devs[0])
+        dev = dmcam.dev_open(None)
+
     assert dev is not None
 
     test_param_write(dev)

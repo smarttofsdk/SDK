@@ -71,18 +71,19 @@ namespace sampleBasicUi
 
             Log(string.Format("found {0} device", cnt));
 
-            if (cnt == 0)
-            {
-                goto FINAL;
-            }
-
             /* open device */
             Log(" Open dmcam device ..");
-            var dev = dmcam.dev_open(null);
+            string onifileName = "\\\\192.168.1.113\\public\\Test-oni\\TC-S3.oni";
+            Log(" Open oni file from " + onifileName);
+            var dev = dmcam.dev_open_by_uri(onifileName);
             if (dev == null)
             {
-                Log(" Open device failed");
-                goto FINAL;
+                dev = dmcam.dev_open(null);
+                if (dev == null)
+                {
+                    Log(" Open device failed");
+                    goto FINAL;
+                }
             }
 
             Log(string.Format(" Set fps to {0} ..", fps));

@@ -7,8 +7,9 @@
 # DMCAM_LIBRARIES - The libraries needed to use DMCAM
 # DMCAM_STATIC_LIBRARIES - The static libraries needed to use DMCAM
 # DMCAM_DEFINITIONS - Compiler switches required for using DMCAM
-
-cmake_policy(SET CMP0054 NEW)
+if (POLICY CMP0054)
+    cmake_policy(SET CMP0054 NEW)
+endif()
 if(NOT DMCAM_SDK_DIR)
     message(WARNING "DMCAM_SDK_DIR must be set")
     set (DMCAM_SDK_DIR "NOT-FOUND" CACHE PATH "DMCAM SDK home dir")

@@ -11,16 +11,25 @@ namespace sampleBasic {
             int cnt = dmcam.dev_list(devs.cast(), 16);
 
             Console.Write("found {0} device\n", cnt);
+            string onifileName = "\\\\192.168.1.113\\public\\Test-oni\\TC-S3.oni";
+            Console.WriteLine(" Open oni file from " + onifileName);
+            dev_t dev = dmcam.dev_open_by_uri(onifileName);
+            if (dev == null)
+            {
+                Console.WriteLine(" Open dmcam device ..");
+                dev = dmcam.dev_open(null);
+                if (dev == null)
+                {
+                    Console.WriteLine(" Open device or oni file failed");
+                    return;
+                }
+            }
 
-            if (cnt == 0) {
-                return;
-            }
-            Console.WriteLine(" Open dmcam device ..");
-            dev_t dev = dmcam.dev_open(null);
-            if (dev == null) {
-                Console.WriteLine(" Open device failed");
-                return;
-            }
+            /* get info */
+            dev_info_t dev_info = new dev_info_t();
+            dmcam.dev_get_info(dev, dev_info);
+            dm_u32_p freq_list= dm_u32_p.frompointer(dev_info.calib.freq_list);
+            Console.WriteLine("calibrated freq: n={0}, f0={1}", dev_info.calib.n_freq, freq_list.getitem(0));
 
             /* set param */
             param_item_t p_fps = new param_item_t();

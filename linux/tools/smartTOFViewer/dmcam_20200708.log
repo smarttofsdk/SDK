@@ -1,0 +1,8 @@
+
+---- DMCAM v1.81.4(compile at Jul  8 2020 05:20:37) log start -----
+20200708 14:17:38.178[101225][DBG][usb_ll_dev_list]probe dmcam device (max=16) in 7 usb device
+20200708 14:17:41.499[101293][DBG][dmcam_dev_open]-- open dmcam device @ 0x7f948b26b320
+20200708 14:17:41.500[101293][DBG][_usb_ll_dev_open] create usb context
+20200708 14:17:41.501[101293][ERR][dmcam_dev_open]open device failed!
+---- DMCAM log END ----
+

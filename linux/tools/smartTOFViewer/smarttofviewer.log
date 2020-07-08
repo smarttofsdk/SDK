@@ -1,0 +1,14 @@
+2020-07-08 14:17:38.175[WAR]     config_load@  268: open file config.json failed: [Errno 2] No such file or directory: 'config.json'
+2020-07-08 14:17:38.176[INF]        <module>@  244: 
+----------------------------------------------
+2020-07-08 14:17:38.176[INF]        <module>@  248: Load resources (path=/home/huwenxiao/Documents/sdk/bin/linux/tools/smartTOFViewer)
+2020-07-08 14:17:38.180[INF]             run@ 2906:  cam daemon started...
+2020-07-08 14:17:41.498[INF] dev_poll_status@  428: check device status: url = None
+2020-07-08 14:17:41.540[ERR]   _job_poll_dev@  471: out of stack space (infinite loop?)
+2020-07-08 14:17:41.540[INF]_job_poll_dev_do@  439: poll_dev job spends: 0.042 secs
+2020-07-08 14:17:42.721[ERR]     on_btn_stop@ 1924: device is not opened!
+2020-07-08 14:17:42.722[INF]     on_btn_quit@ 1953: quit...
+2020-07-08 14:17:42.809[INF]            main@ 3105: exit main loop
+2020-07-08 14:17:42.812[INF]             run@ 2976:  cam daemon exit...
+2020-07-08 14:17:42.812[INF]            main@ 3111: exit main loop2
+2020-07-08 14:17:42.812[INF]            main@ 3115: exit main loop3
