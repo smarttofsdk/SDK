@@ -35,10 +35,10 @@ l.nextRow()
 vb_ambient = l.addViewBox(col=2, colspan=1, rowspan=1)
 l.nextRow()
 plot_hist = l.addPlot(title="Distance Hist", rowspan=1)
-plot_data = plot_hist.plot(pen='y', stepMode=True, brush=(0, 0, 255, 0))
+plot_data = plot_hist.plot([0, 1], [0], pen='y', stepMode=True, brush=(0, 0, 255, 0))
 
 plot_ghist = l.addPlot(title="Gray Hist", rowspan=1)
-plot_ghist_data = plot_ghist.plot(pen='y', stepMode=True, brush=(0, 255, 0, 150))
+plot_ghist_data = plot_ghist.plot([0, 1], [0], pen='y', stepMode=True, brush=(0, 255, 0, 150))
 
 plot3 = l.addPlot(title="N/A", rowspan=1)
 
@@ -177,11 +177,11 @@ class DmcamThread(QtCore.QThread):
             if ret > 0:
                 w = finfo.frame_info.width
                 h = finfo.frame_info.height
-                # print(" frame @ %d, %dx%d (%d)" %
-                #       (finfo.frame_info.frame_idx,
-                #        finfo.frame_info.width,
-                #        finfo.frame_info.height,
-                #        finfo.frame_info.frame_size))
+                print(" frame @ %d, %dx%d (%d)" %
+                      (finfo.frame_info.frame_idx,
+                       finfo.frame_info.width,
+                       finfo.frame_info.height,
+                       finfo.frame_info.frame_size))
 
                 f_mutex.lock()
                 frame_info = finfo.frame_info
@@ -193,7 +193,9 @@ class DmcamThread(QtCore.QThread):
                 if gray_cnt != w * h:
                     f_gray = None
                 f_mutex.unlock()
-                self.frameReadySignal.emit(0)
+
+                if f_dist is not None and f_gray is not None:
+                    self.frameReadySignal.emit(0)
 
         self.captureDoneSignal.emit(int(self.run))
 
@@ -202,10 +204,11 @@ np_dist_buf = []
 
 
 def handle_frame_ready():
-    if frame_info is None or frame_info.width > 1920 or frame_info.height > 1920:
+    f_mutex.lock()
+    if frame_info is None or frame_info.width > 1920 or frame_info.height > 1920 or frame_info.width < 10 or frame_info.height < 10:
+        f_mutex.unlock()
         return
     # print("ready...")
-    f_mutex.lock()
     w = frame_info.width
     h = frame_info.height
     np_dist = f_dist.reshape(h, w) if f_dist is not None else None

@@ -22,6 +22,12 @@ namespace sampleBasic {
                 return;
             }
 
+            /* get info */
+            dev_info_t dev_info = new dev_info_t();
+            dmcam.dev_get_info(dev, dev_info);
+            dm_u32_p freq_list= dm_u32_p.frompointer(dev_info.calib.freq_list);
+            Console.WriteLine("calibrated freq: n={0}, f0={1}", dev_info.calib.n_freq, freq_list.getitem(0));
+
             /* set param */
             param_item_t p_fps = new param_item_t();
             p_fps.param_id = dev_param_e.PARAM_FRAME_RATE;
