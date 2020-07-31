@@ -159,7 +159,7 @@ proc ::tk::MotifFDialog_FileTypes {w} {
     set initialTypeName [lindex $data(-filetypes) 0 0]
     if {$data(-typevariable) ne ""} {
 	upvar #0 $data(-typevariable) typeVariable
-	if {[info exist typeVariable]} {
+	if {[info exists typeVariable]} {
 	    set initialTypeName $typeVariable
 	}
     }
@@ -305,7 +305,8 @@ proc ::tk::MotifFDialog_Config {dataName type argList} {
 	set data(filter) *
     }
     if {![winfo exists $data(-parent)]} {
-	error "bad window path name \"$data(-parent)\""
+	return -code error -errorcode [list TK LOOKUP WINDOW $data(-parent)] \
+	    "bad window path name \"$data(-parent)\""
     }
 }
 

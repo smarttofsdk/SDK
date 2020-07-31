@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 find_package(OpenCV REQUIRED)
-find_package(PCL REQUIRED COMPONENTS common io filters)
+find_package(PCL REQUIRED COMPONENTS common io filters visualization)
 
 include_directories(
   include
@@ -32,6 +32,8 @@ set_target_properties(cloud_viewer
 target_link_libraries(cloud_viewer
   ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
+  ${PCL_COMMON_LIBRARIES} 
+  ${PCL_IO_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 

@@ -5,30 +5,22 @@
 ## python样例运行所需的库
 - 安装支持smarttof模组的python扩展库
   SDK中分别为windows和linux平台提供了支持smarttof模组的python扩展库，并且对应不同的python版本，方便用户选择适合的开发环境。下图是python扩展库的版本支持列表。
-  -  windows
-  
+
   |支持版本|扩展库名|
   |:---|:---|
   |python2.7 32位|dmcam-xxx-cp27-cp27m-win32.whl|
-  |python3.4 32位|dmcam-xxx-cp34-cp34m-win32.whl|
   |python3.5 32位|dmcam-xxx-cp35-cp35m-win32.whl|
-  |python3.6 32位|dmcam-xxx-cp36-cp36m-win32.whl|
+  |python3.6 32位| dmcam-xxx-cp36-cp36m-win32.whl     |
+  |python3.7 32位|dmcam-xxx-cp37-cp37m-win32.whl|
   |python2.7 64位|dmcam-xxx-cp27-cp27m-win_amd64.whl|
-  |python3.4 64位|dmcam-xxx-cp34-cp34m-win_amd64.whl|
-  |python3.5 64位|dmcam-xxx-cp35-cp35m-win_amd64.whl|
+  |python3.5 64位| dmcam-xxx-cp35-cp35m-win_amd64.whl |
   |python3.6 64位|dmcam-xxx-cp36-cp36m-win_amd64.whl|
-  - Linux
-  
-  |支持版本|扩展库名|
-  |:---|:---|
-  |python2.7 64位|dmcam-xxx-cp27-cp27mu-linux_x86_64.whl|
-  |python3.4 64位|dmcam-xxx-cp34-cp34m-linux_x86_64.whl|
-  |python3.5 64位|dmcam-xxx-cp35-cp35m-linux_x86_64.whl|
-说明：上面扩展库名中的xxx是对应的发布版本号
+  |python3.7 64位|dmcam-xxx-cp37-cp37m-win_amd64.whl|
+  说明：上面扩展库名中的xxx是对应的发布版本号
 
 - 安装支持样例运行的其他库
 
-  ​需要安装numpy、matplotlib、pygame、PyQt5、pyqtgraph,可以通过以下命令安装
+  需要安装numpy、matplotlib、pygame、PyQt5、pyqtgraph,可以通过以下命令安装
   ~~~BASH
   pip install -r requirement.txt
   ~~~

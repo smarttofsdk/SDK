@@ -29,8 +29,8 @@ MODLIBS=        $(LOCALMODLIBS) $(BASEMODLIBS)
 VERSION=	3.6
 srcdir=		.
 
-abs_srcdir=	/Python-3.6.9
-abs_builddir=	/Python-3.6.9
+abs_srcdir=	/home/u/Python-3.6.9
+abs_builddir=	/home/u/Python-3.6.9
 
 
 CC=		gcc -pthread
@@ -84,7 +84,7 @@ CONFIGURE_CFLAGS=
 # CFLAGS_NODIST is used for building the interpreter and stdlib C extensions.
 # Use it when a compiler flag should _not_ be part of the distutils CFLAGS
 # once Python is installed (Issue #21121).
-CONFIGURE_CFLAGS_NODIST= -std=c99 -Wextra -Wno-unused-result -Wno-unused-parameter -Wno-missing-field-initializers -Wno-cast-function-type
+CONFIGURE_CFLAGS_NODIST= -std=c99 -Wextra -Wno-unused-result -Wno-unused-parameter -Wno-missing-field-initializers
 # LDFLAGS_NODIST is used in the same manner as CFLAGS_NODIST.
 # Use it when a linker flag should _not_ be part of the distutils LDFLAGS
 # once Python is installed (bpo-35257)
@@ -109,7 +109,7 @@ CCSHARED=	-fPIC
 LINKFORSHARED=	-Xlinker -export-dynamic
 ARFLAGS=	rcs
 # Extra C flags added for building the interpreter object files.
-CFLAGSFORSHARED=
+CFLAGSFORSHARED=$(CCSHARED)
 # C flags used for building the interpreter object files
 PY_CORE_CFLAGS=	$(PY_CFLAGS) $(PY_CFLAGS_NODIST) $(PY_CPPFLAGS) $(CFLAGSFORSHARED) -DPy_BUILD_CORE
 # Linker flags used for building the interpreter object files
@@ -126,7 +126,7 @@ MULTIARCH=	x86_64-linux-gnu
 MULTIARCH_CPPFLAGS = -DMULTIARCH=\"x86_64-linux-gnu\"
 
 # Install prefix for architecture-independent files
-prefix=		/opt/_internal/cpython-3.6.9
+prefix=		/usr/local
 
 # Install prefix for architecture-dependent files
 exec_prefix=	${prefix}
@@ -183,7 +183,7 @@ LIPO_32BIT_FLAGS=
 OTHER_LIBTOOL_OPT=
 
 # Environment to run shared python without installed libraries
-RUNSHARED=       
+RUNSHARED=       LD_LIBRARY_PATH=/home/u/Python-3.6.9
 
 # ensurepip options
 ENSUREPIP=      upgrade
@@ -195,7 +195,7 @@ EXEMODE=	755
 FILEMODE=	644
 
 # configure script arguments
-CONFIG_ARGS=	 '--prefix=/opt/_internal/cpython-3.6.9' '--disable-shared' 'PKG_CONFIG_PATH=/usr/local/lib/pkgconfig'
+CONFIG_ARGS=	 '--enable-shared' '--enable-optimizations'
 
 
 # Subdirectories with code
@@ -212,15 +212,15 @@ DIST=		$(DISTFILES) $(DISTDIRS)
 
 
 LIBRARY=	libpython$(VERSION)$(ABIFLAGS).a
-LDLIBRARY=      libpython$(VERSION)$(ABIFLAGS).a
-BLDLIBRARY=     $(LDLIBRARY)
-PY3LIBRARY=     
+LDLIBRARY=      libpython$(LDVERSION).so
+BLDLIBRARY=     -L. -lpython$(LDVERSION)
+PY3LIBRARY=     libpython3.so
 DLLLIBRARY=	
 LDLIBRARYDIR=   
-INSTSONAME=	$(LDLIBRARY)
+INSTSONAME=	libpython$(LDVERSION).so.1.0
 
 
-LIBS=		-lpthread -ldl  -lutil -lrt
+LIBS=		-lpthread -ldl  -lutil
 LIBM=		-lm
 LIBC=		
 SYSLIBS=	$(LIBM) $(LIBC)
@@ -236,8 +236,8 @@ LIBOBJS=
 PYTHON=		python$(EXE)
 BUILDPYTHON=	python$(BUILDEXE)
 
-PYTHON_FOR_REGEN=python
-UPDATE_FILE=python $(srcdir)/Tools/scripts/update_file.py
+PYTHON_FOR_REGEN=python3
+UPDATE_FILE=python3 $(srcdir)/Tools/scripts/update_file.py
 PYTHON_FOR_BUILD=./$(BUILDPYTHON) -E
 _PYTHON_HOST_PLATFORM=
 BUILD_GNU_TYPE=	x86_64-pc-linux-gnu
@@ -295,7 +295,7 @@ IO_OBJS=	\
 
 ##########################################################################
 
-LIBFFI_INCLUDEDIR=	/usr/lib64/libffi-3.0.5/include
+LIBFFI_INCLUDEDIR=	
 
 ##########################################################################
 # Parser
@@ -459,7 +459,7 @@ DTRACE_DEPS = \
 # Rules
 
 # Default target
-all:		build_all
+all:		profile-opt
 build_all:	check-clean-src $(BUILDPYTHON) oldsharedmods sharedmods gdbhooks \
 		Programs/_testembed python-config
 
@@ -493,7 +493,7 @@ profile-opt:
 	$(MAKE) profile-removal
 
 build_all_generate_profile:
-	$(MAKE) all CFLAGS_NODIST="$(CFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LDFLAGS_NODIST="$(LDFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LIBS="$(LIBS)"
+	$(MAKE) build_all CFLAGS_NODIST="$(CFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LDFLAGS_NODIST="$(LDFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LIBS="$(LIBS)"
 
 run_profile_task:
 	: # FIXME: can't run for a cross build
@@ -503,14 +503,14 @@ build_all_merge_profile:
 	$(LLVM_PROF_MERGER)
 
 build_all_use_profile:
-	$(MAKE) all CFLAGS_NODIST="$(CFLAGS_NODIST) $(PGO_PROF_USE_FLAG)" LDFLAGS_NODIST="$(LDFLAGS_NODIST)"
+	$(MAKE) build_all CFLAGS_NODIST="$(CFLAGS_NODIST) $(PGO_PROF_USE_FLAG)" LDFLAGS_NODIST="$(LDFLAGS_NODIST)"
 
 # Compile and run with gcov
 .PHONY=coverage coverage-lcov coverage-report
 coverage:
 	@echo "Building with support for coverage checking:"
 	$(MAKE) clean profile-removal
-	$(MAKE) all CFLAGS="$(CFLAGS) -O0 -pg -fprofile-arcs -ftest-coverage" LIBS="$(LIBS) -lgcov"
+	$(MAKE) build_all CFLAGS="$(CFLAGS) -O0 -pg -fprofile-arcs -ftest-coverage" LIBS="$(LIBS) -lgcov"
 
 coverage-lcov:
 	@echo "Creating Coverage HTML report with LCOV:"
@@ -1042,7 +1042,7 @@ TESTTIMEOUT=	1200
 
 # Run a basic set of regression tests.
 # This excludes some tests that are particularly resource-intensive.
-test:		all platform
+test:		build_all platform
 		$(TESTRUNNER) $(TESTOPTS)
 
 # Run the full test suite twice - once without .pyc files, and once with.
@@ -1052,7 +1052,7 @@ test:		all platform
 # the bytecode read from a .pyc file had the bug, sometimes the directly
 # generated bytecode.  This is sometimes a very shy bug needing a lot of
 # sample data.
-testall:	all platform
+testall:	build_all platform
 		-find $(srcdir)/Lib -name '*.py[co]' -print | xargs rm -f
 		$(TESTPYTHON) -E $(srcdir)/Lib/compileall.py
 		-find $(srcdir)/Lib -name '*.py[co]' -print | xargs rm -f
@@ -1061,7 +1061,7 @@ testall:	all platform
 
 # Run the test suite for both architectures in a Universal build on OSX.
 # Must be run on an Intel box.
-testuniversal:	all platform
+testuniversal:	build_all platform
 		if [ `arch` != 'i386' ];then \
 			echo "This can only be used on OSX/i386" ;\
 			exit 1 ;\
@@ -1087,7 +1087,7 @@ QUICKTESTOPTS=	$(TESTOPTS) -x test_subprocess test_io test_lib2to3 \
 		test_multiprocessing_forkserver \
 		test_mailbox test_socket test_poll \
 		test_select test_zipfile test_concurrent_futures
-quicktest:	all platform
+quicktest:	build_all platform
 		$(TESTRUNNER) $(QUICKTESTOPTS)
 
 # SSL tests
@@ -1433,7 +1433,7 @@ LIBPL=		$(prefix)/lib/python3.6/config-$(VERSION)$(ABIFLAGS)-x86_64-linux-gnu
 # pkgconfig directory
 LIBPC=		$(LIBDIR)/pkgconfig
 
-libainstall:	all python-config
+libainstall:	build_all python-config
 	@for i in $(LIBDIR) $(LIBPL) $(LIBPC); \
 	do \
 		if test ! -d $(DESTDIR)$$i; then \
@@ -1694,7 +1694,7 @@ distclean: clobber
 				     -exec rm -f {} ';'
 
 # Check for smelly exported symbols (not starting with Py/_Py)
-smelly: all
+smelly: build_all
 	nm -p $(LIBRARY) | \
 		sed -n "/ [TDB] /s/.* //p" | grep -v "^_*Py" | sort -u; \
 
@@ -1731,7 +1731,7 @@ funny:
 		-o -print
 
 # Perform some verification checks on any modified files.
-patchcheck: all
+patchcheck: build_all
 	$(RUNSHARED) ./$(BUILDPYTHON) $(srcdir)/Tools/scripts/patchcheck.py
 
 # Dependencies

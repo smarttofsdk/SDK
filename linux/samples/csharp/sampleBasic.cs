@@ -11,18 +11,15 @@ namespace sampleBasic {
             int cnt = dmcam.dev_list(devs.cast(), 16);
 
             Console.Write("found {0} device\n", cnt);
-            string onifileName = "\\\\192.168.1.113\\public\\Test-oni\\TC-S3.oni";
-            Console.WriteLine(" Open oni file from " + onifileName);
-            dev_t dev = dmcam.dev_open_by_uri(onifileName);
-            if (dev == null)
-            {
-                Console.WriteLine(" Open dmcam device ..");
-                dev = dmcam.dev_open(null);
-                if (dev == null)
-                {
-                    Console.WriteLine(" Open device or oni file failed");
-                    return;
-                }
+
+            if (cnt == 0) {
+                return;
+            }
+            Console.WriteLine(" Open dmcam device ..");
+            dev_t dev = dmcam.dev_open(null);
+            if (dev == null) {
+                Console.WriteLine(" Open device failed");
+                return;
             }
 
             /* get info */

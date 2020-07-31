@@ -41,17 +41,17 @@ int dmg_depth_to_pointcloud_from_cvmat(float *pc, int pc_sz, const cv::Mat& img_
 	int r = img_f.rows;
 	int c = img_f.cols;
 	int idx = 0;
+	double f=(camera.fx+camera.fy)/2.;
 	for (int m = 0; m < r; m++)
 		for (int n = 0; n < c; n++)
 		{
-			float d = img_f.ptr<float>(m)[n];
+			float d = img_f.ptr<float>(m)[n]*f / sqrt(pow(m-camera.cy,2)+ pow(n - camera.cx, 2)+ pow(f, 2));
 			if (d <= 0 || d >= 6.25) {
 				pc[3 * idx + 0] = 0;
 				pc[3 * idx + 1] = 0;
 				pc[3 * idx + 2] = 0;
 			}
 			else {
-				// 计算这个点的空间坐标
 				pc[3 * idx + 2] = float(d);
 				pc[3 * idx + 0] = (n - camera.cx) * pc[3 * idx + 2] / camera.fx;
 				pc[3 * idx + 1] = (m - camera.cy) * pc[3 * idx + 2] / camera.fy;

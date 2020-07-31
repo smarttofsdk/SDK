@@ -112,6 +112,7 @@ private:
     //parameters of tof
     uint32_t m_devMode;
     uint32_t m_modFreq;
+    uint32_t m_modFreq1;
     uint32_t m_syncDelay;
     bool m_enbaleFlip;
     int m_flipCode;
@@ -119,9 +120,15 @@ private:
     uint32_t m_format;
     uint8_t power_percent;
     uint32_t m_fps;
-    uint16_t m_intgTime;
+    uint16_t m_intgTime;//intg_us in 1.72 SDK
+    uint16_t m_intgTimeHDR;
+
+    cv::Mat cameraMatrix;
+    cv::Mat distCoeffs;
+    cv::Mat map1, map2;
+    CAMERA_INTRINSIC_PARAMETERS intrinsicmat;
     //parameters of camera
-    dmcam_camera_para_t cam_int_param;
+    dmcam_len_param_t cam_int_param;
     //publisher
     image_transport::Publisher m_imageGrayPub;
     image_transport::Publisher m_imageDistPub;
@@ -163,6 +170,10 @@ private:
     void publicPointCloud(float* pcl_buff);
     //publish camera info
     void publicCaminfo(void);
+    //undistort the image
+    void undistort( cv::InputArray _src, cv::OutputArray _dst, cv::InputArray _cameraMatrix,
+                    cv::InputArray _distCoeffs, cv::InputArray _newCameraMatrix );
+
     int m_width;
     int m_height;
     int m_curfsize;

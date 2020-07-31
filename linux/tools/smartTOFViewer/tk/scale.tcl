@@ -60,7 +60,7 @@ bind Scale <ButtonRelease-2> {
     tk::ScaleEndDrag %W
     tk::ScaleActivate %W %x %y
 }
-if {$tcl_platform(platform) eq "windows"} {
+if {[tk windowingsystem] eq "win32"} {
     # On Windows do the same with button 3, as that is the right mouse button
     bind Scale <3>		[bind Scale <2>]
     bind Scale <B3-Motion>	[bind Scale <B2-Motion>]
@@ -71,34 +71,34 @@ if {$tcl_platform(platform) eq "windows"} {
 bind Scale <Control-1> {
     tk::ScaleControlPress %W %x %y
 }
-bind Scale <Up> {
+bind Scale <<PrevLine>> {
     tk::ScaleIncrement %W up little noRepeat
 }
-bind Scale <Down> {
+bind Scale <<NextLine>> {
     tk::ScaleIncrement %W down little noRepeat
 }
-bind Scale <Left> {
+bind Scale <<PrevChar>> {
     tk::ScaleIncrement %W up little noRepeat
 }
-bind Scale <Right> {
+bind Scale <<NextChar>> {
     tk::ScaleIncrement %W down little noRepeat
 }
-bind Scale <Control-Up> {
+bind Scale <<PrevPara>> {
     tk::ScaleIncrement %W up big noRepeat
 }
-bind Scale <Control-Down> {
+bind Scale <<NextPara>> {
     tk::ScaleIncrement %W down big noRepeat
 }
-bind Scale <Control-Left> {
+bind Scale <<PrevWord>> {
     tk::ScaleIncrement %W up big noRepeat
 }
-bind Scale <Control-Right> {
+bind Scale <<NextWord>> {
     tk::ScaleIncrement %W down big noRepeat
 }
-bind Scale <Home> {
+bind Scale <<LineStart>> {
     %W set [%W cget -from]
 }
-bind Scale <End> {
+bind Scale <<LineEnd>> {
     %W set [%W cget -to]
 }
 

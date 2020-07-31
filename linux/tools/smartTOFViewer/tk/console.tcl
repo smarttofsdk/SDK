@@ -6,7 +6,7 @@
 #
 # Copyright (c) 1995-1997 Sun Microsystems, Inc.
 # Copyright (c) 1998-2000 Ajuba Solutions.
-# Copyright (c) 2007 Daniel A. Steffen <das@users.sourceforge.net>
+# Copyright (c) 2007-2008 Daniel A. Steffen <das@users.sourceforge.net>
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -20,10 +20,9 @@ namespace eval ::tk::console {
     variable magicKeys   1   ; # enable brace matching and proc/var recognition
     variable maxLines    600 ; # maximum # of lines buffered in console
     variable showMatches 1   ; # show multiple expand matches
-
+    variable useFontchooser [llength [info command ::tk::fontchooser]]
     variable inPlugin [info exists embed_args]
     variable defaultPrompt   ; # default prompt if tcl_prompt1 isn't used
-
 
     if {$inPlugin} {
 	set defaultPrompt {subst {[history nextid] % }}
@@ -93,10 +92,33 @@ proc ::tk::ConsoleInit {} {
     }
 
     AmpMenuArgs .menubar.edit add separator
+    if {$::tk::console::useFontchooser} {
+        if {[tk windowingsystem] eq "aqua"} {
+            .menubar.edit add command -label tk_choose_font_marker
+            set index [.menubar.edit index tk_choose_font_marker]
+            .menubar.edit entryconfigure $index \
+                -label [mc "Show Fonts"]\
+                -accelerator "$mod-T"\
+                -command [list ::tk::console::FontchooserToggle]
+            bind Console <<TkFontchooserVisibility>> \
+                [list ::tk::console::FontchooserVisibility $index]
+	    ::tk::console::FontchooserVisibility $index
+        } else {
+            AmpMenuArgs .menubar.edit add command -label [mc "&Font..."] \
+                -command [list ::tk::console::FontchooserToggle]
+        }
+	bind Console <FocusIn>  [list ::tk::console::FontchooserFocus %W 1]
+	bind Console <FocusOut> [list ::tk::console::FontchooserFocus %W 0]
+    }
     AmpMenuArgs .menubar.edit add command -label [mc "&Increase Font Size"] \
         -accel "$mod++" -command {event generate .console <<Console_FontSizeIncr>>}
     AmpMenuArgs .menubar.edit add command -label [mc "&Decrease Font Size"] \
         -accel "$mod+-" -command {event generate .console <<Console_FontSizeDecr>>}
+
+    if {[tk windowingsystem] eq "aqua"} {
+	.menubar add cascade -label [mc Window] -menu [menu .menubar.window]
+	.menubar add cascade -label [mc Help] -menu [menu .menubar.help]
+    }
 
     . configure -menu .menubar
 
@@ -390,8 +412,6 @@ proc ::tk::ConsoleBind {w} {
     bind Console <Control-KeyPress> {# nothing}
 
     foreach {ev key} {
-	<<Console_Prev>>		<Key-Up>
-	<<Console_Next>>		<Key-Down>
 	<<Console_NextImmediate>>	<Control-Key-n>
 	<<Console_PrevImmediate>>	<Control-Key-p>
 	<<Console_PrevSearch>>		<Control-Key-r>
@@ -425,6 +445,9 @@ proc ::tk::ConsoleBind {w} {
 	} {
 	    event add $ev $key
 	    bind Console $key {}
+	}
+	if {$::tk::console::useFontchooser} {
+	    bind Console <Command-Key-t> [list ::tk::console::FontchooserToggle]
 	}
     }
     bind Console <<Console_Expand>> {
@@ -474,18 +497,16 @@ proc ::tk::ConsoleBind {w} {
     }
     bind Console <Control-h> [bind Console <BackSpace>]
 
-    bind Console <Home> {
+    bind Console <<LineStart>> {
 	if {[%W compare insert < promptEnd]} {
 	    tk::TextSetCursor %W {insert linestart}
 	} else {
 	    tk::TextSetCursor %W promptEnd
 	}
     }
-    bind Console <Control-a> [bind Console <Home>]
-    bind Console <End> {
+    bind Console <<LineEnd>> {
 	tk::TextSetCursor %W {insert lineend}
     }
-    bind Console <Control-e> [bind Console <End>]
     bind Console <Control-d> {
 	if {[%W compare insert < promptEnd]} {
 	    break
@@ -535,10 +556,10 @@ proc ::tk::ConsoleBind {w} {
 	    %W delete insert {insert wordend}
 	}
     }
-    bind Console <<Console_Prev>> {
+    bind Console <<PrevLine>> {
 	tk::ConsoleHistory prev
     }
-    bind Console <<Console_Next>> {
+    bind Console <<NextLine>> {
 	tk::ConsoleHistory next
     }
     bind Console <Insert> {
@@ -562,11 +583,22 @@ proc ::tk::ConsoleBind {w} {
 
     bind Console <<Console_FontSizeIncr>> {
         set size [font configure TkConsoleFont -size]
-        font configure TkConsoleFont -size [incr size]
+        if {$size < 0} {set sign -1} else {set sign 1}
+        set size [expr {(abs($size) + 1) * $sign}]
+        font configure TkConsoleFont -size $size
+	if {$::tk::console::useFontchooser} {
+	    tk fontchooser configure -font TkConsoleFont
+	}
     }
     bind Console <<Console_FontSizeDecr>> {
         set size [font configure TkConsoleFont -size]
-        font configure TkConsoleFont -size [incr size -1]
+        if {abs($size) < 2} { return }
+        if {$size < 0} {set sign -1} else {set sign 1}
+        set size [expr {(abs($size) - 1) * $sign}]
+        font configure TkConsoleFont -size $size
+	if {$::tk::console::useFontchooser} {
+	    tk fontchooser configure -font TkConsoleFont
+	}
     }
 
     ##
@@ -669,6 +701,35 @@ proc ::tk::ConsoleAbout {} {
 
 Tcl $::tcl_patchLevel
 Tk $::tk_patchLevel"
+}
+
+# ::tk::console::Fontchooser* --
+# 	Let the user select the console font (TIP 324).
+
+proc ::tk::console::FontchooserToggle {} {
+    if {[tk fontchooser configure -visible]} {
+	tk fontchooser hide
+    } else {
+	tk fontchooser show
+    }
+}
+proc ::tk::console::FontchooserVisibility {index} {
+    if {[tk fontchooser configure -visible]} {
+	.menubar.edit entryconfigure $index -label [msgcat::mc "Hide Fonts"]
+    } else {
+	.menubar.edit entryconfigure $index -label [msgcat::mc "Show Fonts"]
+    }
+}
+proc ::tk::console::FontchooserFocus {w isFocusIn} {
+    if {$isFocusIn} {
+	tk fontchooser configure -parent $w -font TkConsoleFont \
+		-command [namespace code [list FontchooserApply]]
+    } else {
+	tk fontchooser configure -parent $w -font {} -command {}
+    }
+}
+proc ::tk::console::FontchooserApply {font args} {
+    catch {font configure TkConsoleFont {*}[font actual $font]}
 }
 
 # ::tk::console::TagProc --
@@ -913,8 +974,8 @@ proc ::tk::console::Expand {w {type ""}} {
  
 proc ::tk::console::ExpandPathname str {
     set pwd [EvalAttached pwd]
-    if {[catch {EvalAttached [list cd [file dirname $str]]} err]} {
-	return -code error $err
+    if {[catch {EvalAttached [list cd [file dirname $str]]} err opt]} {
+	return -options $opt $err
     }
     set dir [file tail $str]
     ## Check to see if it was known to be a directory and keep the trailing

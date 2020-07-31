@@ -1,3 +1,5 @@
 int32 mod_freq_value
+int32 mod_freq_value1
 ---
 int32 mod_freq_new_value
+int32 mod_freq_new_value1

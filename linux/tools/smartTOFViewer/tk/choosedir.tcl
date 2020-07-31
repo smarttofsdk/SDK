@@ -89,7 +89,7 @@ proc ::tk::dialog::file::chooseDir:: {args} {
 
     # Withdraw the window, then update all the geometry information
     # so we know how big it wants to be, then center the window in the
-    # display and de-iconify it.
+    # display (Motif style) and de-iconify it.
 
     ::tk::PlaceWindow $w widget $data(-parent)
     wm title $w $data(-title)
@@ -186,7 +186,8 @@ proc ::tk::dialog::file::chooseDir::Config {dataName argList} {
     }
 
     if {![winfo exists $data(-parent)]} {
-	error "bad window path name \"$data(-parent)\""
+	return -code error -errorcode [list TK LOOKUP WINDOW $data(-parent)] \
+	    "bad window path name \"$data(-parent)\""
     }
 }
 
@@ -209,9 +210,9 @@ proc ::tk::dialog::file::chooseDir::OkCmd {w} {
     # 4b.   If the value is different from the current directory, change to
     #       that directory.
 
-    set selection [tk::IconList_CurSelection $data(icons)]
+    set selection [$data(icons) selection get]
     if {[llength $selection] != 0} {
-	set iconText [tk::IconList_Get $data(icons) [lindex $selection 0]]
+	set iconText [$data(icons) get [lindex $selection 0]]
 	set iconText [file join $data(selectPath) $iconText]
 	Done $w $iconText
     } else {
@@ -259,10 +260,9 @@ proc ::tk::dialog::file::chooseDir::IsOK? {w text} {
 
 proc ::tk::dialog::file::chooseDir::DblClick {w} {
     upvar ::tk::dialog::file::[winfo name $w] data
-    set selection [tk::IconList_CurSelection $data(icons)]
+    set selection [$data(icons) selection get]
     if {[llength $selection] != 0} {
-	set filenameFragment \
-		[tk::IconList_Get $data(icons) [lindex $selection 0]]
+	set filenameFragment [$data(icons) get [lindex $selection 0]]
 	set file $data(selectPath)
 	if {[file isdirectory $file]} {
 	    ::tk::dialog::file::ListInvoke $w [list $filenameFragment]

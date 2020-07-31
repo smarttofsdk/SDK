@@ -18,14 +18,19 @@
  *
  * *******************************************************************/
 #include "tofhandle.h"
+#include <pwd.h>
+#include <unistd.h>
+#define FILTER_ID_LEN_CALIB   1 //lens calibration
+#define FILTER_ID_PIXEL_CALIB 0 //pixel calibration 
+#define FILTER_ID_GAUSS       1 //Gauss filter for distance data
+#define FILTER_ID_AMP         1 //Amplitude filter control
+#define FILTER_ID_AUTO_INTG   0 //auto integration filter enable : use sat_ratio to adjust
+#define FILTER_ID_SYNC_DELAY  0 //
+#define FILTER_CNT            0 //
+#define FILTER_ID_MEDIAN      1
+#define FILTER_ID_HDR         0
+#define FILTER_ID_FLYNOISE    0
 
-#define FILTER_ID_LEN_CALIB     0 //lens calibration
-#define FILTER_ID_PIXEL_CALIB   0 //pixel calibration 
-#define FILTER_ID_GAUSS         0 //Gauss filter for distance data
-#define FILTER_ID_AMP           0 //Amplitude filter control
-#define FILTER_ID_AUTO_INTG     0 //auto integration filter enable : use sat_ratio to adjust
-#define FILTER_ID_SYNC_DELAY    0 //
-#define FILTER_CNT              0 //
 
 #define EPC_DEVICE_635      "EPC635"
 #define EPC_DEVICE_660      "EPC660"
@@ -100,7 +105,7 @@ std::string TofHandle::checkDeviceType()
         return "";
     }
 
-    //EPC device id:E1��E2��E3��E4��SONY device id��S1
+    //EPC device id:E1、E2、E3、E4，SONY device id：S1
     if (pid[0] == 'E')
     {
         int chip_type = epcGetPartType();
@@ -154,28 +159,51 @@ void TofHandle::getFrameInfo(std::string deviceType)
 //initial tof
 void TofHandle::tofInitialize(void)
 {
-    dmcam_init(NULL);
-    dmcam_log_cfg(LOG_LEVEL_INFO, LOG_LEVEL_INFO, LOG_LEVEL_NONE);
+    struct passwd *pwd;
+    pwd = getpwuid(getuid());
+    char dmcamLogName[100] = { 0 };
+    char dmcamPath[100] = { 0 };
+    sprintf(dmcamLogName,"/home/%s/tmp/dmcam.log",pwd->pw_name);
+    sprintf(dmcamPath,"/home/%s/tmp/",pwd->pw_name);
+    ROS_INFO("dmcamLogName is %s,dmcamPath is %s \n",dmcamLogName,dmcamPath);
+    dmcam_init(dmcamLogName);
+	dmcam_log_cfg(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_NONE);
+    dmcam_path_set(dmcamPath);
     //try to open smart tof
     dmcam_dev_t dev_list[4];
+    std::string oniFileName;
+    m_nodeHandle->getParam("oni_file", oniFileName);
+    ROS_INFO("[tofInitialize] open oni file name is %s\n", oniFileName.c_str());
+    if(!oniFileName.empty())
+    {
+        m_dev = dmcam_dev_open_by_uri(oniFileName.c_str());
+    }else
+    {
+        int dev_cnt = dmcam_dev_list(dev_list, 4);
+        ROS_INFO("[SMART TOF]%d dmcam device found!", dev_cnt);
+        if (dev_cnt == 0) {
+            ROS_INFO("[SMART TOF]find device failed. Please kill the process and check your device.");
+            return;
+        }
+    #if NEEDSUDO
+        sudodev(&dev_list[0]);
+    #endif
 
-    int dev_cnt = dmcam_dev_list(dev_list, 4);
-    ROS_INFO("[SMART TOF]%d dmcam device found!", dev_cnt);
-    if (dev_cnt == 0) {
-        ROS_INFO("[SMART TOF]find device failed. Please kill the process and check your device.");
-        return;
+        m_dev = dmcam_dev_open(NULL);
+        if (!m_dev) {
+            ROS_INFO("[SMART TOF]open device failed!");
+            return;
+        } else {
+            ROS_INFO("[SMART TOF]open device succeeded!");
+        }
     }
-#if NEEDSUDO
-    sudodev(&dev_list[0]);
-#endif
-    m_dev = dmcam_dev_open(NULL);
-
-    if (!m_dev) {
-        ROS_INFO("[SMART TOF]open device failed!");
-        return;
-    } else {
-        ROS_INFO("[SMART TOF]open device succeeded!");
-    }
+    
+    dmcam_cap_cfg_t cap_cfg;
+    memset(&cap_cfg,0,sizeof(dmcam_cap_cfg_t));
+    cap_cfg.en_fdev_rewind = true;
+    cap_cfg.cache_frames_cnt = 10;
+    dmcam_cap_config_set(m_dev, &cap_cfg);
+    
     //init the device opened
     std::string deviceType = checkDeviceType();
     getFrameInfo(deviceType);
@@ -186,6 +214,8 @@ void TofHandle::tofInitialize(void)
     m_cameraState = 1;
     dmcam_cap_start(m_dev);
     ROS_INFO("[SMART TOF]curfsize=%d\n", m_curfsize);
+
+    ROS_INFO("[SMART TOF]curfsize=%s\n", dmcam_path_get());
 }
 
 //initialize server
@@ -197,6 +227,8 @@ void TofHandle::serverInitialize(void)
     m_filterType.insert(std::make_pair("DMCAM_FILTER_ID_AUTO_INTG", DMCAM_FILTER_ID_AUTO_INTG));
     m_filterType.insert(std::make_pair("DMCAM_FILTER_ID_SYNC_DELAY", DMCAM_FILTER_ID_SYNC_DELAY));
     m_filterType.insert(std::make_pair("DMCAM_FILTER_CNT", DMCAM_FILTER_CNT));
+    m_filterType.insert(std::make_pair("DMCAM_FILTER_ID_FLYNOISE", DMCAM_FILTER_ID_FLYNOISE));
+    m_filterType.insert(std::make_pair("DMCAM_FILTER_ID_HDR", DMCAM_FILTER_ID_HDR));
 
     m_changePowerServer = m_nodeHandle->advertiseService("/smarttof/change_power", &TofHandle::changePower, this);
     m_changeIntgServer = m_nodeHandle->advertiseService("/smarttof/change_intg", &TofHandle::changeIntgTime, this);
@@ -219,10 +251,14 @@ void TofHandle::paramInitialize(dmcam_dev_t *dev)
     m_nodeHandle->getParam("format",          param_value[2]);
     m_nodeHandle->getParam("power_percent",   param_value[3]);
     m_nodeHandle->getParam("fps",             param_value[4]);
-    m_nodeHandle->getParam("intg_us",      param_value[5]);
+    m_nodeHandle->getParam("intg_us",         param_value[5]);
     m_nodeHandle->getParam("sync_delay",      param_value[6]);
-    m_nodeHandle->getParam("enableflip", param_value[7]);
-    m_nodeHandle->getParam("flipcode", param_value[8]);
+    m_nodeHandle->getParam("enableflip",      param_value[7]);
+    m_nodeHandle->getParam("flipcode",        param_value[8]);
+    m_nodeHandle->getParam("srow",            param_value[9]);
+    m_nodeHandle->getParam("erow",            param_value[10]);
+    m_nodeHandle->getParam("scol",            param_value[11]);
+    m_nodeHandle->getParam("ecol",            param_value[12]);
     m_devMode         = param_value[0];
     m_modFreq         = param_value[1];
     m_format          = param_value[2];
@@ -232,45 +268,49 @@ void TofHandle::paramInitialize(dmcam_dev_t *dev)
     m_syncDelay       = param_value[6];
     m_enbaleFlip      = param_value[7];
     m_flipCode        = param_value[8];
+    m_roi.srow        = param_value[9];
+    m_roi.erow        = param_value[10];
+    m_roi.scol        = param_value[11];
+    m_roi.ecol        = param_value[12];
     printf("----------setting params----------\n");
     dmcam_param_item_t param_items[7];
     param_items[0].param_id = PARAM_DEV_MODE;
     param_items[0].param_val.dev_mode = m_devMode;
     param_items[0].param_val_len = sizeof(m_devMode);
 
-    param_items[1].param_id = PARAM_ILLUM_POWER;
-    param_items[1].param_val.illum_power.percent = power_percent;
-    param_items[1].param_val_len = sizeof(power_percent);
-
-
-    memset(&param_items[2], 0, sizeof(param_items[2]));
-    param_items[2].param_id = PARAM_INTG_TIME;
-    param_items[2].param_val.intg.intg_us = m_intgTime;
-    param_items[2].param_val_len = sizeof(m_intgTime);
+    memset(&param_items[1], 0, sizeof(param_items[2]));
+    param_items[1].param_id = PARAM_INTG_TIME;
+    param_items[1].param_val.intg.intg_us = m_intgTime;
+    param_items[1].param_val_len = sizeof(m_intgTime);
     
-    param_items[3].param_id = PARAM_FRAME_FORMAT;
-    param_items[3].param_val.frame_format.format = m_format;
-    param_items[3].param_val_len = sizeof(m_format);
+    param_items[2].param_id = PARAM_FRAME_FORMAT;
+    param_items[2].param_val.frame_format.format = m_format;
+    param_items[2].param_val_len = sizeof(m_format);
 
-    param_items[4].param_id = PARAM_MOD_FREQ;
-    param_items[4].param_val.mod_freq = m_modFreq;
-    param_items[4].param_val_len = sizeof(m_modFreq);
+    if(m_format==2 || m_format==0x0f){
+        param_items[3].param_id = PARAM_MOD_FREQ;
+        param_items[3].param_val.mod_freq = m_modFreq;
+        param_items[3].param_val_len = sizeof(m_modFreq);
+    }
+    else if(m_format==0x11){
+        param_items[3].param_id = PARAM_DUAL_MOD_FREQ;
+        param_items[3].param_val.dual_freq.mod_freq0 = 54000000;
+        param_items[3].param_val.dual_freq.mod_freq1 = 92000000;
+        param_items[3].param_val_len = 2*sizeof(m_modFreq);
+    }
 
-    param_items[5].param_id = PARAM_FRAME_RATE;
-    param_items[5].param_val.frame_rate.fps = m_fps;
-    param_items[5].param_val_len = sizeof(m_fps);
+    param_items[4].param_id = PARAM_FRAME_RATE;
+    param_items[4].param_val.frame_rate.fps = m_fps;
+    param_items[4].param_val_len = sizeof(m_fps);
 
-    param_items[6].param_id = PARAM_HDR_INTG_TIME;
-    param_items[6].param_val.intg.intg_us = m_intgTime;
-    param_items[6].param_val_len = sizeof(m_intgTime);
-
+    
     printf("param mode is %d\n", param_items[0].param_val.dev_mode);
-    printf("param power is %d\n", param_items[1].param_val.illum_power.percent);
-    printf("param intg time is %d\n", param_items[2].param_val.intg.intg_us);
-    printf("param format is %d\n", param_items[3].param_val.frame_format.format);
-    printf("param freq is %d\n", param_items[4].param_val.mod_freq);
-    printf("param m_fps is %d\n", param_items[5].param_val.frame_rate.fps);
-    for (int i = 0; i < 7; ++i) {
+    //printf("param power is %d\n", param_items[1].param_val.illum_power.percent);
+    printf("param intg time is %d\n", param_items[1].param_val.intg.intg_us);
+    printf("param format is %d\n", param_items[2].param_val.frame_format.format);
+    //printf("param freq is %d\n", param_items[3].param_val.mod_freq);
+    printf("param m_fps is %d\n", param_items[4].param_val.frame_rate.fps);
+    for (int i = 0; i < 5; ++i) {
         flag = dmcam_param_batch_set(dev, &(param_items[i]), 1);
     }
 
@@ -279,15 +319,35 @@ void TofHandle::paramInitialize(dmcam_dev_t *dev)
 
     //camera intrinsic
     double tmp_param;
+    cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
     m_nodeHandle->getParam("cx", tmp_param);
     cam_int_param.cx = tmp_param;
+    cameraMatrix.at<double>(0, 2) = tmp_param; //u
     m_nodeHandle->getParam("cy", tmp_param);
     cam_int_param.cy = tmp_param;
+    cameraMatrix.at<double>(1, 2) = tmp_param;  //v
     m_nodeHandle->getParam("fx", tmp_param);
     cam_int_param.fx = tmp_param;
+    cameraMatrix.at<double>(0, 0) = tmp_param;  //fx
     m_nodeHandle->getParam("fy", tmp_param);
     cam_int_param.fy = tmp_param;
+    cameraMatrix.at<double>(1, 1) = tmp_param;  //fy
+    intrinsicmat.cx = cam_int_param.cx;
+    intrinsicmat.cy = cam_int_param.cy;
+    intrinsicmat.fx = cam_int_param.fx;
+    intrinsicmat.fy = cam_int_param.fy;
+    intrinsicmat.scale = 1;
 
+    XmlRpc::XmlRpcValue param_list;
+    m_nodeHandle->getParam("dcoeff", param_list);
+    distCoeffs = cv::Mat::zeros(5, 1, CV_64F);
+    for(int i=0; i<param_list.size(); ++i){
+        cam_int_param.dcoef[i] = double(param_list[i]);
+        distCoeffs.at<double>(i, 0) = double(param_list[i]);
+    }
+    cv::initUndistortRectifyMap( cameraMatrix, distCoeffs, cv::Mat::eye(3,3,CV_64F), \
+                                 cameraMatrix, cv::Size((m_roi.ecol-m_roi.scol), (m_roi.erow-m_roi.srow)), \
+                                     CV_32F, map1, map2 );
     //camera info init
     m_cameraInfoMessage.height = m_height;
     m_cameraInfoMessage.width = m_width;
@@ -338,6 +398,51 @@ void TofHandle::paramInitialize(dmcam_dev_t *dev)
         printf("[%d]get flag is %d, parameter len we get %d, ", PARAM_INTG_TIME, flag, get_param1.param_val_len);
         printf("get intg time is %d\n", get_param1.param_val.intg.intg_us);
     }
+        /*filter*/
+    dmcam_filter_args_u filter_args;
+
+#if     FILTER_ID_LEN_CALIB
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_LEN_CALIB, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_ID_PIXEL_CALIB
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_PIXEL_CALIB, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_ID_AMP
+    filter_args.min_amp = 30;
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AMP, &filter_args, sizeof(filter_args));
+#endif
+
+#if FILTER_ID_MEDIAN
+    filter_args.median_ksize = 100;
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_MEDIAN, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_ID_AUTO_INTG
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AUTO_INTG, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_ID_SYNC_DELAY
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_SYNC_DELAY, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_CNT
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_CNT, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_ID_FLYNOISE
+    filter_args.fly_noise_threshold = 20;
+    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_FLYNOISE, &filter_args, sizeof(filter_args));
+#endif
+
+#if     FILTER_ID_HDR
+    if(m_format==0x0f){
+        filter_args.intg.intg_3d = 100;     //HDR 模式时小的曝光时间
+        filter_args.intg.intg_3dhdr = 900;  //HDR 模式时大的曝光时间
+        dmcam_filter_enable(m_dev,DMCAM_FILTER_ID_HDR,&filter_args,sizeof(filter_args)); //开启HDR模式
+    }
+#endif            
 }
 
 //initial topics
@@ -401,80 +506,75 @@ void TofHandle::getOneFrame(void)
 }
 
 //pub image
-void TofHandle::publicImage(void)
+void TofHandle::publicImage(void) //pub_image in SDK1.72
 {
     /*prepare header information*/
     m_imgHeadMsg.stamp     = ros::Time::now();
-
-    /*publish image_gray*/
-    dmcam_frame_get_gray(m_dev, m_rbgBuffer, m_width * m_height, m_frameBuffer, m_frameInfo.frame_info.frame_size, &m_frameInfo.frame_info);
-    cv::Mat img_gray(m_height, m_width, CV_32FC1, m_rbgBuffer);
-
-    //image flip code  0 : ��ֱ��ת, 1 : ˮƽ��ת, -1 : ˮƽ��ֱ��תת
-     if (m_enbaleFlip)
-     {
-         cv::flip(img_gray, img_gray, m_flipCode);
-     }
-
-    img_gray.convertTo(img_gray,CV_8UC1);
-    m_imageGrayPub.publish(sensor_msgs::ImagePtr(cv_bridge::CvImage(m_imgHeadMsg, "mono8", img_gray).toImageMsg()));
-
-    /*filter*/
-    dmcam_filter_args_u filter_args;
-
-#if     FILTER_ID_LEN_CALIB
-    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_LEN_CALIB, &filter_args, sizeof(filter_args));
-#endif
-
-#if     FILTER_ID_PIXEL_CALIB
-    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_PIXEL_CALIB, &filter_args, sizeof(filter_args));
-#endif
-
-//#if     FILTER_ID_KALMAN
-    //dmcam_filter_enable(dev, DMCAM_FILTER_ID_KALMAN, &filter_args, sizeof(filter_args));
-//#endif
-
-#if     FILTER_ID_AMP
-    filter_args.min_amp = 30;
-    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AMP, &filter_args, sizeof(filter_args));
-#endif
-
-#if     FILTER_ID_AUTO_INTG
-    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AUTO_INTG, &filter_args, sizeof(filter_args));
-#endif
-
-#if     FILTER_ID_SYNC_DELAY
-    dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_SYNC_DELAY, &filter_args, sizeof(filter_args));
-#endif
-
-#if     FILTER_CNT
-    dmcam_filter_enable(m_dev, DMCAM_FILTER_CNT, &filter_args, sizeof(filter_args));
-#endif
 
     int pix_cnt = dmcam_frame_get_distance(m_dev, m_rbgBuffer, m_width * m_height, m_frameBuffer, m_frameInfo.frame_info.frame_size, &m_frameInfo.frame_info);
     if (pix_cnt != m_height * m_width) 
     {
         printf(" unmatch pixcnt: %d, HxW: %dx%d\n", pix_cnt, m_height, m_width);
     }
+    /*
+    const dmcam_lens_calib_cfg_t* temp = dmcam_lens_calib_config_get(m_dev);
+    if(temp->en_2d_calib)
+    {   
+        int dst_len = m_width * m_height;
+        float *m_rbgBuffer_temp = new float[m_width*m_height];
+        memcpy(m_rbgBuffer_temp, m_rbgBuffer, sizeof(float)*m_width*m_height);
+        dmcam_lens_calib_apply_dist_f32(m_dev, m_rbgBuffer, dst_len, (const float *)m_rbgBuffer_temp, dst_len, &m_frameInfo.frame_info, NULL);
+        delete(m_rbgBuffer_temp);
+    }
+    //publish point cloud
+    cv::Mat img_dist(m_height, m_width, CV_32FC1, m_rbgBuffer);
+    cv::Mat img_dist_rectified = cv::Mat::zeros(m_height, m_width,CV_32FC1);
+    if (m_enbaleFlip)cv::flip(img_dist, img_dist, m_flipCode);
+    undistort(img_dist, img_dist_rectified,cameraMatrix, distCoeffs,cameraMatrix);
+    if (pix_cnt != m_height * m_width)
+    {
+        printf(" unmatch pixcnt: %d, HxW: %dx%d\n", pix_cnt, m_height, m_width);
+    }
+    */
     publicPointCloud(m_rbgBuffer);
 
-    /*publish image dist*/
+    //publish image dist
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg; // message to be sent
-
-    /* convert dist to pseudo img */
+    // convert dist to pseudo img 
     dmcam_cmap_dist_f32_to_RGB(dist_pseudo_rgb, m_curfsize  * 3, m_rbgBuffer, pix_cnt, DMCAM_CMAP_OUTFMT_RGB, 0.0, 5.0,NULL);
-
     cv::Mat img_dist_rgb(m_height, m_width, CV_8UC3, dist_pseudo_rgb);
-     if (m_enbaleFlip)
-     {
-         cv::flip(img_dist_rgb, img_dist_rgb, m_flipCode);      
-     }
-
-    img_bridge = cv_bridge::CvImage(m_imgHeadMsg, sensor_msgs::image_encodings::RGB8, img_dist_rgb);
+    cv::Mat img_dist_rgb_rect;
+    img_dist_rgb_rect=img_dist_rgb.clone();
+    //cv::undistort(img_dist_rgb, img_dist_rgb_rect,cameraMatrix, distCoeffs,cameraMatrix);
+    img_bridge = cv_bridge::CvImage(m_imgHeadMsg, sensor_msgs::image_encodings::RGB8, img_dist_rgb_rect);
     img_bridge.toImageMsg(img_msg);
     m_imageDistPub.publish(img_msg);
-    
+
+    // publish image_gray
+    dmcam_frame_get_gray(m_dev, m_rbgBuffer, m_width * m_height, m_frameBuffer, m_frameInfo.frame_info.frame_size, &m_frameInfo.frame_info);
+    /*
+    if(temp->en_2d_calib)
+    {   
+        int gray_len = m_width * m_height;
+        float *m_rbgBuffer_temp = new float[m_width*m_height];
+        memcpy(m_rbgBuffer_temp, m_rbgBuffer, sizeof(float)*m_width*m_height);
+        dmcam_lens_calib_apply_gray_f32(m_dev, m_rbgBuffer, gray_len, (const float *)m_rbgBuffer_temp, gray_len, &m_frameInfo.frame_info, NULL);
+        delete(m_rbgBuffer_temp);
+    }*/
+    cv::Mat img_gray(m_height, m_width, CV_32FC1, m_rbgBuffer);
+    //image flip code  0 : 垂直翻转, 1 : 水平翻转, -1 : 水平垂直翻转转
+    if (m_enbaleFlip)cv::flip(img_gray, img_gray, m_flipCode);
+    img_gray.convertTo(img_gray,CV_8UC1);
+    cv::Mat img_gray_rectified;
+    img_gray_rectified=img_gray.clone();
+    //cv::undistort(img_gray, img_gray_rectified,cameraMatrix, distCoeffs);
+    if(m_testMode)
+    {
+        cv::imshow("img gray", img_gray_rectified);
+    }
+    m_imageGrayPub.publish(sensor_msgs::ImagePtr(cv_bridge::CvImage(m_imgHeadMsg, "mono8", img_gray_rectified).toImageMsg()));
+
     if (m_testMode) {
         cv::waitKey(1);
         cv::moveWindow("img gray", 1, 480);
@@ -544,6 +644,9 @@ bool TofHandle::changeParameters(dmcam_param_item_t params)
             case PARAM_MOD_FREQ:
                 printf("change_parameters mod_freq is %d\n", params.param_val.mod_freq);
                 break;
+            case PARAM_DUAL_MOD_FREQ:
+                printf("change_parameters mod_freq1 is %d; mod_freq2 is %d\n", params.param_val.dual_freq.mod_freq0,params.param_val.dual_freq.mod_freq1);
+                break;
             case PARAM_SYNC_DELAY:
                 printf("change_parameters sync_delay is %d\n", params.param_val.sync_delay.delay);
                 break;
@@ -599,13 +702,36 @@ bool TofHandle::changeFrameRate(dmcam_ros::change_frame_rate::Request& req, dmca
 
 bool TofHandle::changeModFreq(dmcam_ros::change_mod_freq::Request& req, dmcam_ros::change_mod_freq::Response& res)
 {
-    m_modFreq = req.mod_freq_value;
-    res.mod_freq_new_value = m_modFreq;
+    m_modFreq = req.mod_freq_value;     m_modFreq1 = req.mod_freq_value1;
     dmcam_param_item_t reset_mod_freq;
     memset(&reset_mod_freq, 0, sizeof(reset_mod_freq));
-    reset_mod_freq.param_id = PARAM_MOD_FREQ;
-    reset_mod_freq.param_val.mod_freq = m_modFreq;
-    reset_mod_freq.param_val_len = sizeof(m_modFreq);
+    if(m_modFreq1==0 || m_modFreq1 <= m_modFreq){
+        std::cout<<"change_filter_id is 1111";
+        dmcam_param_item_t wparam;
+        memset(&wparam,0,sizeof(wparam));
+        wparam.param_id = PARAM_FRAME_FORMAT;
+        wparam.param_val.frame_format.format = 2;
+        wparam.param_val_len = sizeof(m_format);
+        dmcam_param_batch_set(m_dev,&wparam,1);
+        reset_mod_freq.param_id = PARAM_MOD_FREQ;
+        reset_mod_freq.param_val.mod_freq = m_modFreq;
+        reset_mod_freq.param_val_len = sizeof(m_modFreq);
+    }
+    else{
+        std::cout<<"change_filter_id is 1112";
+        dmcam_param_item_t wparam;
+        memset(&wparam,0,sizeof(wparam));
+        wparam.param_id = PARAM_FRAME_FORMAT;
+        wparam.param_val.frame_format.format = 0x11;
+        wparam.param_val_len = sizeof(m_format);
+        dmcam_param_batch_set(m_dev,&wparam,1);
+        reset_mod_freq.param_id = PARAM_DUAL_MOD_FREQ;
+        reset_mod_freq.param_val.dual_freq.mod_freq0 = m_modFreq;
+        reset_mod_freq.param_val.dual_freq.mod_freq1 = m_modFreq1;
+        reset_mod_freq.param_val_len = 2*sizeof(m_modFreq);
+    }
+    std::cout<<"change_filter_id is 2222"<<std::endl;
+    res.mod_freq_new_value = m_modFreq; res.mod_freq_new_value1 = m_modFreq1;
     return changeParameters(reset_mod_freq);
 }
 bool TofHandle::changeSyncDelay(dmcam_ros::change_sync_delay::Request& req, dmcam_ros::change_sync_delay::Response& res)
@@ -634,36 +760,99 @@ bool TofHandle::changeFilter(dmcam_ros::change_filter::Request& req, dmcam_ros::
             filter_type = itor->second;
         }
     }
+    switch (filter_type)
+    {
+    case DMCAM_FILTER_ID_LEN_CALIB:
+        std::cout<<"change_filter_id is 1111";
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_LEN_CALIB, &filter_args, sizeof(filter_args));
+        break;
+    case DMCAM_FILTER_ID_PIXEL_CALIB:
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_PIXEL_CALIB, &filter_args, sizeof(filter_args));
+        break;
+    case DMCAM_FILTER_ID_AMP:
+        if(filter_value == 0)
+        {
+            filter_value = 30;
+        }
+        filter_args.min_amp = filter_value;
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AMP, &filter_args, sizeof(filter_args));
+        break;
+    case DMCAM_FILTER_ID_AUTO_INTG:
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AUTO_INTG, &filter_args, sizeof(filter_args));
+        break;
+    case DMCAM_FILTER_ID_SYNC_DELAY:
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_SYNC_DELAY, &filter_args, sizeof(filter_args));
+        break;
+    case DMCAM_FILTER_CNT:
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_CNT, &filter_args, sizeof(filter_args));
+        break;
+    case DMCAM_FILTER_ID_HDR:
+        printf("change_filter_id is 1117");
+        dmcam_param_item_t wparam;
+        memset(&wparam,0,sizeof(wparam));
+        wparam.param_id = PARAM_FRAME_FORMAT;
+        wparam.param_val.frame_format.format = 0x0f;
+        wparam.param_val_len = sizeof(m_format);
+        dmcam_param_batch_set(m_dev,&wparam,1);
+        filter_args.intg.intg_3d = m_intgTime;        //HDR 模式时小的曝光时间
+        filter_args.intg.intg_3dhdr = filter_value;  //HDR 模式时大的曝光时间
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_HDR, &filter_args, sizeof(filter_args)); //开启HDR模式
+        break;
+    case DMCAM_FILTER_ID_FLYNOISE:
+        filter_args.fly_noise_threshold = filter_value;
+        dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_FLYNOISE, &filter_args, sizeof(filter_args)); //start flynoise filter
+        break;
+    default:
+        break;
+    }
+    std::cout<<"change_filter_id is 2222"<<std::endl;
     res.change_filter_id = req.filter_id.c_str();
     res.change_filter_value = req.filter_value;
-    switch (filter_type)
-        {
-        case DMCAM_FILTER_ID_LEN_CALIB:
-            dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_LEN_CALIB, &filter_args, sizeof(filter_args));
-            break;
-        case DMCAM_FILTER_ID_PIXEL_CALIB:
-            dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_PIXEL_CALIB, &filter_args, sizeof(filter_args));
-            break;
-        case DMCAM_FILTER_ID_AMP:
-            if(filter_value == 0)
-            {
-                filter_value = 30;
-            }
-            filter_args.min_amp = filter_value;
-            dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AMP, &filter_args, sizeof(filter_args));
-            break;
-        case DMCAM_FILTER_ID_AUTO_INTG:
-            dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_AUTO_INTG, &filter_args, sizeof(filter_args));
-            break;
-        case DMCAM_FILTER_ID_SYNC_DELAY:
-            dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_SYNC_DELAY, &filter_args, sizeof(filter_args));
-            break;
-        case DMCAM_FILTER_CNT:
-            dmcam_filter_enable(m_dev, DMCAM_FILTER_CNT, &filter_args, sizeof(filter_args));
-            break;
-        default:
-            break;
-        }
+}
+
+void TofHandle::undistort( cv::InputArray _src, cv::OutputArray _dst, cv::InputArray _cameraMatrix,
+                cv::InputArray _distCoeffs, cv::InputArray _newCameraMatrix )
+{
+    cv::Mat src = _src.getMat(), cameraMatrix = _cameraMatrix.getMat();
+    cv::Mat distCoeffs = _distCoeffs.getMat(), newCameraMatrix = _newCameraMatrix.getMat();
+
+    _dst.create( src.size(), src.type() );
+    cv::Mat dst = _dst.getMat();
+
+    CV_Assert( dst.data != src.data );
+
+    int stripe_size0 = std::min(std::max(1, (1 << 12) / std::max(src.cols, 1)), src.rows);
+    cv::Mat map1(stripe_size0, src.cols, CV_16SC2), map2(stripe_size0, src.cols, CV_16UC1);
+
+    cv::Mat_<double> A, Ar, I = cv::Mat_<double>::eye(3,3);
+
+    cameraMatrix.convertTo(A, CV_64F);
+    if( !distCoeffs.empty() )
+        distCoeffs = cv::Mat_<double>(distCoeffs);
+    else
+    {
+        distCoeffs.create(5, 1, CV_64F);
+        distCoeffs = 0.;
+    }
+
+    if( !newCameraMatrix.empty() )
+        newCameraMatrix.convertTo(Ar, CV_64F);
+    else
+        A.copyTo(Ar);
+
+    double v0 = Ar(1, 2);
+    for( int y = 0; y < src.rows; y += stripe_size0 )
+    {
+        int stripe_size = std::min( stripe_size0, src.rows - y );
+        Ar(1, 2) = v0 - y;
+        cv::Mat map1_part = map1.rowRange(0, stripe_size),
+            map2_part = map2.rowRange(0, stripe_size),
+            dst_part = dst.rowRange(y, y + stripe_size);
+
+        cv::initUndistortRectifyMap( A, distCoeffs, I, Ar, cv::Size(src.cols, stripe_size),
+                                 map1_part.type(), map1_part, map2_part );
+        cv::remap( src, dst_part, map1_part, map2_part, cv::INTER_NEAREST, cv::BORDER_REPLICATE );
+    }
 }
 
 bool TofHandle::disableFilter(dmcam_ros::disable_filter::Request& req, dmcam_ros::disable_filter::Response& res)
@@ -675,29 +864,36 @@ bool TofHandle::disableFilter(dmcam_ros::disable_filter::Request& req, dmcam_ros
         if (itor->first == req.filter_id){
             filter_type = itor->second;
         }
-    }    
-    res.disable_filter_id = req.filter_id.c_str();
+    }
     switch (filter_type)
-        {    
-        case DMCAM_FILTER_ID_LEN_CALIB:
-            dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_LEN_CALIB);
-            break;
-        case DMCAM_FILTER_ID_PIXEL_CALIB:
-            dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_PIXEL_CALIB);
-            break;
-        case DMCAM_FILTER_ID_AMP:
-            dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_AMP);
-            break;
-        case DMCAM_FILTER_ID_AUTO_INTG:
-            dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_AUTO_INTG);    
-            break;
-        case DMCAM_FILTER_ID_SYNC_DELAY:
-            dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_SYNC_DELAY);
-            break;
-        case DMCAM_FILTER_CNT:
-            dmcam_filter_disable(m_dev, DMCAM_FILTER_CNT);
-            break;
-        default:
-            break;
-        }
+    {    
+    case DMCAM_FILTER_ID_LEN_CALIB:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_LEN_CALIB);
+        break;
+    case DMCAM_FILTER_ID_PIXEL_CALIB:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_PIXEL_CALIB);
+        break;
+    case DMCAM_FILTER_ID_AMP:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_AMP);
+        break;
+    case DMCAM_FILTER_ID_AUTO_INTG:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_AUTO_INTG);    
+        break;
+    case DMCAM_FILTER_ID_SYNC_DELAY:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_SYNC_DELAY);
+        break;
+    case DMCAM_FILTER_CNT:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_CNT);
+        break;
+    case DMCAM_FILTER_ID_HDR:
+        dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_HDR); //close HDR
+        break;
+    case DMCAM_FILTER_ID_FLYNOISE:
+        //int a = dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_FLYNOISE); //stop flynoise filter
+        std::cout<<dmcam_filter_disable(m_dev, DMCAM_FILTER_ID_FLYNOISE)<<std::endl;
+        break;
+    default:
+        break;
+    }
+    res.disable_filter_id = req.filter_id.c_str();
 }

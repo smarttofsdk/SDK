@@ -91,28 +91,28 @@ bind Scrollbar <Control-2> {
     tk::ScrollTopBottom %W %x %y
 }
 
-bind Scrollbar <Up> {
+bind Scrollbar <<PrevLine>> {
     tk::ScrollByUnits %W v -1
 }
-bind Scrollbar <Down> {
+bind Scrollbar <<NextLine>> {
     tk::ScrollByUnits %W v 1
 }
-bind Scrollbar <Control-Up> {
+bind Scrollbar <<PrevPara>> {
     tk::ScrollByPages %W v -1
 }
-bind Scrollbar <Control-Down> {
+bind Scrollbar <<NextPara>> {
     tk::ScrollByPages %W v 1
 }
-bind Scrollbar <Left> {
+bind Scrollbar <<PrevChar>> {
     tk::ScrollByUnits %W h -1
 }
-bind Scrollbar <Right> {
+bind Scrollbar <<NextChar>> {
     tk::ScrollByUnits %W h 1
 }
-bind Scrollbar <Control-Left> {
+bind Scrollbar <<PrevWord>> {
     tk::ScrollByPages %W h -1
 }
-bind Scrollbar <Control-Right> {
+bind Scrollbar <<NextWord>> {
     tk::ScrollByPages %W h 1
 }
 bind Scrollbar <Prior> {
@@ -121,25 +121,41 @@ bind Scrollbar <Prior> {
 bind Scrollbar <Next> {
     tk::ScrollByPages %W hv 1
 }
-bind Scrollbar <Home> {
+bind Scrollbar <<LineStart>> {
     tk::ScrollToPos %W 0
 }
-bind Scrollbar <End> {
+bind Scrollbar <<LineEnd>> {
     tk::ScrollToPos %W 1
 }
 }
-if {[tk windowingsystem] eq "aqua"} {
-    bind Scrollbar <MouseWheel> {
-        tk::ScrollByUnits %W v [expr {- (%D)}]
+switch [tk windowingsystem] {
+    "aqua" {
+	bind Scrollbar <MouseWheel> {
+	    tk::ScrollByUnits %W v [expr {- (%D)}]
+	}
+	bind Scrollbar <Option-MouseWheel> {
+	    tk::ScrollByUnits %W v [expr {-10 * (%D)}]
+	}
+	bind Scrollbar <Shift-MouseWheel> {
+	    tk::ScrollByUnits %W h [expr {- (%D)}]
+	}
+	bind Scrollbar <Shift-Option-MouseWheel> {
+	    tk::ScrollByUnits %W h [expr {-10 * (%D)}]
+	}
     }
-    bind Scrollbar <Option-MouseWheel> {
-        tk::ScrollByUnits %W v [expr {-10 * (%D)}]
+    "win32" {
+	bind Scrollbar <MouseWheel> {
+	    tk::ScrollByUnits %W v [expr {- (%D / 120) * 4}]
+	}
+	bind Scrollbar <Shift-MouseWheel> {
+	    tk::ScrollByUnits %W h [expr {- (%D / 120) * 4}]
+	}
     }
-    bind Scrollbar <Shift-MouseWheel> {
-        tk::ScrollByUnits %W h [expr {- (%D)}]
-    }
-    bind Scrollbar <Shift-Option-MouseWheel> {
-        tk::ScrollByUnits %W h [expr {-10 * (%D)}]
+    "x11" {
+	bind Scrollbar <4> {tk::ScrollByUnits %W v -5}
+	bind Scrollbar <5> {tk::ScrollByUnits %W v 5}
+	bind Scrollbar <Shift-4> {tk::ScrollByUnits %W h -5}
+	bind Scrollbar <Shift-5> {tk::ScrollByUnits %W h 5}
     }
 }
 # tk::ScrollButtonDown --

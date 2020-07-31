@@ -1,23 +1,41 @@
 #initialize tof with these parameters
   dev_mode: 0
-  mod_freq: 12000000
+  mod_freq: 100000000
   format: 2
-  power_percent: 60
+# power_percent: 60
   fps: 20
-  intg_us: 700
+  intg_us: 800
   sync_delay: 0
-
+  srow: 0
+  scol: 0
+  erow: 480
+  ecol: 640
 #camera parameter
-  cx: 162.00374
-  cy: 110.05493
-  fx: 319.33169
-  fy: 319.25846
   scale: 1.0
-
+# wide FOV
+#  cx: 157.262
+#  cy: 122.083
+#  fx: 210.783
+#  fy: 204.817
+#  dcoeff: [-0.378924, 0.145035, -0.000970854, 6.20728e-005, -0.0133954]
+  fx: 502.664416646093
+  fy: 501.636656805248
+  cx: 300.580418290497
+  cy: 236.897055251865
+  dcoeff: [-0.256998881568812, 0.0995395399959623, 0.0, 0.0, 0.0]
+#narrow FOV
+#  cx: 162.00374
+#  cy: 110.05493
+#  fx: 319.33169
+#  fy: 319.25846
+#  dcoeff: [-0.27131, 0.14523, -0.00099, 0.00032, 0.0]
 #image flip code:  0: 垂直翻转, 1: 水平翻转, -1: 水平垂直翻转转
 #翻转使能 enableflip 0:false,1:true
   enableflip: 0
   flipcode: 1
 
 #switch test mode(under test mode, you can see more information in terminal and images)
-  testmode: FALSE
+  testmode: false
+#oni_file setting
+#oni file name with full path example:
+#oni_file: /home/u/tmp/dmrep_20200731_114024_100MHz_lens_gradient.oni1
