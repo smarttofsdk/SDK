@@ -1,6 +1,6 @@
 #initialize tof with these parameters
   dev_mode: 0
-  mod_freq: 100000000
+  mod_freq: 360000000
   format: 2
 # power_percent: 60
   fps: 20

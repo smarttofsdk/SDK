@@ -516,28 +516,25 @@ void TofHandle::publicImage(void) //pub_image in SDK1.72
     {
         printf(" unmatch pixcnt: %d, HxW: %dx%d\n", pix_cnt, m_height, m_width);
     }
-    /*
-    const dmcam_lens_calib_cfg_t* temp = dmcam_lens_calib_config_get(m_dev);
-    if(temp->en_2d_calib)
+    //publish point cloud
+    publicPointCloud(m_rbgBuffer);
+
+    const dmcam_lens_calib_cfg_t* cfg = dmcam_lens_calib_config_get(m_dev);
+    if cfg->en_2d_calib)
     {   
         int dst_len = m_width * m_height;
-        float *m_rbgBuffer_temp = new float[m_width*m_height];
-        memcpy(m_rbgBuffer_temp, m_rbgBuffer, sizeof(float)*m_width*m_height);
-        dmcam_lens_calib_apply_dist_f32(m_dev, m_rbgBuffer, dst_len, (const float *)m_rbgBuffer_temp, dst_len, &m_frameInfo.frame_info, NULL);
-        delete(m_rbgBuffer_temp);
+        float *m_rbgBuffer cfg = new float[m_width*m_height];
+        memcpy(m_rbgBuffer cfg, m_rbgBuffer, sizeof(float)*m_width*m_height);
+        dmcam_lens_calib_apply_dist_f32(m_dev, m_rbgBuffer, dst_len, (const float *)m_rbgBuffer cfg, dst_len, &m_frameInfo.frame_info, NULL);
+        delete(m_rbgBuffer cfg);
     }
-    //publish point cloud
     cv::Mat img_dist(m_height, m_width, CV_32FC1, m_rbgBuffer);
     cv::Mat img_dist_rectified = cv::Mat::zeros(m_height, m_width,CV_32FC1);
     if (m_enbaleFlip)cv::flip(img_dist, img_dist, m_flipCode);
-    undistort(img_dist, img_dist_rectified,cameraMatrix, distCoeffs,cameraMatrix);
     if (pix_cnt != m_height * m_width)
     {
         printf(" unmatch pixcnt: %d, HxW: %dx%d\n", pix_cnt, m_height, m_width);
     }
-    */
-    publicPointCloud(m_rbgBuffer);
-
     //publish image dist
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg; // message to be sent
@@ -546,22 +543,21 @@ void TofHandle::publicImage(void) //pub_image in SDK1.72
     cv::Mat img_dist_rgb(m_height, m_width, CV_8UC3, dist_pseudo_rgb);
     cv::Mat img_dist_rgb_rect;
     img_dist_rgb_rect=img_dist_rgb.clone();
-    //cv::undistort(img_dist_rgb, img_dist_rgb_rect,cameraMatrix, distCoeffs,cameraMatrix);
     img_bridge = cv_bridge::CvImage(m_imgHeadMsg, sensor_msgs::image_encodings::RGB8, img_dist_rgb_rect);
     img_bridge.toImageMsg(img_msg);
     m_imageDistPub.publish(img_msg);
 
     // publish image_gray
     dmcam_frame_get_gray(m_dev, m_rbgBuffer, m_width * m_height, m_frameBuffer, m_frameInfo.frame_info.frame_size, &m_frameInfo.frame_info);
-    /*
-    if(temp->en_2d_calib)
+    
+    if cfg->en_2d_calib)
     {   
         int gray_len = m_width * m_height;
-        float *m_rbgBuffer_temp = new float[m_width*m_height];
-        memcpy(m_rbgBuffer_temp, m_rbgBuffer, sizeof(float)*m_width*m_height);
-        dmcam_lens_calib_apply_gray_f32(m_dev, m_rbgBuffer, gray_len, (const float *)m_rbgBuffer_temp, gray_len, &m_frameInfo.frame_info, NULL);
-        delete(m_rbgBuffer_temp);
-    }*/
+        float *m_rbgBuffer cfg = new float[m_width*m_height];
+        memcpy(m_rbgBuffer cfg, m_rbgBuffer, sizeof(float)*m_width*m_height);
+        dmcam_lens_calib_apply_gray_f32(m_dev, m_rbgBuffer, gray_len, (const float *)m_rbgBuffer cfg, gray_len, &m_frameInfo.frame_info, NULL);
+        delete(m_rbgBuffer cfg);
+    }
     cv::Mat img_gray(m_height, m_width, CV_32FC1, m_rbgBuffer);
     //image flip code  0 : 垂直翻转, 1 : 水平翻转, -1 : 水平垂直翻转转
     if (m_enbaleFlip)cv::flip(img_gray, img_gray, m_flipCode);
@@ -763,7 +759,7 @@ bool TofHandle::changeFilter(dmcam_ros::change_filter::Request& req, dmcam_ros::
     switch (filter_type)
     {
     case DMCAM_FILTER_ID_LEN_CALIB:
-        std::cout<<"change_filter_id is 1111";
+        std::cout<<"change_filter_id is DMCAM_FILTER_ID_LEN_CALIB";
         dmcam_filter_enable(m_dev, DMCAM_FILTER_ID_LEN_CALIB, &filter_args, sizeof(filter_args));
         break;
     case DMCAM_FILTER_ID_PIXEL_CALIB:
