@@ -1,5 +1,79 @@
 
 
+# SDK Version: 1.81.4
+
+## Release date: 2020/07/08
+
+### DMCAM library
+
+- #### **API change**
+
+  - New: dmcam_dev_get_info
+    - get device readonly information including vendor/product string, serial, version, calibration, lens 
+  - New: dmcam_lens_calib_config_set
+    - set config related with lens calibration
+  - New: dmcam_lens_calib_config_get
+    - get config of lens calibration
+  - New: dmcam_lens_param_get
+    - get lens calibration data from calibration data
+  - New: dmcam_lens_param_filename
+    - get lens parameter filename
+  - New: dmcam_lens_calib_apply_dist_f32
+    - apply lens calibration (if have) on specified distance image (dist in float), and output distance in camera coordinate. 
+     - The behavior of this function is controlled by dmcam_lens_calib_config_set.
+        - en_2d_calib: decide whether to apply 2d undistortion using camera intrinsics
+        - en_3d_calib: decide whether to apply 3d undistortion(gradient) using 3d calibration coefficients.
+   - New: dmcam_lens_calib_apply_dist_u16
+      - apply lens calibration (if have) on specified distance image (dist in uint16), and output distance in camera coordinate. 
+      - The behavior of this function is controlled by dmcam_lens_calib_config_set
+         - en_2d_calib: decide whether to apply 2d undistortion using camera intrinsics
+         - en_3d_calib: decide whether to apply 3d undistortion(gradient) using 3d calibration coefficients
+   - New: dmcam_lens_calib_apply_gray_f32
+      - apply lens calibration (if have) on specified gray (intensity) image (pixel in float), and output with lens 2d undistorted image 
+      - The behavior of this function is controlled by dmcam_lens_calib_config_set.
+         -  en_2d_calib: decide whether to apply 2d undistortion using camera intrinsics. if false, this function just copy src to dst
+   - New: dmcam_lens_calib_apply_gray_u16
+      - apply lens calibration (if have) on specified gray (intensity) image (pixel in uint16), and output with lens 2d undistorted image 
+      - The behavior of this function is controlled by dmcam_lens_calib_config_set.
+         - en_2d_calib: decide whether to apply 2d undistortion using camera intrinsics. if false, this function just copy src to dst
+
+ - **Main features:**
+
+    - imx: support multiple physical calibration plane data (calib file ver >= 142)
+    - Support to parse and apply temperature calibration data
+    - Support 2d calibration of lens with non-5 distortion coefficients
+
+- **BUG fix:**
+
+  - IMX hdr calculation part threshold adjustment
+  - Fix _cal_load_calib_data scan frequency list return value error
+  - Fix sw/smarttof/libdmcam#5 by flush frame buffer in dmcam_dev_cap_start and dmcam_dev_cap_stop
+  - Fix dmcam_frame_seek return value error (1 larger than normal)
+
+### Tools
+
+- **SmartTOFViewer**
+  - [**Enhance**]Optimize HDR interface logic
+  - [**New**]Add inv_dist to advanced parameters for manual calibration
+  - [**New**]Add PCL pseudo color rendering mode
+  - [**New**]Add mouse to click on a fixed area, display information, support up, down, left and right keys to move the point of interest
+  - [**New**]Increase video down sampling support
+  - [**Bug fix**]Fix exposure time update during video playback
+- **SmartTOFCli**
+  - [**Enhance**]Simplify cap -p boundary judgment code
+  - [**Enhance**]Synchronize the latest dmcam api changes
+  - [**Enhance**]VPU upgrade command modification
+  - [**Enhance**]Optimize print command printing
+  - [**Bug fix**]Fix the problem of invalid -d command, increase the frequency query of cap recording logs
+  - [**New**]Support deleting calibration data
+
+### ROS
+
+- Fixes the compilation error in the latest sdk
+- Fix the compilation error in ubuntu18.04 melodic version
+
+
+
 # SDK Version: 1.80.4
 
 ## Release date: 2019/12/2
