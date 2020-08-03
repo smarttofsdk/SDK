@@ -520,13 +520,13 @@ void TofHandle::publicImage(void) //pub_image in SDK1.72
     publicPointCloud(m_rbgBuffer);
 
     const dmcam_lens_calib_cfg_t* cfg = dmcam_lens_calib_config_get(m_dev);
-    if cfg->en_2d_calib)
-    {   
+    if (cfg->en_2d_calib)
+    {
         int dst_len = m_width * m_height;
-        float *m_rbgBuffer cfg = new float[m_width*m_height];
-        memcpy(m_rbgBuffer cfg, m_rbgBuffer, sizeof(float)*m_width*m_height);
-        dmcam_lens_calib_apply_dist_f32(m_dev, m_rbgBuffer, dst_len, (const float *)m_rbgBuffer cfg, dst_len, &m_frameInfo.frame_info, NULL);
-        delete(m_rbgBuffer cfg);
+        float *m_rbgBufferTmp = new float[m_width*m_height];
+        memcpy(m_rbgBufferTmp, m_rbgBuffer, sizeof(float)*m_width*m_height);
+        dmcam_lens_calib_apply_dist_f32(m_dev, m_rbgBuffer, dst_len, (const float *)m_rbgBufferTmp, dst_len, &m_frameInfo.frame_info, NULL);
+        delete(m_rbgBufferTmp);
     }
     cv::Mat img_dist(m_height, m_width, CV_32FC1, m_rbgBuffer);
     cv::Mat img_dist_rectified = cv::Mat::zeros(m_height, m_width,CV_32FC1);
@@ -550,13 +550,13 @@ void TofHandle::publicImage(void) //pub_image in SDK1.72
     // publish image_gray
     dmcam_frame_get_gray(m_dev, m_rbgBuffer, m_width * m_height, m_frameBuffer, m_frameInfo.frame_info.frame_size, &m_frameInfo.frame_info);
     
-    if cfg->en_2d_calib)
-    {   
+    if (cfg->en_2d_calib)
+    {
         int gray_len = m_width * m_height;
-        float *m_rbgBuffer cfg = new float[m_width*m_height];
-        memcpy(m_rbgBuffer cfg, m_rbgBuffer, sizeof(float)*m_width*m_height);
-        dmcam_lens_calib_apply_gray_f32(m_dev, m_rbgBuffer, gray_len, (const float *)m_rbgBuffer cfg, gray_len, &m_frameInfo.frame_info, NULL);
-        delete(m_rbgBuffer cfg);
+        float *m_rbgBufferTmp = new float[m_width*m_height];
+        memcpy(m_rbgBufferTmp, m_rbgBuffer, sizeof(float)*m_width*m_height);
+        dmcam_lens_calib_apply_gray_f32(m_dev, m_rbgBuffer, gray_len, (const float *)m_rbgBufferTmp, gray_len, &m_frameInfo.frame_info, NULL);
+        delete(m_rbgBufferTmp);
     }
     cv::Mat img_gray(m_height, m_width, CV_32FC1, m_rbgBuffer);
     //image flip code  0 : 垂直翻转, 1 : 水平翻转, -1 : 水平垂直翻转转
@@ -564,7 +564,6 @@ void TofHandle::publicImage(void) //pub_image in SDK1.72
     img_gray.convertTo(img_gray,CV_8UC1);
     cv::Mat img_gray_rectified;
     img_gray_rectified=img_gray.clone();
-    //cv::undistort(img_gray, img_gray_rectified,cameraMatrix, distCoeffs);
     if(m_testMode)
     {
         cv::imshow("img gray", img_gray_rectified);
@@ -698,11 +697,12 @@ bool TofHandle::changeFrameRate(dmcam_ros::change_frame_rate::Request& req, dmca
 
 bool TofHandle::changeModFreq(dmcam_ros::change_mod_freq::Request& req, dmcam_ros::change_mod_freq::Response& res)
 {
-    m_modFreq = req.mod_freq_value;     m_modFreq1 = req.mod_freq_value1;
+    m_modFreq = req.mod_freq_value;
+    m_modFreq1 = req.mod_freq_value1;
     dmcam_param_item_t reset_mod_freq;
     memset(&reset_mod_freq, 0, sizeof(reset_mod_freq));
-    if(m_modFreq1==0 || m_modFreq1 <= m_modFreq){
-        std::cout<<"change_filter_id is 1111";
+    if(m_modFreq1==0){
+        std::cout<<"change_filter_id is changeModFreq";
         dmcam_param_item_t wparam;
         memset(&wparam,0,sizeof(wparam));
         wparam.param_id = PARAM_FRAME_FORMAT;
@@ -714,7 +714,7 @@ bool TofHandle::changeModFreq(dmcam_ros::change_mod_freq::Request& req, dmcam_ro
         reset_mod_freq.param_val_len = sizeof(m_modFreq);
     }
     else{
-        std::cout<<"change_filter_id is 1112";
+        std::cout<<"change_filter_id is change dual ModFreq";
         dmcam_param_item_t wparam;
         memset(&wparam,0,sizeof(wparam));
         wparam.param_id = PARAM_FRAME_FORMAT;
@@ -726,7 +726,6 @@ bool TofHandle::changeModFreq(dmcam_ros::change_mod_freq::Request& req, dmcam_ro
         reset_mod_freq.param_val.dual_freq.mod_freq1 = m_modFreq1;
         reset_mod_freq.param_val_len = 2*sizeof(m_modFreq);
     }
-    std::cout<<"change_filter_id is 2222"<<std::endl;
     res.mod_freq_new_value = m_modFreq; res.mod_freq_new_value1 = m_modFreq1;
     return changeParameters(reset_mod_freq);
 }
