@@ -3,3 +3,4 @@ matplotlib
 pygame
 PyQt5
 pyqtgraph
+open3d

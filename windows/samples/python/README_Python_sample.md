@@ -91,3 +91,11 @@
   
   ~~~
 
+## sample_open3d_pclviewer.py
+
+​	通过采集模组的数据，通过点云的方式显示出来，仅支持64bit的python，单独安装命令为
+
+```
+pip install open3d
+```
+
